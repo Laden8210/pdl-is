@@ -1,11 +1,12 @@
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
+
+// TODO: Refactor this to use a configuration file or context for dynamic navigation items.
+
 
 const mainNavItems: NavItem[] = [
     {
@@ -13,17 +14,39 @@ const mainNavItems: NavItem[] = [
         href: '/dashboard',
         icon: LayoutGrid,
     },
-];
-
-const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
+        title: 'PDL Transfer',
+        href: '/pdl-transfer',
         icon: Folder,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
+        title: 'PDL Information',
+        href: '/pdl-information',
+        icon: Folder,
+    },
+    {
+        title: 'PDL Cell Assignment',
+        href: '/pdl-cell-assignment',
+        icon: Folder,
+    },
+    {
+        title: 'Court Order',
+        href: '/court-order',
+        icon: Folder,
+    },
+    {
+        title: 'Case Information',
+        href: '/case-information',
+        icon: Folder,
+    },
+    {
+        title: 'Medical Record',
+        href: '/medical-record',
+        icon: BookOpen,
+    },
+    {
+        title: 'Health Assessment',
+        href: '/health-assessment',
         icon: BookOpen,
     },
 ];
@@ -36,7 +59,7 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href="/dashboard" prefetch>
-                                <AppLogo />
+                                <AppLogo imageUrl="/images/user.jpg" name="John Doe" role="Administrator" />
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -46,11 +69,6 @@ export function AppSidebar() {
             <SidebarContent>
                 <NavMain items={mainNavItems} />
             </SidebarContent>
-
-            <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
-                <NavUser />
-            </SidebarFooter>
         </Sidebar>
     );
 }

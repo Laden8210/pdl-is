@@ -19,10 +19,8 @@ const setCookie = (name: string, value: string, days = 365) => {
     document.cookie = `${name}=${value};path=/;max-age=${maxAge};SameSite=Lax`;
 };
 
-const applyTheme = (appearance: Appearance) => {
-    const isDark = appearance === 'dark' || (appearance === 'system' && prefersDark());
-
-    document.documentElement.classList.toggle('dark', isDark);
+const applyTheme = (_appearance: Appearance) => {
+    document.documentElement.classList.remove('dark');
 };
 
 const mediaQuery = () => {
