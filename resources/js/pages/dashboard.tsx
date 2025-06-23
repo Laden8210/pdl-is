@@ -2,23 +2,22 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
+const quarterlyData = [
+    { name: 'Sentence', value: 62 },
+    { name: 'Parole', value: 58 },
+    { name: 'Positive', value: 21 },
+    { name: 'Negative', value: 10 },
+];
 
-import { Button } from '@/components/ui/button';
+const populationData = [
+    { name: 'Male', value: 300 },
+    { name: 'Female', value: 187 },
+];
 
+const COLORS = ['#4f46e5', '#a855f7'];
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
@@ -26,112 +25,116 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// <Dialog>
-//     <DialogTrigger asChild>
-//         <Button variant="outline" className="mt-4 w-full">
-//             Show Message
-//         </Button>
-//     </DialogTrigger>
-//     <DialogContent>
-//         <DialogHeader>
-//             <DialogTitle>Welcome!</DialogTitle>
-//             <DialogDescription>
-//                 This is a placeholder for the login functionality.
-//             </DialogDescription>
-//         </DialogHeader>
-//         <DialogFooter>
-//             <DialogClose asChild>
-//                 <Button>Close</Button>
-//             </DialogClose>
-//         </DialogFooter>
-//     </DialogContent>
-// </Dialog>
 export default function Dashboard() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                {/* Header section with Add button */}
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold">Item List</h2>
+            <div className="flex flex-col gap-6 p-4">
+                <h1 className="text-2xl font-bold">Dashboard</h1>
 
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button variant="default">Add Item</Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Add New Item</DialogTitle>
-                                <DialogDescription>Fill in the item details.</DialogDescription>
-                            </DialogHeader>
-                            <div className="py-2 space-y-2 text-sm">
-                                <Label htmlFor="item-name">Item Name</Label>
-                                <Input id="item-name" placeholder="Enter item name" />
-                                <Label htmlFor="item-description">Description</Label>
-                                <Input id="item-description" placeholder="Enter item description" />
-                                <Label htmlFor="item-price">Price</Label>
-                                <Input id="item-price" placeholder="Enter item price" />
-                                <Label htmlFor="item-quantity">Quantity</Label>
-                                <Input id="item-quantity" placeholder="Enter item quantity" />
+                {/* Top Stats */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-sm text-muted-foreground">Total Inmate Population</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center justify-between gap-4">
+                                {/* Left: Total number */}
+                                <div>
+                                    <p className="text-3xl font-bold">487</p>
+                                    <p className="mt-1 text-sm text-muted-foreground">Total Inmates</p>
+                                </div>
+
+                                {/* Right: Pie Chart */}
+                                <div className="h-[80px] w-[80px]">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie data={populationData} innerRadius={20} outerRadius={40} paddingAngle={2} dataKey="value">
+                                                {populationData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </div>
-                            <DialogFooter>
-                                <Button type="submit">Save</Button>
-                                <DialogClose asChild>
-                                    <Button variant="ghost">Cancel</Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-sm text-muted-foreground">Quarterly Inmate Status Reports</CardTitle>
+                        </CardHeader>
+
+                        <CardContent>
+                            <div className="flex items-start justify-between gap-4">
+                                {/* Left: Summary Text */}
+                                <div className="flex-1 space-y-1 text-sm">
+                                    <p>• Sentence Progression: 62% complete</p>
+                                    <p>• Parole Eligibility: 58 inmates eligible</p>
+                                    <p>• Behavioral Remarks: 21 positive, 10 negative</p>
+                                </div>
+
+                                {/* Right: Bar Chart */}
+                                <div className="h-32 w-48">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={quarterlyData}>
+                                            <XAxis dataKey="name" fontSize={10} hide />
+                                            <YAxis fontSize={10} hide />
+                                            <Tooltip />
+                                            <Bar dataKey="value" fill="#4f46e5" radius={[4, 4, 0, 0]} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-sm text-muted-foreground">Drug Clearing Status</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-1 text-sm">
+                            <p>
+                                Cleared: <strong>135</strong>
+                            </p>
+                            <p>
+                                Pending: <strong>54</strong>
+                            </p>
+                        </CardContent>
+                    </Card>
                 </div>
 
-                {/* Full-width table */}
-                <div className="w-full">
-                    <Table className="w-full">
-                        <TableCaption>A list of items.</TableCaption>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Item</TableHead>
-                                <TableHead>Description</TableHead>
-                                <TableHead>Price</TableHead>
-                                <TableHead>Quantity</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            <TableRow>
-                                <TableCell>Item 1</TableCell>
-                                <TableCell>Sample description for item 1.</TableCell>
-                                <TableCell>$10.00</TableCell>
-                                <TableCell>100</TableCell>
-                                <TableCell>Available</TableCell>
-                                <TableCell className="flex items-center gap-2">
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button variant="outline" size="sm">View</Button>
-                                        </DialogTrigger>
-                                        <DialogContent>
-                                            <DialogHeader>
-                                                <DialogTitle>Item Details</DialogTitle>
-                                                <DialogDescription>Sample description for item 1.</DialogDescription>
-                                            </DialogHeader>
-                                            <div className="py-2 text-sm space-y-1">
-                                                <p><strong>Price:</strong> $10.00</p>
-                                                <p><strong>Quantity:</strong> 100</p>
-                                                <p><strong>Status:</strong> Available</p>
-                                            </div>
-                                            <DialogFooter>
-                                                <DialogClose asChild>
-                                                    <Button variant="ghost">Close</Button>
-                                                </DialogClose>
-                                            </DialogFooter>
-                                        </DialogContent>
-                                    </Dialog>
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
+                {/* Middle Section */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-sm text-muted-foreground">Monthly Drug-related Cases</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-1 text-sm">
+                            <p>• New Admissions: 29 inmates</p>
+                            <p>• Rehab Program Completed: 9 inmates</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-sm text-muted-foreground">Upcoming Activities</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-1 text-sm">
+                            <p>
+                                <strong>10:00 AM</strong> – PDL Transfer
+                            </p>
+                            <p>
+                                <strong>02:00 PM</strong> – Hearing
+                            </p>
+                            <p>
+                                <strong>03:00 PM</strong> – System Update
+                            </p>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </AppLayout>
