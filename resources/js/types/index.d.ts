@@ -34,22 +34,25 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
-export interface CurrentUser {
-    fname: string;
-    lname: string;
-    position: string;
-    avatar: string | null;
+
+export interface PageProps extends InertiaPageProps {
+  auth: {
+    user: User | null;
+  };
+  errors: Record<string, string>;
+  success?: string;
 }
-export interface PageProps {
-    auth: {
-        user: {
-            id: number;
-            fname: string;
-            lname: string;
-            username: string;
-            position: string;
-            avatar: string | null;
-        } | null;
-    };
-    errors: Record<string, string>;
-}
+
+
+export type Personnel = {
+  id: number;
+  fname: string;
+  mname: string | null;
+  lname: string;
+  contactnum: string;
+  avatar: string | null;
+  username: string;
+  password: string;
+  position: string;
+  agency: string;
+};

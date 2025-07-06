@@ -1,10 +1,14 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { DataTable } from '@/components/data-table';
+import { PaginationControls } from '@/components/pagination-controls';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Personnel } from '@/types';
+import { useState } from 'react';
+import { user_columns } from '@/features/user-management/user-columns';
 
 import {
     Dialog,
@@ -18,6 +22,7 @@ import {
 } from '@/components/ui/dialog';
 
 import { Button } from '@/components/ui/button';
+import { CreateUser } from '@/features/user-management/create-user';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -26,88 +31,70 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// <Dialog>
-//     <DialogTrigger asChild>
-//         <Button variant="outline" className="mt-4 w-full">
-//             Show Message
-//         </Button>
-//     </DialogTrigger>
-//     <DialogContent>
-//         <DialogHeader>
-//             <DialogTitle>Welcome!</DialogTitle>
-//             <DialogDescription>
-//                 This is a placeholder for the login functionality.
-//             </DialogDescription>
-//         </DialogHeader>
-//         <DialogFooter>
-//             <DialogClose asChild>
-//                 <Button>Close</Button>
-//             </DialogClose>
-//         </DialogFooter>
-//     </DialogContent>
-// </Dialog>
 export default function List() {
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+    const { users, filters } = usePage().props as unknown as {
+        users: {
+            data: Personnel[];
+            current_page: number;
+            last_page: number;
+        };
+        filters: {
+            search: string;
+        };
+    };
 
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                {/* Header section with Add button */}
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold">Item List</h2>
+    const [searchInput, setSearchInput] = useState(filters.search || '');
 
+    const handleSearch = () => {
+        router.get('/admin/user-management', { search: searchInput }, { preserveState: true });
+    };
 
-                </div>
+  return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="User Management" />
 
-                {/* Full-width table */}
-                <div className="w-full">
-                    <Table className="w-full">
-                        <TableCaption>A list of items.</TableCaption>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Item</TableHead>
-                                <TableHead>Description</TableHead>
-                                <TableHead>Price</TableHead>
-                                <TableHead>Quantity</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            <TableRow>
-                                <TableCell>Item 1</TableCell>
-                                <TableCell>Sample description for item 1.</TableCell>
-                                <TableCell>$10.00</TableCell>
-                                <TableCell>100</TableCell>
-                                <TableCell>Available</TableCell>
-                                <TableCell className="flex items-center gap-2">
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button variant="outline" size="sm">View</Button>
-                                        </DialogTrigger>
-                                        <DialogContent>
-                                            <DialogHeader>
-                                                <DialogTitle>Item Details</DialogTitle>
-                                                <DialogDescription>Sample description for item 1.</DialogDescription>
-                                            </DialogHeader>
-                                            <div className="py-2 text-sm space-y-1">
-                                                <p><strong>Price:</strong> $10.00</p>
-                                                <p><strong>Quantity:</strong> 100</p>
-                                                <p><strong>Status:</strong> Available</p>
-                                            </div>
-                                            <DialogFooter>
-                                                <DialogClose asChild>
-                                                    <Button variant="ghost">Close</Button>
-                                                </DialogClose>
-                                            </DialogFooter>
-                                        </DialogContent>
-                                    </Dialog>
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </div>
-            </div>
-        </AppLayout>
-    );
+      <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">User Management</h1>
+            <p className="text-sm text-muted-foreground">
+              Manage your users and their permissions.
+            </p>
+          </div>
+
+          <CreateUser />
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <Label htmlFor="search" className="text-sm font-medium">
+            Search Users
+          </Label>
+          <Input
+            id="search"
+            placeholder="Search by name or username"
+            className="w-64"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+          />
+          <Button variant="outline" onClick={handleSearch}>Search</Button>
+        </div>
+
+        <div className="w-full">
+          <DataTable columns={user_columns} data={users.data} />
+          <PaginationControls
+            page={users.current_page}
+            totalPages={users.last_page}
+            onPageChange={(newPage) =>
+              router.get('/admin/user-management', {
+                search: filters.search,
+                page: newPage,
+              }, { preserveState: true })
+            }
+          />
+        </div>
+      </div>
+    </AppLayout>
+  );
+
 }

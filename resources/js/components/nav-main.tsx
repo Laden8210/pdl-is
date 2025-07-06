@@ -1,12 +1,16 @@
 import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import type { PageProps } from '@/types';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
-export function NavMain({ items = [], position }: { items: NavItem[]; position: string }) {
+
+export function NavMain({ items = [] }: { items: NavItem[] }) {
     const page = usePage();
     const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({});
+    const { props } = usePage<PageProps>();
+    const user = props.auth.user;
 
     const toggleDropdown = (title: string) => {
         setOpenDropdowns((prev) => ({
@@ -19,12 +23,11 @@ export function NavMain({ items = [], position }: { items: NavItem[]; position: 
         <SidebarGroup className="px-2 py-0">
             <SidebarMenu className="mt-2">
                 {items
-                    .filter((item) => !item.userType || item.userType === position)
+                    .filter((item) => !item.userType || item.userType === user?.position)
                     .map((item) => {
                         const hasChildren = item.children && item.children.length > 0;
                         const isDropdownOpen =
-                            openDropdowns[item.title] ||
-                            (hasChildren && item.children?.some((child) => page.url.startsWith(child.href ?? "")));
+                            openDropdowns[item.title] || (hasChildren && item.children?.some((child) => page.url.startsWith(child.href ?? '')));
 
                         return (
                             <div key={item.title}>

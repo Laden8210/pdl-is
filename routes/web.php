@@ -17,7 +17,14 @@ Route::get('/', [AuthController::class, 'index'])->name('home');
 Route::get('/admin/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
 
 Route::get('/admin/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management.index');
+Route::post('/admin/profile/update', [ProfileManagementController::class, 'update'])->name('admin.profile.update');
+
+
 Route::get('/admin/user-management', [UserManagementController::class, 'index'])->name('user-management.index');
+Route::get('/admin/user-management/create', [UserManagementController::class, 'create'])->name('user-management.create');
+Route::post('/admin/user-management', [UserManagementController::class, 'store'])->name('user-management.store');
+
+
 Route::get('/admin/court-hearing-calendar', [CourtHearingCalendarController::class, 'index'])->name('court-hearing.calendar');
 Route::get('/admin/verification', [VerificationController::class, 'index'])->name('verification.index');
 

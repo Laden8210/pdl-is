@@ -1,11 +1,13 @@
 import { NavMain } from '@/components/nav-main';
 import { Button } from '@/components/ui/button';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import type { CurrentUser } from '@/types';
+
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, Calculator, Calendar, FileSearch, LayoutGrid, Share2, User, UserCheck, Users } from 'lucide-react';
+import { Calendar, FileSearch, LayoutGrid, User, UserCheck, Users } from 'lucide-react';
 import AppLogo from './app-logo';
+
+import type { PageProps } from '@/types';
 
 const mainNavItems: NavItem[] = [
     {
@@ -106,7 +108,6 @@ const mainNavItems: NavItem[] = [
         userType: 'admin',
     },
 
-
     {
         title: 'PDL Management',
         icon: Calendar,
@@ -130,7 +131,6 @@ const mainNavItems: NavItem[] = [
         ],
     },
 
-
     {
         title: 'Report Management',
         icon: Calendar,
@@ -149,16 +149,16 @@ const mainNavItems: NavItem[] = [
         icon: Calendar,
         userType: 'admin',
     },
-
 ];
 
 export function AppSidebar() {
     const { props } = usePage<PageProps>();
-    const user = props.auth.user as CurrentUser | null;
+    const user = props.auth.user;
 
     const fullName = user ? `${user.fname} ${user.lname}` : 'Guest';
-    const position = user?.position ?? '';
-    const avatar = user?.avatar ?? '/images/default-avatar.jpg';
+    const position = user?.position ? user.position.charAt(0).toUpperCase() + user.position.slice(1) : '';
+    const avatar = user?.avatar ? `/storage/${user.avatar}` : '/images/default-avatar.jpg';
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -174,7 +174,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} position={user?.position ?? ''} />
+                <NavMain items={mainNavItems} />
             </SidebarContent>
 
             <SidebarFooter>

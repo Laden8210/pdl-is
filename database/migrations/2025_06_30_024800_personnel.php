@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('position');
             $table->string('agency');
+            $table->string('status')->default('active');
             $table->timestamps();
         });
     }
