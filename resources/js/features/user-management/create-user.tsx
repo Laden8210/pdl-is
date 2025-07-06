@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 
+
 export function CreateUser() {
     const avatarRef = useRef<HTMLInputElement>(null);
     const { props } = usePage<PageProps>();
