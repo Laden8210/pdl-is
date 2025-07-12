@@ -149,6 +149,56 @@ const mainNavItems: NavItem[] = [
         icon: Calendar,
         userType: 'admin',
     },
+
+    {
+        title: 'Law Enforcement Dashboard',
+        href: '/law-enforcement/dashboard',
+        icon: LayoutGrid,
+        userType: 'law-enforcement',
+    },
+
+    {
+        title: 'Profile Management',
+        href: '/law-enforcement/profile-management',
+        icon: UserCheck,
+        userType: 'law-enforcement',
+    },
+
+
+    {
+        title: 'PDL Management',
+        icon: Calendar,
+        userType: 'law-enforcement',
+        children: [
+            {
+                title: 'PDL Personal Information',
+                href: 'law-enforcement/pdl-management/personal-information',
+                icon: UserCheck,
+            },
+            {
+                title: 'Court Order',
+                href: 'law-enforcement/pdl-management/court-order',
+                icon: UserCheck,
+            },
+            {
+                title: 'Case Information',
+                href: 'law-enforcement/pdl-management/case-information',
+                icon: UserCheck,
+            },
+            {
+                title: 'Medical Records',
+                href: 'law-enforcement/pdl-management/medical-records',
+                icon: FileSearch,
+            },
+            {
+                title: 'Physical Characteristics',
+                href: 'law-enforcement/pdl-management/physical-characteristics',
+                icon: UserCheck,
+            }
+
+        ],
+    },
+
 ];
 
 export function AppSidebar() {

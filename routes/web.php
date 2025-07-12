@@ -23,6 +23,10 @@ Route::post('/admin/profile/update', [ProfileManagementController::class, 'updat
 Route::get('/admin/user-management', [UserManagementController::class, 'index'])->name('user-management.index');
 Route::get('/admin/user-management/create', [UserManagementController::class, 'create'])->name('user-management.create');
 Route::post('/admin/user-management', [UserManagementController::class, 'store'])->name('user-management.store');
+Route::get('/admin/pdl-management/personal-information', [PDLManagementController::class, 'personal_information'])->name('pdl-management.personal-information');
+Route::get('/admin/pdl-management/health-assessment', [PDLManagementController::class, 'health_assessment'])->name('pdl-management.health-assessment');
+Route::get('/admin/pdl-management/medical-records', [PDLManagementController::class, 'medical_records'])->name('pdl-management.medical-records');
+
 
 
 Route::get('/admin/court-hearing-calendar', [CourtHearingCalendarController::class, 'index'])->name('court-hearing.calendar');
@@ -38,5 +42,18 @@ Route::get('/record-officer/pdl-management/personal-information', [PDLManagement
 Route::get('/record-officer/pdl-management/health-assessment', [PDLManagementController::class, 'health_assessment'])->name('pdl-management.health-assessment');
 Route::get('/record-officer/pdl-management/medical-records', [PDLManagementController::class, 'medical_records'])->name('pdl-management.medical-records');
 
+
+// Law Enforcement Routes
+Route::get('/law-enforcement/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management.index');
+Route::get('/law-enforcement/dashboard', [AuthController::class, 'dashboard'])->name('dashboard.law-enforcement');
+Route::get('/law-enforcement/pdl-management/personal-information', [PDLManagementController::class, 'personal_information'])->name('pdl-management.personal-information');
+
+
+Route::get('/law-enforcement/pdl-management/court-order', [PDLManagementController::class, 'court_order'])->name('pdl-management.court-order');
+Route::get('/law-enforcement/pdl-management/case-information', [PDLManagementController::class, 'case_information'])->name('pdl-management.case-information');
+Route::get('/law-enforcement/pdl-management/medical-records', [PDLManagementController::class, 'medical_records'])->name('pdl-management.medical-records');
+
+Route::post('/pdl-management/create', [PDLManagementController::class, 'create'])->name('pdl-management.create');
+Route::put('/pdl-management/{pdl}', [PDLManagementController::class, 'update'])->name('pdl-management.update');
 
 require __DIR__.'/auth.php';

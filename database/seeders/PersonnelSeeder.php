@@ -15,32 +15,48 @@ class PersonnelSeeder extends Seeder
     public function run(): void
     {
         DB::table('personnel')->insert([
+            // [
+            //     'fname' => 'John',
+            //     'mname' => 'A.',
+            //     'lname' => 'Doe',
+            //     'contactnum' => '09171234567',
+            //     'avatar' => null,
+            //     'username' => 'johndoe',
+            //     'password' => Hash::make('password123'),
+            //     'position' => 'record-officer',
+            //     'agency' => 'LGU Buenavista',
+            //     'created_at' => now(),
+            //     'updated_at' => now(),
+            // ],
+            // [
+            //     'fname' => 'Jane',
+            //     'mname' => 'B.',
+            //     'lname' => 'Smith',
+            //     'contactnum' => '09179876543',
+            //     'avatar' => null,
+            //     'username' => 'janesmith',
+            //     'password' => Hash::make('securepass'),
+            //     'position' => 'admin',
+            //     'agency' => 'LGU Buenavista',
+            //     'created_at' => now(),
+            //     'updated_at' => now(),
+            // ],
+
             [
-                'fname' => 'John',
-                'mname' => 'A.',
-                'lname' => 'Doe',
-                'contactnum' => '09171234567',
+                'fname' => 'Alice',
+                'mname' => 'C.',
+                'lname' => 'Johnson',
+                'contactnum' => '09172345678',
                 'avatar' => null,
-                'username' => 'johndoe',
-                'password' => Hash::make('password123'),
-                'position' => 'record-officer',
+                'username' => 'alicejohnson',
+                'password' => Hash::make('alicepass'),
+                'position' => 'law-enforcement',
                 'agency' => 'LGU Buenavista',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            [
-                'fname' => 'Jane',
-                'mname' => 'B.',
-                'lname' => 'Smith',
-                'contactnum' => '09179876543',
-                'avatar' => null,
-                'username' => 'janesmith',
-                'password' => Hash::make('securepass'),
-                'position' => 'admin',
-                'agency' => 'LGU Buenavista',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+
+
         ]);
     }
 }

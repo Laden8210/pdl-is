@@ -3,7 +3,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'PDL Management',
@@ -11,17 +11,37 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button";
+import { format } from 'date-fns';
+import { EditPersonalInformation } from '@/features/pdl-management/edit-pdl-personal-information';
+
+interface PageProps {
+    pdls: {
+        id: number;
+        fname: string;
+        lname: string;
+        alias: string | null;
+        birthdate: string;
+        age: number;
+        gender: string | null;
+        ethnic_group: string | null;
+        civil_status: string | null;
+        brgy: string | null;
+        city: string | null;
+        province: string | null;
+        personnel: {
+            fname: string;
+            lname: string;
+        } | null;
+    }[];
+}
+
+import { CreatePersonalInformation } from '@/features/pdl-management/create-pdl-personal-information';
+import { usePage } from '@inertiajs/react';
 
 export default function PersonalInformation() {
+    const { props } = usePage<PageProps>();
+    const { pdls } = props;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Personal Information" />
@@ -30,70 +50,49 @@ export default function PersonalInformation() {
                 <h1 className="text-2xl font-bold">Personal Information</h1>
                 <Card>
                     <CardHeader>
-                        <CardTitle>Personal Information</CardTitle>
+                        <CardTitle>
+                            <div className="flex items-center justify-between">
+                                <span>Personal Information List</span>
+
+                                <CreatePersonalInformation />
+                            </div>
+                        </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <Table>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>ID</TableHead>
-
-                                    <TableHead>Name</TableHead>
+                                    <TableHead>Full Name</TableHead>
+                                    <TableHead>Alias</TableHead>
+                                    <TableHead>Gender</TableHead>
+                                    <TableHead>Ethnic Group</TableHead>
+                                    <TableHead>Civil Status</TableHead>
                                     <TableHead>Date of Birth</TableHead>
                                     <TableHead>Age</TableHead>
-                                     <TableHead>Address</TableHead>
-                                    <TableHead>Active</TableHead>
+                                    <TableHead>Address</TableHead>
+                                    <TableHead>Added By</TableHead>
                                     <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                <TableRow>
-                                    <TableCell>1</TableCell>
-                                    <TableCell>John Doe</TableCell>
-                                    <TableCell>01/01/1990</TableCell>
-                                    <TableCell>33</TableCell>
-                                    <TableCell>123 Main St</TableCell>
-                                    <TableCell>Yes</TableCell>
-                                    <TableCell>
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button variant="outline">Edit</Button>
-                                            </DialogTrigger>
-                                            <DialogContent>
-                                                <DialogHeader>
-                                                    <DialogTitle>Edit Personal Information</DialogTitle>
-                                                    <DialogDescription>
-                                                        Make changes to the personal information.
-                                                    </DialogDescription>
-                                                </DialogHeader>
-                                            </DialogContent>
-                                        </Dialog>
-                                    </TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell>2</TableCell>
-                                    <TableCell>Jane Smith</TableCell>
-                                    <TableCell>02/02/1992</TableCell>
-                                    <TableCell>31</TableCell>
-                                    <TableCell>456 Elm St</TableCell>
-                                    <TableCell>No</TableCell>
-                                    <TableCell>
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button variant="outline">Edit</Button>
-                                            </DialogTrigger>
-                                            <DialogContent>
-                                                <DialogHeader>
-                                                    <DialogTitle>Edit Personal Information</DialogTitle>
-                                                    <DialogDescription>
-                                                        Make changes to the personal information.
-                                                    </DialogDescription>
-                                                </DialogHeader>
-                                            </DialogContent>
-                                        </Dialog>
-                                    </TableCell>
-                                </TableRow>
-
+                                {pdls.map((pdl) => (
+                                    <TableRow key={pdl.id}>
+                                        <TableCell>{pdl.id}</TableCell>
+                                        <TableCell>{`${pdl.fname} ${pdl.lname}`}</TableCell>
+                                        <TableCell>{pdl.alias ?? '-'}</TableCell>
+                                        <TableCell>{pdl.gender ?? '-'}</TableCell>
+                                        <TableCell>{pdl.ethnic_group ?? '-'}</TableCell>
+                                        <TableCell>{pdl.civil_status ?? '-'}</TableCell>
+                                        <TableCell>{format(new Date(pdl.birthdate), 'MMMM dd, yyyy')}</TableCell>
+                                        <TableCell>{pdl.age}</TableCell>
+                                        <TableCell>{`${pdl.brgy ?? ''}, ${pdl.city ?? ''}, ${pdl.province ?? ''}`}</TableCell>
+                                        <TableCell>{pdl.personnel ? `${pdl.personnel.fname} ${pdl.personnel.lname}` : '—'}</TableCell>
+                                        <TableCell>
+                                            <EditPersonalInformation pdl={pdl} />
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
                             </TableBody>
                         </Table>
                     </CardContent>
