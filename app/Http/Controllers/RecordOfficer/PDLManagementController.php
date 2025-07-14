@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Requests\PDL\CreatePdlRequest;
 use Illuminate\Support\Facades\Auth;
-use App\Models\PDL;
+use App\Models\Pdl;
 
 class PDLManagementController extends Controller
 {
