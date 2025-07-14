@@ -44,7 +44,7 @@ class UserManagementController extends Controller
         $user->position = $data['position'];
         $user->contactnum = $data['contactNumber'];
         $user->agency = $data['agency'];
-        $user->status = 'active';
+        $user->status = 1;
         $user->username = $data['username'];
         $user->password = Hash::make($data['password']);
 
