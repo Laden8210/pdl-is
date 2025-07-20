@@ -7,26 +7,27 @@ import { Head, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { CreateMedicalRecord } from '@/features/pdl-management/create-medical-record';
-import { medical_record_columns } from '@/features/pdl-management/medical-record-columns';
-import { type BreadcrumbItem } from '@/types';
+import { case_information_columns } from '@/features/pdl-management/case-information-columns';
+import { CreateCaseInformation } from '@/features/pdl-management/create-case-information';
+import { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Medical Records',
-        href: '/medical-records',
+        title: 'Case Information Management',
+        href: '/case-information',
     },
 ];
 
-interface MedicalRecord {
-    medical_record_id: number;
+interface CaseInformation {
+    case_id: number;
+    case_number: string;
+    crime_committed: string;
+    date_committed: string;
+    time_committed: string;
+    case_status: string;
+    case_remarks: string;
+    security_classification: string;
     pdl_id: number;
-    complaint: string;
-    date: string;
-    prognosis: string;
-    laboratory: string;
-    prescription: string;
-    findings: string;
     pdl?: {
         fname: string;
         lname: string;
@@ -34,21 +35,22 @@ interface MedicalRecord {
 }
 
 interface PageProps {
-    records: MedicalRecord[];
-    pdls: any[];
+    cases: CaseInformation[];
+    pdls: any[]; // Adjust this type based on your Pdl model
     filters?: {
         search: string;
     };
 }
 
-export default function MedicalRecords() {
+export default function CaseInformation() {
     const { props } = usePage<PageProps>();
-    const { records, pdls, filters } = props;
+    const { cases, pdls, filters } = props;
 
+    // Safely handle undefined filters
     const [searchInput, setSearchInput] = useState(filters?.search || '');
 
     const handleSearch = () => {
-        router.get('/medical-records', {
+        router.get('/case-information', {
             search: searchInput,
         }, {
             preserveState: true,
@@ -64,27 +66,27 @@ export default function MedicalRecords() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Medical Records Management" />
+            <Head title="Case Information Management" />
 
             <div className="flex flex-col gap-6 p-4">
-                <h1 className="text-2xl font-bold">Medical Records</h1>
+                <h1 className="text-2xl font-bold">Case Information Management</h1>
                 <Card>
                     <CardHeader>
                         <CardTitle>
                             <div className="flex items-center justify-between">
-                                <span>Medical Records</span>
-                                <CreateMedicalRecord pdls={pdls} />
+                                <span>Case Information List</span>
+                                <CreateCaseInformation pdls={pdls} />
                             </div>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="mb-4 flex items-center space-x-4">
                             <Label htmlFor="search" className="text-sm font-medium">
-                                Search Records
+                                Search Cases
                             </Label>
                             <Input
                                 id="search"
-                                placeholder="Search by complaint, PDL name, findings, etc."
+                                placeholder="Search by case number, crime, PDL name, etc."
                                 className="w-64 md:w-96"
                                 value={searchInput}
                                 onChange={(e) => setSearchInput(e.target.value)}
@@ -95,7 +97,7 @@ export default function MedicalRecords() {
                             </Button>
                         </div>
 
-                        <DataTable data={records ?? []} columns={medical_record_columns} />
+                        <DataTable data={cases} columns={case_information_columns} />
                     </CardContent>
                 </Card>
             </div>

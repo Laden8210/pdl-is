@@ -22,7 +22,6 @@ export interface NavItem {
     isActive?: boolean;
     userType?: string;
     children?: NavItem[];
-
 }
 
 export interface SharedData {
@@ -34,25 +33,108 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
-
 export interface PageProps extends InertiaPageProps {
-  auth: {
-    user: User | null;
-  };
-  errors: Record<string, string>;
-  success?: string;
+    auth: {
+        user: User | null;
+    };
+    errors: Record<string, string>;
+    success?: string;
 }
 
-
 export type Personnel = {
-  id: number;
-  fname: string;
-  mname: string | null;
-  lname: string;
-  contactnum: string;
-  avatar: string | null;
-  username: string;
-  password: string;
-  position: string;
-  agency: string;
+    id: number;
+    fname: string;
+    mname: string | null;
+    lname: string;
+    contactnum: string;
+    avatar: string | null;
+    username: string;
+    password: string;
+    position: string;
+    agency: string;
 };
+
+export type CellAssignment = {
+    assignment_id: number;
+    cell_number: string;
+    cell_id: number;
+    pdl_id: number;
+    pdl_name: string;
+    assigned_date: string;
+};
+
+// types/index.ts
+export interface Cells {
+    cell_id: number;
+    cell_name: string;
+    capacity: number;
+    description?: string | null;
+    status: string;
+    created_at?: string;
+    updated_at?: string;
+    assignments?: CellAssignment[];
+    assignments_count?: number;
+}
+
+export interface Pdl {
+    id: number;
+    fname: string;
+    lname: string;
+    alias?: string | null;
+    birthdate: string;
+    age: number;
+    gender?: string | null;
+    ethnic_group?: string | null;
+    civil_status?: string | null;
+    brgy?: string | null;
+    city?: string | null;
+    province?: string | null;
+    personnel_id?: number | null;
+    created_at?: string;
+    updated_at?: string;
+    deleted_at?: string | null;
+}
+
+export interface CellAssignment {
+    assignment_id: number;
+    cell_id: number;
+    pdl_id: number;
+    created_at: string;
+    updated_at?: string;
+    cell?: Cells;
+    pdl?: Pdl;
+}
+
+export type CourtOrder = {
+    court_order_id: number;
+    court_order_number: string;
+    order_type: string;
+    order_date: string;
+    received_date: string;
+    remarks: string;
+    document_type: string;
+    court_branch: string;
+    pdl_id: number;
+    pdl?: Pdl;
+};
+
+export interface PhysicalCharacteristic {
+  characteristic_id: number;
+  pdl_id: number;
+  height: number;
+  weight: number;
+  build: string;
+  complexion: string;
+  hair_color: string;
+  eye_color: string;
+  identification_marks: string;
+  mark_location: string;
+  remark: string | null;
+  created_at?: string;
+  updated_at?: string;
+  pdl?: {
+    fname: string;
+    lname: string;
+    id: number;
+  };
+}

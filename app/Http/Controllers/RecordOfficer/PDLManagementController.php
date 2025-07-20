@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use App\Http\Requests\PDL\CreatePdlRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Pdl;
+use App\Models\CourtOrder;
 
 class PDLManagementController extends Controller
 {
@@ -28,6 +29,63 @@ class PDLManagementController extends Controller
     {
         return Inertia::render('records-officer/pdl-management/medical-records');
     }
+
+    public function court_order(Request $request)
+    {
+        $search = $request->input('search');
+        $perPage = $request->input('perPage', 10);
+
+        $pdls = Pdl::select('id', 'fname', 'lname', 'birthdate')->get();
+
+        $orders = CourtOrder::with('pdl:id,fname,lname')
+            ->when($search, function ($query, $search) {
+                $query->where('court_order_number', 'like', "%{$search}%")
+                    ->orWhere('order_type', 'like', "%{$search}%")
+                    ->orWhere('document_type', 'like', "%{$search}%")
+                    ->orWhere('court_branch', 'like', "%{$search}%")
+                    ->orWhereHas('pdl', function ($q) use ($search) {
+                        $q->where('fname', 'like', "%{$search}%")
+                            ->orWhere('lname', 'like', "%{$search}%");
+                    });
+            })
+            ->latest()
+            ->paginate($perPage);
+
+        return Inertia::render('records-officer/pdl-management/court-order', [
+            'courtOrders' => $orders->items(),
+            'pdls' => $pdls,
+            'filters' => [
+                'search' => $search,
+            ],
+            'pagination' => [
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'total' => $orders->total(),
+            ]
+        ]);
+    }
+
+    public function store_court_order(Request $request)
+    {
+        $validated = $request->validate([
+            'court_order_number' => 'required|string|max:255',
+            'order_type' => 'required|string|max:255',
+            'order_date' => 'required|date',
+            'received_date' => 'required|date',
+            'document_type' => 'required|string|max:255',
+            'court_branch' => 'required|string|max:255',
+            'pdl_id' => 'required|exists:pdl,id',
+            'remarks' => 'nullable|string',
+        ]);
+
+        CourtOrder::create($validated);
+
+        return redirect()->back()->with('success', 'Court order created successfully.');
+    }
+
+
+
+
 
     public function create(CreatePdlRequest $request)
     {

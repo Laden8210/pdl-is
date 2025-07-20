@@ -8,9 +8,13 @@ use App\Http\Controllers\Admin\ProfileManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\CourtHearingCalendarController;
 use App\Http\Controllers\Admin\VerificationController;
+use App\Http\Controllers\CaseInformationController;
 use App\Http\Controllers\RecordOfficer\PDLArchiveController;
 use App\Http\Controllers\RecordOfficer\JailEventsController;
 use App\Http\Controllers\RecordOfficer\PDLManagementController;
+use App\Http\Controllers\CellAssignmentController;
+use App\Http\Controllers\MedicalRecordController;
+use App\Http\Controllers\PhysicalCharacteristicController;
 
 Route::get('/', [AuthController::class, 'index'])->name('home');
 
@@ -27,6 +31,11 @@ Route::get('/admin/pdl-management/personal-information', [PDLManagementControlle
 Route::get('/admin/pdl-management/health-assessment', [PDLManagementController::class, 'health_assessment'])->name('pdl-management.health-assessment');
 Route::get('/admin/pdl-management/medical-records', [PDLManagementController::class, 'medical_records'])->name('pdl-management.medical-records');
 
+Route::get('/admin/cell-management', [CellAssignmentController::class, 'cell_management'])->name('cell-assignments.cell-management');
+Route::post('/admin/cell-management/create', [CellAssignmentController::class, 'create'])->name('cell.create');
+Route::post('/admin/cell-management/update', [CellAssignmentController::class, 'update'])->name('cell.update');
+
+Route::post('/admin/cell-management/assign', [CellAssignmentController::class, 'assign'])->name('cell.assign');
 
 
 Route::get('/admin/court-hearing-calendar', [CourtHearingCalendarController::class, 'index'])->name('court-hearing.calendar');
@@ -50,10 +59,40 @@ Route::get('/law-enforcement/pdl-management/personal-information', [PDLManagemen
 
 
 Route::get('/law-enforcement/pdl-management/court-order', [PDLManagementController::class, 'court_order'])->name('pdl-management.court-order');
-Route::get('/law-enforcement/pdl-management/case-information', [PDLManagementController::class, 'case_information'])->name('pdl-management.case-information');
-Route::get('/law-enforcement/pdl-management/medical-records', [PDLManagementController::class, 'medical_records'])->name('pdl-management.medical-records');
+Route::post('/law-enforcement/pdl-management/court-order', [PDLManagementController::class, 'store_court_order'])->name('court-orders.store');
+Route::get('/law-enforcement/pdl-management/case-information', [CaseInformationController::class, 'index'])->name('case-information.index');
+Route::post('/law-enforcement/pdl-management/case-information', [CaseInformationController::class, 'store'])->name('case-information.store');
 
-Route::post('/pdl-management/create', [PDLManagementController::class, 'create'])->name('pdl-management.create');
-Route::put('/pdl-management/{pdl}', [PDLManagementController::class, 'update'])->name('pdl-management.update');
+Route::get('/law-enforcement/pdl-management/cell-assignment', [CellAssignmentController::class, 'index'])->name('cell-assignments.index');
+
+Route::get('/law-enforcement/pdl-management/medical-records', [MedicalRecordController::class, 'index'])
+    ->name('medical-records.index');
+
+Route::post('/law-enforcement/medical-records', [MedicalRecordController::class, 'store'])
+    ->name('medical-records.store');
+
+Route::put('/law-enforcement/medical-records/{medicalRecord}', [MedicalRecordController::class, 'update'])
+    ->name('medical-records.update');
+
+Route::delete('/law-enforcement/medical-records/{medicalRecord}', [MedicalRecordController::class, 'destroy'])
+    ->name('medical-records.destroy');
+
+Route::get('/law-enforcement/pdl-management/physical-characteristics', [PhysicalCharacteristicController::class, 'index'])
+    ->name('physical-characteristics.index');
+
+Route::post('/law-enforcement/pdl-management/physical-characteristics', [PhysicalCharacteristicController::class, 'store'])
+    ->name('physical-characteristics.store');
+
+Route::put('/law-enforcement/pdl-management/physical-characteristics/{characteristic}', [PhysicalCharacteristicController::class, 'update'])
+    ->name('physical-characteristics.update');
+
+Route::delete('/law-enforcement/pdl-management/physical-characteristics/{characteristic}', [PhysicalCharacteristicController::class, 'destroy'])
+    ->name('physical-characteristics.destroy');
+
+Route::post('/law-enforcement/pdl-management/cell-assignment', [CellAssignmentController::class, 'assign'])->name('cell-assignments.store');
+Route::post('/law-enforcement/pdl-management/create', [PDLManagementController::class, 'create'])->name('pdl-management.create');
+Route::put('/law-enforcement/pdl-management/{pdl}', [PDLManagementController::class, 'update'])->name('pdl-management.update');
+
+
 
 require __DIR__.'/auth.php';

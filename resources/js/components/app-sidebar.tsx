@@ -164,7 +164,6 @@ const mainNavItems: NavItem[] = [
         userType: 'law-enforcement',
     },
 
-
     {
         title: 'PDL Management',
         icon: Calendar,
@@ -176,10 +175,16 @@ const mainNavItems: NavItem[] = [
                 icon: UserCheck,
             },
             {
+                title: 'Cell Assignment',
+                href: 'law-enforcement/pdl-management/cell-assignment',
+                icon: UserCheck,
+            },
+            {
                 title: 'Court Order',
                 href: 'law-enforcement/pdl-management/court-order',
                 icon: UserCheck,
             },
+
             {
                 title: 'Case Information',
                 href: 'law-enforcement/pdl-management/case-information',
@@ -194,11 +199,9 @@ const mainNavItems: NavItem[] = [
                 title: 'Physical Characteristics',
                 href: 'law-enforcement/pdl-management/physical-characteristics',
                 icon: UserCheck,
-            }
-
+            },
         ],
     },
-
 ];
 
 export function AppSidebar() {

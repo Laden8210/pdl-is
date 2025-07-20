@@ -7,48 +7,35 @@ import { Head, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { CreateMedicalRecord } from '@/features/pdl-management/create-medical-record';
-import { medical_record_columns } from '@/features/pdl-management/medical-record-columns';
+import { CreatePhysicalCharacteristic } from '@/features/pdl-management/create-physical-characteristic';
+import { physical_characteristic_columns } from '@/features/pdl-management/physical-characteristic-columns';
 import { type BreadcrumbItem } from '@/types';
+import { PhysicalCharacteristic } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Medical Records',
-        href: '/medical-records',
+        title: 'Physical Characteristics',
+        href: '/physical-characteristics',
     },
 ];
 
-interface MedicalRecord {
-    medical_record_id: number;
-    pdl_id: number;
-    complaint: string;
-    date: string;
-    prognosis: string;
-    laboratory: string;
-    prescription: string;
-    findings: string;
-    pdl?: {
-        fname: string;
-        lname: string;
-    };
-}
 
 interface PageProps {
-    records: MedicalRecord[];
+    characteristics: PhysicalCharacteristic[];
     pdls: any[];
     filters?: {
         search: string;
     };
 }
 
-export default function MedicalRecords() {
+export default function PhysicalCharacteristics() {
     const { props } = usePage<PageProps>();
-    const { records, pdls, filters } = props;
+    const { characteristics, pdls, filters } = props;
 
     const [searchInput, setSearchInput] = useState(filters?.search || '');
 
     const handleSearch = () => {
-        router.get('/medical-records', {
+        router.get('/physical-characteristics', {
             search: searchInput,
         }, {
             preserveState: true,
@@ -64,27 +51,27 @@ export default function MedicalRecords() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Medical Records Management" />
+            <Head title="Physical Characteristics Management" />
 
             <div className="flex flex-col gap-6 p-4">
-                <h1 className="text-2xl font-bold">Medical Records</h1>
+                <h1 className="text-2xl font-bold">Physical Characteristics</h1>
                 <Card>
                     <CardHeader>
                         <CardTitle>
                             <div className="flex items-center justify-between">
-                                <span>Medical Records</span>
-                                <CreateMedicalRecord pdls={pdls} />
+                                <span>Physical Characteristics</span>
+                                <CreatePhysicalCharacteristic pdls={pdls} />
                             </div>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="mb-4 flex items-center space-x-4">
                             <Label htmlFor="search" className="text-sm font-medium">
-                                Search Records
+                                Search Characteristics
                             </Label>
                             <Input
                                 id="search"
-                                placeholder="Search by complaint, PDL name, findings, etc."
+                                placeholder="Search by build, complexion, PDL name, etc."
                                 className="w-64 md:w-96"
                                 value={searchInput}
                                 onChange={(e) => setSearchInput(e.target.value)}
@@ -95,7 +82,7 @@ export default function MedicalRecords() {
                             </Button>
                         </div>
 
-                        <DataTable data={records ?? []} columns={medical_record_columns} />
+                        <DataTable data={characteristics} columns={physical_characteristic_columns} />
                     </CardContent>
                 </Card>
             </div>
