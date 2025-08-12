@@ -81,6 +81,7 @@ export interface Pdl {
     fname: string;
     lname: string;
     alias?: string | null;
+    status?: string | null;
     birthdate: string;
     age: number;
     gender?: string | null;
@@ -137,4 +138,17 @@ export interface PhysicalCharacteristic {
     lname: string;
     id: number;
   };
+}
+
+
+export interface Verification {
+    verification_id: number;
+    pdl_id: number;
+    personnel_id: number;
+    status: 'pending' | 'approved' | 'rejected';
+    reason: string;
+    created_at: string;
+    updated_at: string;
+    pdl?: Pdl;
+    personnel?: Personnel;
 }

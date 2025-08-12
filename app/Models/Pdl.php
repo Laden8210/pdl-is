@@ -31,6 +31,25 @@ class Pdl extends Model
         'birthdate' => 'date',
     ];
 
+    public function verifications()
+    {
+        return $this->hasMany(Verifications::class);
+    }
+
+    public function physicalCharacteristics()
+    {
+        return $this->hasMany(PhysicalCharacteristic::class);
+    }
+
+    public function courtOrders()
+    {
+        return $this->hasMany(CourtOrder::class);
+    }
+
+    public function medicalRecords()
+    {
+        return $this->hasMany(MedicalRecord::class);
+    }
 
     public function personnel()
     {

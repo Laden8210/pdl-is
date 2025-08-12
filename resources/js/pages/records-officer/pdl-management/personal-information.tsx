@@ -13,30 +13,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 import { format } from 'date-fns';
 import { EditPersonalInformation } from '@/features/pdl-management/edit-pdl-personal-information';
-
-interface PageProps {
-    pdls: {
-        id: number;
-        fname: string;
-        lname: string;
-        alias: string | null;
-        birthdate: string;
-        age: number;
-        gender: string | null;
-        ethnic_group: string | null;
-        civil_status: string | null;
-        brgy: string | null;
-        city: string | null;
-        province: string | null;
-        personnel: {
-            fname: string;
-            lname: string;
-        } | null;
-    }[];
-}
+import { PageProps } from '@/types';
 
 import { CreatePersonalInformation } from '@/features/pdl-management/create-pdl-personal-information';
 import { usePage } from '@inertiajs/react';
+import { TransferPDL } from '@/features/pdl-management/transfer-pdl';
 
 export default function PersonalInformation() {
     const { props } = usePage<PageProps>();
@@ -88,8 +69,9 @@ export default function PersonalInformation() {
                                         <TableCell>{pdl.age}</TableCell>
                                         <TableCell>{`${pdl.brgy ?? ''}, ${pdl.city ?? ''}, ${pdl.province ?? ''}`}</TableCell>
                                         <TableCell>{pdl.personnel ? `${pdl.personnel.fname} ${pdl.personnel.lname}` : '—'}</TableCell>
-                                        <TableCell>
+                                        <TableCell className='space-x-1'>
                                             <EditPersonalInformation pdl={pdl} />
+                                            <TransferPDL pdl={pdl} />
                                         </TableCell>
                                     </TableRow>
                                 ))}

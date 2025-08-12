@@ -40,10 +40,14 @@ Route::post('/admin/cell-management/assign', [CellAssignmentController::class, '
 
 Route::get('/admin/court-hearing-calendar', [CourtHearingCalendarController::class, 'index'])->name('court-hearing.calendar');
 Route::get('/admin/verification', [VerificationController::class, 'index'])->name('verification.index');
+Route::patch('/admin/verification/{verification}/update', [VerificationController::class, 'update'])
+    ->name('admin.verification.update');
 
 // Record Officer Routes
 Route::get('/record-officer/dashboard', [AuthController::class, 'dashboard'])->name('dashboard.record-officer');
 Route::get('/record-officer/jail-events', [JailEventsController::class, 'index'])->name('jail-events.index');
+Route::post('/record-officer/jail-events', [JailEventsController::class, 'store'])->name('jail-events.store');
+
 Route::get('/record-officer/pdl-archives', [PDLArchiveController::class, 'index'])->name('pdl-archives.index');
 Route::get('/record-officer/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management.index');
 Route::get('/record-officer/verification', [VerificationController::class, 'index'])->name('verification.index');
@@ -56,7 +60,7 @@ Route::get('/record-officer/pdl-management/medical-records', [PDLManagementContr
 Route::get('/law-enforcement/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management.index');
 Route::get('/law-enforcement/dashboard', [AuthController::class, 'dashboard'])->name('dashboard.law-enforcement');
 Route::get('/law-enforcement/pdl-management/personal-information', [PDLManagementController::class, 'personal_information'])->name('pdl-management.personal-information');
-
+Route::post('/law-enforcement/pdl-management/personal-information/transfer/', [PDLManagementController::class, 'transfer'])->name('pdl-management.transfer');
 
 Route::get('/law-enforcement/pdl-management/court-order', [PDLManagementController::class, 'court_order'])->name('pdl-management.court-order');
 Route::post('/law-enforcement/pdl-management/court-order', [PDLManagementController::class, 'store_court_order'])->name('court-orders.store');
@@ -95,4 +99,4 @@ Route::put('/law-enforcement/pdl-management/{pdl}', [PDLManagementController::cl
 
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

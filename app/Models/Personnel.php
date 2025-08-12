@@ -12,6 +12,8 @@ class Personnel extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    
+
     protected $fillable = [
         'fname',
         'mname',

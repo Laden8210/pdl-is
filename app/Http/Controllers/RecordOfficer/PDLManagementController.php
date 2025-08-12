@@ -9,6 +9,8 @@ use App\Http\Requests\PDL\CreatePdlRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Pdl;
 use App\Models\CourtOrder;
+use App\Http\Requests\PDL\TransferRequest;
+use App\Models\Verifications;
 
 class PDLManagementController extends Controller
 {
@@ -102,5 +104,15 @@ class PDLManagementController extends Controller
         $pdl->update($request->validated());
 
         return redirect()->back()->with('success', 'PDL record updated successfully.');
+    }
+
+    public function transfer(TransferRequest $request)
+    {
+        $validated = $request->validated();
+        $user = Auth::user();
+
+        $validated['personnel_id'] = $user->id;
+        Verifications::create($validated);
+        return redirect()->back()->with('success', 'PDL transferred successfully.');
     }
 }
