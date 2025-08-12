@@ -10,16 +10,6 @@ import { Personnel } from '@/types';
 import { useState } from 'react';
 import { user_columns } from '@/features/user-management/user-columns';
 
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
 
 import { Button } from '@/components/ui/button';
 import { CreateUser } from '@/features/user-management/create-user';

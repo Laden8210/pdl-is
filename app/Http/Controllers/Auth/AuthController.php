@@ -32,7 +32,10 @@ class AuthController extends Controller
             return redirect()->route('dashboard');
         } elseif ($user->position === 'record-officer') {
             return redirect()->route('dashboard.record-officer');
-        } else {
+        }else if ($user->position === 'law-enforcement') {
+            return redirect()->route('dashboard.record-officer');
+        }
+        else {
             return redirect()->route('home');
         }
 

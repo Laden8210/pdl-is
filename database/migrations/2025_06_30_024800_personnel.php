@@ -20,11 +20,13 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->string('username')->unique();
             $table->string('password');
+            
             $table->string('position');
             $table->string('agency');
             $table->string('status')->default('active');
             $table->timestamps();
         });
+
     }
 
     /**
