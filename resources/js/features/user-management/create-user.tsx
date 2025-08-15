@@ -21,7 +21,7 @@ export function CreateUser() {
     const { props } = usePage<PageProps>();
     const successMessage = props.success;
 
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         firstName: '',
         middleName: '',
         lastName: '',

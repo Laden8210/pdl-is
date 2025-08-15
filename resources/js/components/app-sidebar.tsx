@@ -108,26 +108,27 @@ const mainNavItems: NavItem[] = [
         userType: 'admin',
     },
 
+
     {
         title: 'PDL Management',
         icon: Calendar,
         userType: 'admin',
         children: [
             {
-                title: 'Personal Information',
+                title: 'List of PDLs',
                 href: 'admin/pdl-management/personal-information',
                 icon: UserCheck,
             },
             {
-                title: 'Health Assessment',
-                href: 'admin/pdl-management/health-assessment',
+                title: 'Cell Assignment',
+                href: 'admin/pdl-management/cell-assignment',
                 icon: UserCheck,
             },
             {
-                title: 'Medical Records',
-                href: 'admin/pdl-management/medical-records',
-                icon: FileSearch,
-            },
+                title: 'Time Allowance',
+                href: 'admin/pdl-management/time-allowance',
+                icon: UserCheck,
+            }
         ],
     },
 
@@ -147,6 +148,7 @@ const mainNavItems: NavItem[] = [
     {
         title: 'User and PDL Archive',
         icon: Calendar,
+        href: '/admin/user-pdl-archive',
         userType: 'admin',
     },
 
@@ -174,11 +176,7 @@ const mainNavItems: NavItem[] = [
                 href: 'law-enforcement/pdl-management/personal-information',
                 icon: UserCheck,
             },
-            {
-                title: 'Cell Assignment',
-                href: 'law-enforcement/pdl-management/cell-assignment',
-                icon: UserCheck,
-            },
+
             {
                 title: 'Court Order',
                 href: 'law-enforcement/pdl-management/court-order',

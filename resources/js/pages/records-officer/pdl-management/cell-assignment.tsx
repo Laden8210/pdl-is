@@ -1,6 +1,6 @@
 // CellAssignment.tsx
 import { DataTable } from '@/components/data-table';
-import { PaginationControls } from '@/components/pagination-controls';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { cell_assignment_columns } from '@/features/pdl-management/cell-assignment-columns';
 import { CreateCellAssignment } from '@/features/pdl-management/create-cell-assignment';
-import { Cells, Pdl } from '@/types'; 
+import { Cells, Pdl } from '@/types';
 
 interface PageProps {
   assignments: {
@@ -49,7 +49,7 @@ export default function CellAssignment() {
   }));
 
   const handleSearch = () => {
-    router.get('/law-enforcement/pdl-management/cell-assignment', {
+    router.get('/admin/pdl-management/cell-assignment', {
       search: searchInput,
     });
   };
@@ -61,7 +61,7 @@ export default function CellAssignment() {
     },
     {
       title: 'Assignments',
-      href: '/law-enforcement/pdl-management/cell-assignment',
+      href: '/admin/pdl-management/cell-assignment',
     },
   ];
 

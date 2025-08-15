@@ -10,10 +10,22 @@ use Illuminate\Support\Facades\Auth;
 
 class VerificationController extends Controller
 {
-
     public function index(Request $request)
     {
-        $verifications = Verifications::with('personnel', 'pdl')
+        $verifications = Verifications::with([
+            'personnel:id,fname,lname',
+            'pdl' => function ($query) {
+                $query->with([
+                    'physicalCharacteristics',
+                    'courtOrders',
+                    'medicalRecords',
+                    'cases',
+                    'personnel:id,fname,lname'
+                ]);
+            },
+            'reviewer:id,fname,lname'
+        ])
+            ->where('status', '!=', 'approved')
             ->latest();
 
         if ($request->search) {
@@ -30,7 +42,30 @@ class VerificationController extends Controller
         $verifications = $verifications->get();
 
         return Inertia::render('admin/verification/list', [
-            'verifications' => $verifications,
+            'verifications' => $verifications->map(function ($verification) {
+                return [
+                    'verification_id' => $verification->verification_id,
+                    'reason' => $verification->reason,
+                    'status' => $verification->status,
+                    'feedback' => $verification->feedback,
+                    'reviewed_at' => $verification->reviewed_at,
+                    'personnel' => $verification->personnel,
+                    'reviewer' => $verification->reviewer,
+                    'pdl' => $verification->pdl ? [
+                        'id' => $verification->pdl->id,
+                        'fname' => $verification->pdl->fname,
+                        'lname' => $verification->pdl->lname,
+                        'alias' => $verification->pdl->alias,
+                        'birthdate' => $verification->pdl->birthdate,
+                        'personnel' => $verification->pdl->personnel,
+                        'physical_characteristics' => $verification->pdl->physicalCharacteristics,
+                        'court_orders' => $verification->pdl->courtOrders,
+                        'medical_records' => $verification->pdl->medicalRecords,
+                        'cases' => $verification->pdl->cases,
+                    ] : null,
+                    'created_at' => $verification->created_at,
+                ];
+            }),
             'filters' => $request->only(['search']),
         ]);
     }

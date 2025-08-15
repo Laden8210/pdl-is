@@ -94,6 +94,12 @@ export interface Pdl {
     created_at?: string;
     updated_at?: string;
     deleted_at?: string | null;
+    physical_characteristics?: PhysicalCharacteristic[];
+    court_orders?: CourtOrder[];
+    medical_records?: MedicalRecord[];
+    cases?: CaseInformation[];
+    personnel?: Personnel;
+    verifications?: Verification[];
 }
 
 export interface CellAssignment {
@@ -120,26 +126,25 @@ export type CourtOrder = {
 };
 
 export interface PhysicalCharacteristic {
-  characteristic_id: number;
-  pdl_id: number;
-  height: number;
-  weight: number;
-  build: string;
-  complexion: string;
-  hair_color: string;
-  eye_color: string;
-  identification_marks: string;
-  mark_location: string;
-  remark: string | null;
-  created_at?: string;
-  updated_at?: string;
-  pdl?: {
-    fname: string;
-    lname: string;
-    id: number;
-  };
+    characteristic_id: number;
+    pdl_id: number;
+    height: number;
+    weight: number;
+    build: string;
+    complexion: string;
+    hair_color: string;
+    eye_color: string;
+    identification_marks: string;
+    mark_location: string;
+    remark: string | null;
+    created_at?: string;
+    updated_at?: string;
+    pdl?: {
+        fname: string;
+        lname: string;
+        id: number;
+    };
 }
-
 
 export interface Verification {
     verification_id: number;
