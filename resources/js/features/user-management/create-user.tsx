@@ -12,13 +12,13 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 
-
 export function CreateUser() {
     const avatarRef = useRef<HTMLInputElement>(null);
-    const { props } = usePage<PageProps>();
+    const { props } = usePage<any>();
     const successMessage = props.success;
 
     const { data, setData, post, processing, errors } = useForm({
@@ -31,17 +31,19 @@ export function CreateUser() {
         password: '',
         position: '',
         agency: '',
+
     });
+
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-
         post(route('user-management.store'), {
             preserveScroll: true,
             forceFormData: true,
             onSuccess: () => {},
         });
     };
+
     return (
         <Dialog>
             <Head title="Create User" />
@@ -156,19 +158,33 @@ export function CreateUser() {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="position">Position</Label>
-                            <Input
-                                id="position"
-                                name="position"
+                            <Label htmlFor="userType">User Type</Label>
+                            <Select
                                 value={data.position}
-                                onChange={(e) => setData('position', e.target.value)}
+                                onValueChange={(value) => setData('position', value)}
                                 required
-                            />
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select user type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="law-enforcement">Law Enforcement</SelectItem>
+                                    <SelectItem value="admin">Administrator</SelectItem>
+                                    <SelectItem value="record-officer">Records Officer</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
+
 
                         <div className="col-span-3">
                             <Label htmlFor="agency">Agency</Label>
-                            <Input id="agency" name="agency" value={data.agency} onChange={(e) => setData('agency', e.target.value)} required />
+                            <Input
+                                id="agency"
+                                name="agency"
+                                value={data.agency}
+                                onChange={(e) => setData('agency', e.target.value)}
+                                required
+                            />
                         </div>
                     </div>
 
@@ -176,8 +192,13 @@ export function CreateUser() {
                         <DialogClose asChild>
                             <Button variant="secondary">Cancel</Button>
                         </DialogClose>
-                        <Button type="submit" form="create-user-form" className="bg-blue-500 hover:bg-blue-600" disabled={processing}>
-                            Create User
+                        <Button
+                            type="submit"
+                            form="create-user-form"
+                            className="bg-blue-500 hover:bg-blue-600"
+                            disabled={processing}
+                        >
+                            {processing ? 'Creating...' : 'Create User'}
                         </Button>
                     </DialogFooter>
                 </form>
