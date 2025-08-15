@@ -13,51 +13,77 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler, useRef } from 'react';
+import { FormEventHandler, useEffect, useRef } from 'react';
+import { Personnel } from './user-columns';
+import { Pencil } from 'lucide-react';
 
+interface EditUserProps {
+    user: Personnel;
+}
 
-export function CreateUser() {
+export function EditUser({ user }: EditUserProps) {
     const avatarRef = useRef<HTMLInputElement>(null);
     const { props } = usePage<PageProps>();
     const successMessage = props.success;
 
-    const { data, setData, post, processing, errors } = useForm({
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        contactNumber: '',
+    const { data, setData, put, processing, errors } = useForm({
+        firstName: user.fname,
+        middleName: user.mname || '',
+        lastName: user.lname,
+        contactNumber: user.contactnum,
         avatar: null as File | null,
-        username: '',
+        username: user.username,
         password: '',
-        position: '',
-        agency: '',
+        position: user.position,
+        agency: user.agency,
     });
+
+    useEffect(() => {
+        setData({
+            firstName: user.fname,
+            middleName: user.mname || '',
+            lastName: user.lname,
+            contactNumber: user.contactnum,
+            avatar: null,
+            username: user.username,
+            password: '',
+            position: user.position,
+            agency: user.agency,
+        });
+    }, [user]);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        post(route('user-management.store'), {
+        put(route('user-management.update', user.id), {
             preserveScroll: true,
             forceFormData: true,
-            onSuccess: () => {},
+            onSuccess: () => {
+                // Clear password field after successful update
+                setData('password', '');
+            },
         });
     };
+
     return (
         <Dialog>
-            <Head title="Create User" />
+            <Head title="Edit User" />
 
             <DialogTrigger asChild>
-                <Button variant="outline">Add User</Button>
+                <Button variant="outline"  className=' text-start'>
+                    <Pencil />
+                    Edit
+                </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-3xl">
-                <form id="create-user-form" onSubmit={submit}>
+                <form id="edit-user-form" onSubmit={submit}>
                     <DialogHeader>
-                        <DialogTitle>Create User</DialogTitle>
-                        <DialogDescription>Fill in the details to create a new user.</DialogDescription>
+                        <DialogTitle>Edit User</DialogTitle>
+                        <DialogDescription>Update the user details below.</DialogDescription>
                     </DialogHeader>
 
                     {Object.keys(errors).length > 0 && (
-                        <Alert variant="destructive" className="mb-4 mt-4">
+                        <Alert variant="destructive" className="mt-4 mb-4">
                             <AlertTitle>Unable to process request</AlertTitle>
                             <AlertDescription>
                                 {Object.values(errors).map((error, index) => (
@@ -122,14 +148,23 @@ export function CreateUser() {
 
                         <div className="col-span-3">
                             <Label htmlFor="avatar">Avatar</Label>
-                            <Input
-                                id="avatar"
-                                name="avatar"
-                                type="file"
-                                ref={avatarRef}
-                                onChange={(e) => setData('avatar', e.target.files?.[0] ?? null)}
-                                accept="image/*"
-                            />
+                            <div className="flex items-center gap-4">
+                                {user.avatar && (
+                                    <img
+                                        src={`/storage/${user.avatar}`}
+                                        alt="Current avatar"
+                                        className="h-12 w-12 rounded-full object-cover"
+                                    />
+                                )}
+                                <Input
+                                    id="avatar"
+                                    name="avatar"
+                                    type="file"
+                                    ref={avatarRef}
+                                    onChange={(e) => setData('avatar', e.target.files?.[0] ?? null)}
+                                    accept="image/*"
+                                />
+                            </div>
                         </div>
 
                         <div className="col-span-3">
@@ -144,14 +179,14 @@ export function CreateUser() {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">Password (leave blank to keep current)</Label>
                             <Input
                                 id="password"
                                 name="password"
                                 type="password"
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
-                                required
+                                placeholder="Leave blank to keep current password"
                             />
                         </div>
 
@@ -168,7 +203,13 @@ export function CreateUser() {
 
                         <div className="col-span-3">
                             <Label htmlFor="agency">Agency</Label>
-                            <Input id="agency" name="agency" value={data.agency} onChange={(e) => setData('agency', e.target.value)} required />
+                            <Input
+                                id="agency"
+                                name="agency"
+                                value={data.agency}
+                                onChange={(e) => setData('agency', e.target.value)}
+                                required
+                            />
                         </div>
                     </div>
 
@@ -176,8 +217,13 @@ export function CreateUser() {
                         <DialogClose asChild>
                             <Button variant="secondary">Cancel</Button>
                         </DialogClose>
-                        <Button type="submit" form="create-user-form" className="bg-blue-500 hover:bg-blue-600" disabled={processing}>
-                            Create User
+                        <Button
+                            type="submit"
+                            form="edit-user-form"
+                            className="bg-blue-500 hover:bg-blue-600"
+                            disabled={processing}
+                        >
+                            {processing ? 'Updating...' : 'Update User'}
                         </Button>
                     </DialogFooter>
                 </form>

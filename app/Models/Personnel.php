@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Personnel extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
-    
+
 
     protected $fillable = [
         'fname',
@@ -61,5 +61,10 @@ class Personnel extends Authenticatable
     public function pdls()
     {
         return $this->hasMany(Pdl::class);
+    }
+
+    public function scopeWithTrashed($query)
+    {
+        return $query->whereNotNull('deleted_at');
     }
 }

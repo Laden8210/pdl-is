@@ -9,6 +9,7 @@ use App\Models\Personnel;
 use App\Http\Requests\Profile\CreateUserRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\UpdateUserRequest;
 
 class UserManagementController extends Controller
 {
@@ -56,5 +57,51 @@ class UserManagementController extends Controller
         $user->save();
 
         return redirect()->route('user-management.index')->with('success', 'User created successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $personnel = Personnel::find($id);
+
+        if (!$personnel) {
+            return back()->withErrors(['user' => 'User not found.']);
+        }
+
+
+        $personnel->delete();
+
+        return back()->with('success', 'User archived successfully.');
+    }
+
+    public function update(UpdateUserRequest $request, $id)
+    {
+        $personnel = Personnel::findOrFail($id);
+
+        $validated = $request->validated();
+
+        $updateData = [
+            'fname' => $validated['firstName'],
+            'mname' => $validated['middleName'],
+            'lname' => $validated['lastName'],
+            'contactnum' => $validated['contactNumber'],
+            'username' => $validated['username'],
+            'position' => $validated['position'],
+            'agency' => $validated['agency'],
+        ];
+
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('profile_images', 'public');
+            $updateData['avatar'] = $path;
+        }else {
+            $updateData['avatar'] = $personnel->avatar;
+        }
+
+        if (!empty($validated['password'])) {
+            $updateData['password'] = Hash::make($validated['password']);
+        }
+
+        $personnel->update($updateData);
+
+        return back()->with('success', 'User updated successfully.');
     }
 }

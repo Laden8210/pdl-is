@@ -55,4 +55,11 @@ class Pdl extends Model
     {
         return $this->belongsTo(Personnel::class);
     }
+
+    public function cases()
+    {
+        return $this->hasMany(CaseInformation::class);
+    }
+
+
 }

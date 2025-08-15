@@ -10,18 +10,28 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { Pdl, Personnel, Verification } from '@/types';
 
 interface VerificationCardProps {
   verification: Verification & {
-    pdl: Pdl;
+    pdl: Pdl & {
+      physical_characteristics?: any[];
+      court_orders?: any[];
+      medical_records?: any[];
+      cases?: any[];
+    };
     personnel: Personnel;
   };
   onUpdate: () => void;
@@ -40,7 +50,6 @@ export default function VerificationCard({ verification, onUpdate }: Verificatio
 
   const submitFeedback = () => {
     setIsSubmitting(true);
-
     router.patch(`/admin/verification/${verification.verification_id}/update`, {
       feedback,
       status: statusUpdate,
@@ -95,7 +104,7 @@ export default function VerificationCard({ verification, onUpdate }: Verificatio
                 Review Request
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
+            <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Verification Request Details</DialogTitle>
                 <DialogDescription>
@@ -129,21 +138,180 @@ export default function VerificationCard({ verification, onUpdate }: Verificatio
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">Verification Details</Label>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">Requested by:</span> {personnelName}
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Requested on:</span>{" "}
-                      {format(new Date(verification.created_at), "MMM dd, yyyy")}
-                    </div>
-                    <div className="col-span-2">
-                      <span className="text-muted-foreground">Reason:</span> {verification.reason}
-                    </div>
-                  </div>
-                </div>
+                <Accordion type="multiple" className="w-full">
+                  {/* Physical Characteristics */}
+                  <AccordionItem value="physical">
+                    <AccordionTrigger className="text-sm font-medium">
+                      Physical Characteristics
+                    </AccordionTrigger>
+                    <AccordionContent className="grid grid-cols-2 gap-2 text-sm p-2">
+                      {verification.pdl.physical_characteristics?.length ? (
+                        verification.pdl.physical_characteristics.map((characteristic, index) => (
+                          <div key={index} className="space-y-1">
+                            <div>
+                              <span className="text-muted-foreground">Height:</span> {characteristic.height} cm
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Weight:</span> {characteristic.weight} kg
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Build:</span> {characteristic.build}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Complexion:</span> {characteristic.complexion}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Hair Color:</span> {characteristic.hair_color}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Eye Color:</span> {characteristic.eye_color}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">ID Marks:</span> {characteristic.identification_marks}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Mark Location:</span> {characteristic.mark_location}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-muted-foreground">No physical characteristics recorded</div>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Court Orders */}
+                  <AccordionItem value="court">
+                    <AccordionTrigger className="text-sm font-medium">
+                      Court Orders
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-2 p-2">
+                      {verification.pdl.court_orders?.length ? (
+                        verification.pdl.court_orders.map((order, index) => (
+                          <div key={index} className="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <span className="text-muted-foreground">Order #:</span> {order.court_order_number}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Type:</span> {order.order_type}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Order Date:</span>{" "}
+                              {format(new Date(order.order_date), "MMM dd, yyyy")}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Received:</span>{" "}
+                              {format(new Date(order.received_date), "MMM dd, yyyy")}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Court Branch:</span> {order.court_branch}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Document Type:</span> {order.document_type}
+                            </div>
+                            {order.remarks && (
+                              <div className="col-span-2">
+                                <span className="text-muted-foreground">Remarks:</span> {order.remarks}
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-muted-foreground">No court orders recorded</div>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Medical Records */}
+                  <AccordionItem value="medical">
+                    <AccordionTrigger className="text-sm font-medium">
+                      Medical Records
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-2 p-2">
+                      {verification.pdl.medical_records?.length ? (
+                        verification.pdl.medical_records.map((record, index) => (
+                          <div key={index} className="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <span className="text-muted-foreground">Date:</span>{" "}
+                              {format(new Date(record.date), "MMM dd, yyyy")}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Complaint:</span> {record.complaint}
+                            </div>
+                            <div className="col-span-2">
+                              <span className="text-muted-foreground">Findings:</span> {record.findings}
+                            </div>
+                            <div className="col-span-2">
+                              <span className="text-muted-foreground">Prognosis:</span> {record.prognosis}
+                            </div>
+                            <div className="col-span-2">
+                              <span className="text-muted-foreground">Laboratory:</span> {record.laboratory}
+                            </div>
+                            <div className="col-span-2">
+                              <span className="text-muted-foreground">Prescription:</span> {record.prescription}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-muted-foreground">No medical records recorded</div>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Case Information */}
+                  <AccordionItem value="cases">
+                    <AccordionTrigger className="text-sm font-medium">
+                      Case Information
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-2 p-2">
+                      {verification.pdl.cases?.length ? (
+                        verification.pdl.cases.map((caseInfo, index) => (
+                          <div key={index} className="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <span className="text-muted-foreground">Case #:</span> {caseInfo.case_number}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Status:</span>{" "}
+                              <Badge variant={
+                                caseInfo.case_status === 'open' ? 'destructive' :
+                                caseInfo.case_status === 'closed' ? 'secondary' : 'default'
+                              }>
+                                {caseInfo.case_status}
+                              </Badge>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Crime:</span> {caseInfo.crime_committed}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Date Committed:</span>{" "}
+                              {format(new Date(caseInfo.date_committed), "MMM dd, yyyy")}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Time Committed:</span> {caseInfo.time_committed}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Security:</span>{" "}
+                              <Badge variant={
+                                caseInfo.security_classification === 'low' ? 'secondary' :
+                                caseInfo.security_classification === 'medium' ? 'default' :
+                                caseInfo.security_classification === 'high' ? 'destructive' : 'destructive'
+                              }>
+                                {caseInfo.security_classification}
+                              </Badge>
+                            </div>
+                            {caseInfo.case_remarks && (
+                              <div className="col-span-2">
+                                <span className="text-muted-foreground">Remarks:</span> {caseInfo.case_remarks}
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-muted-foreground">No case information recorded</div>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
 
                 <div className="space-y-2">
                   <Label htmlFor={`feedback-${verification.verification_id}`} className="text-sm font-medium">
@@ -177,9 +345,11 @@ export default function VerificationCard({ verification, onUpdate }: Verificatio
                 </div>
               </div>
 
-              <DialogFooter>
+              <div className="flex justify-end gap-2 pt-4">
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Cancel
+                </Button>
                 <Button
-                  type="button"
                   onClick={submitFeedback}
                   disabled={
                     isSubmitting ||
@@ -189,7 +359,7 @@ export default function VerificationCard({ verification, onUpdate }: Verificatio
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Review'}
                 </Button>
-              </DialogFooter>
+              </div>
             </DialogContent>
           </Dialog>
         </div>

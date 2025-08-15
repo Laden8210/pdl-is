@@ -27,4 +27,8 @@ class Verifications extends Model
     {
         return $this->belongsTo(Pdl::class, 'pdl_id');
     }
+    public function reviewer()
+    {
+        return $this->belongsTo(Personnel::class, 'reviewed_by');
+    }
 }
