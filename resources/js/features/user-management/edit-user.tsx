@@ -13,10 +13,10 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Head, useForm, usePage } from '@inertiajs/react';
+import { Pencil } from 'lucide-react';
 import { FormEventHandler, useEffect, useRef } from 'react';
 import { Personnel } from './user-columns';
-import { Pencil } from 'lucide-react';
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 interface EditUserProps {
     user: Personnel;
 }
@@ -70,7 +70,7 @@ export function EditUser({ user }: EditUserProps) {
             <Head title="Edit User" />
 
             <DialogTrigger asChild>
-                <Button variant="outline"  className=' text-start'>
+                <Button variant="outline" className="text-start">
                     <Pencil />
                     Edit
                 </Button>
@@ -150,11 +150,7 @@ export function EditUser({ user }: EditUserProps) {
                             <Label htmlFor="avatar">Avatar</Label>
                             <div className="flex items-center gap-4">
                                 {user.avatar && (
-                                    <img
-                                        src={`/storage/${user.avatar}`}
-                                        alt="Current avatar"
-                                        className="h-12 w-12 rounded-full object-cover"
-                                    />
+                                    <img src={`/storage/${user.avatar}`} alt="Current avatar" className="h-12 w-12 rounded-full object-cover" />
                                 )}
                                 <Input
                                     id="avatar"
@@ -191,25 +187,22 @@ export function EditUser({ user }: EditUserProps) {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="position">Position</Label>
-                            <Input
-                                id="position"
-                                name="position"
-                                value={data.position}
-                                onChange={(e) => setData('position', e.target.value)}
-                                required
-                            />
+                            <Label htmlFor="userType">User Type</Label>
+                            <Select value={data.position} onValueChange={(value) => setData('position', value)} required>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select user type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="law-enforcement">Law Enforcement</SelectItem>
+                                    <SelectItem value="admin">Administrator</SelectItem>
+                                    <SelectItem value="record-officer">Records Officer</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         <div className="col-span-3">
                             <Label htmlFor="agency">Agency</Label>
-                            <Input
-                                id="agency"
-                                name="agency"
-                                value={data.agency}
-                                onChange={(e) => setData('agency', e.target.value)}
-                                required
-                            />
+                            <Input id="agency" name="agency" value={data.agency} onChange={(e) => setData('agency', e.target.value)} required />
                         </div>
                     </div>
 
@@ -217,12 +210,7 @@ export function EditUser({ user }: EditUserProps) {
                         <DialogClose asChild>
                             <Button variant="secondary">Cancel</Button>
                         </DialogClose>
-                        <Button
-                            type="submit"
-                            form="edit-user-form"
-                            className="bg-blue-500 hover:bg-blue-600"
-                            disabled={processing}
-                        >
+                        <Button type="submit" form="edit-user-form" className="bg-blue-500 hover:bg-blue-600" disabled={processing}>
                             {processing ? 'Updating...' : 'Update User'}
                         </Button>
                     </DialogFooter>
