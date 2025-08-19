@@ -74,6 +74,10 @@ Route::post('/law-enforcement/pdl-management/personal-information/transfer/', [P
 Route::get('/law-enforcement/pdl-management/personal-information/create', [PDLManagementController::class, 'view_create'])->name('pdl-management.personal-information.create');
 Route::post('/law-enforcement/pdl-management/personal-information/create', [PDLManagementController::class, 'store_create'])->name('pdl-management.personal-information.create');
 
+Route::get('/law-enforcement/pdl-management/personal-information/{pdl_id}', [PDLManagementController::class, 'view_update'])->name('pdl-management.personal-information.update');
+Route::put('/law-enforcement/pdl-management/personal-information/{pdl_id}', [PDLManagementController::class, 'update_personal_information'])->name('pdl-management.personal-information.update');
+
+
 Route::get('/law-enforcement/pdl-management/court-order', [PDLManagementController::class, 'court_order'])->name('pdl-management.court-order');
 Route::post('/law-enforcement/pdl-management/court-order', [PDLManagementController::class, 'store_court_order'])->name('court-orders.store');
 Route::get('/law-enforcement/pdl-management/case-information', [CaseInformationController::class, 'index'])->name('case-information.index');

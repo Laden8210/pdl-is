@@ -11,7 +11,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-import { EditPersonalInformation } from '@/features/pdl-management/edit-pdl-personal-information';
 import { PageProps } from '@/types';
 import { format } from 'date-fns';
 
@@ -24,12 +23,15 @@ export default function PersonalInformation() {
     const { pdls } = props;
 
     console.log('PDLs:', pdls);
-    console.log('PDLs:', pdls.map((pdl) => ({
-        id: pdl.id,
-        status: pdl.verifications.length > 0 ? pdl.verifications[0].status : 'No Verification',
-        reviewed_at: pdl.verifications.length > 0 ? pdl.verifications[0].reviewed_at : null,
-        reviewed_by: pdl.verifications.length > 0 ? pdl.verifications[0].reviewed_by : null,
-    })));
+    console.log(
+        'PDLs:',
+        pdls.map((pdl) => ({
+            id: pdl.id,
+            status: pdl.verifications.length > 0 ? pdl.verifications[0].status : 'No Verification',
+            reviewed_at: pdl.verifications.length > 0 ? pdl.verifications[0].reviewed_at : null,
+            reviewed_by: pdl.verifications.length > 0 ? pdl.verifications[0].reviewed_by : null,
+        })),
+    );
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -91,7 +93,13 @@ export default function PersonalInformation() {
                                                 : 'No Verification'}
                                         </TableCell>
                                         <TableCell className="space-x-1">
-                                            <EditPersonalInformation pdl={pdl} />
+                                            {/* <EditPersonalInformation pdl={pdl} /> */}
+                                            <Link
+                                                href={`/law-enforcement/pdl-management/personal-information/${pdl.id}`}
+                                                className="inline-flex items-center gap-2 rounded-sm bg-yellow-500 px-4 py-2 text-sm text-white hover:bg-yellow-600"
+                                            >
+                                                Edit
+                                            </Link>
                                             <TransferPDL pdl={pdl} />
                                         </TableCell>
                                     </TableRow>
