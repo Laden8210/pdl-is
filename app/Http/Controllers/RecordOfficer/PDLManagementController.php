@@ -214,6 +214,166 @@ class PDLManagementController extends Controller
         return Inertia::render('records-officer/pdl-management/create-pdl-information');
     }
 
+    public function view_update($pdl_id)
+    {
+        $pdl = Pdl::with([
+            'physicalCharacteristics',
+            'courtOrders',
+            'medicalRecords',
+            'cases',
+            'personnel:id,fname,lname'
+        ])->findOrFail($pdl_id);
+        return Inertia::render('records-officer/pdl-management/update-pdl-information', [
+            'pdl' => $pdl
+        ]);
+    }
+
+
+    public function update_personal_information(Request $request, $id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $user = Auth::user();
+
+            // Fetch the PDL record
+            $pdl = Pdl::findOrFail($id);
+
+            // Update main PDL info
+            $pdl->update([
+                'fname' => $request->fname,
+                'lname' => $request->lname,
+                'alias' => $request->alias,
+                'birthdate' => $request->birthdate,
+                'age' => $request->age,
+                'gender' => $request->gender,
+                'ethnic_group' => $request->ethnic_group,
+                'civil_status' => $request->civil_status,
+                'brgy' => $request->brgy,
+                'city' => $request->city,
+                'province' => $request->province,
+                'personnel_id' => $user->id,
+            ]);
+
+            // Update or create Court Order
+            if ($request->court_order_id) {
+                $pdl->courtOrders()->updateOrCreate(
+                    ['court_order_id' => $request->court_order_id],
+                    [
+                        'court_order_number' => $request->court_order_number,
+                        'order_type' => $request->order_type,
+                        'order_date' => $request->order_date,
+                        'received_date' => $request->received_date,
+                        'remarks' => $request->cod_remarks,
+                        'document_type' => $request->document_type,
+                        'court_branch' => $request->court_branch,
+                    ]
+                );
+            } else {
+                $pdl->courtOrders()->create([
+                    'court_order_number' => $request->court_order_number,
+                    'order_type' => $request->order_type,
+                    'order_date' => $request->order_date,
+                    'received_date' => $request->received_date,
+                    'remarks' => $request->cod_remarks,
+                    'document_type' => $request->document_type,
+                    'court_branch' => $request->court_branch,
+                ]);
+            }
+
+            // Update or create Medical Record
+            if ($request->medical_record_id) {
+                $pdl->medicalRecords()->updateOrCreate(
+                    ['medical_record_id' => $request->medical_record_id],
+                    [
+                        'complaint' => $request->complaint,
+                        'date' => $request->date,
+                        'prognosis' => $request->prognosis,
+                        'laboratory' => $request->laboratory,
+                        'prescription' => $request->prescription,
+                        'findings' => $request->findings,
+                    ]
+                );
+            } else {
+                $pdl->medicalRecords()->create([
+                    'complaint' => $request->complaint,
+                    'date' => $request->date,
+                    'prognosis' => $request->prognosis,
+                    'laboratory' => $request->laboratory,
+                    'prescription' => $request->prescription,
+                    'findings' => $request->findings,
+                ]);
+            }
+
+            // Update or create Physical Characteristics
+            if ($request->physical_characteristic_id) {
+                $pdl->physicalCharacteristics()->updateOrCreate(
+                    ['characteristic_id' => $request->physical_characteristic_id],
+                    [
+                        'height' => $request->height,
+                        'weight' => $request->weight,
+                        'build' => $request->build,
+                        'complexion' => $request->complexion,
+                        'hair_color' => $request->hair_color,
+                        'eye_color' => $request->eye_color,
+                        'identification_marks' => $request->identification_marks,
+                        'mark_location' => $request->mark_location,
+                        'remark' => $request->pc_remark,
+                    ]
+                );
+            } else {
+                $pdl->physicalCharacteristics()->create([
+                    'height' => $request->height,
+                    'weight' => $request->weight,
+                    'build' => $request->build,
+                    'complexion' => $request->complexion,
+                    'hair_color' => $request->hair_color,
+                    'eye_color' => $request->eye_color,
+                    'identification_marks' => $request->identification_marks,
+                    'mark_location' => $request->mark_location,
+                    'remark' => $request->pc_remark,
+                ]);
+            }
+
+            // Update or create Cases
+            foreach ($request->cases as $caseData) {
+                if (isset($caseData['case_id']) && $caseData['case_id']) {
+                    $pdl->cases()->updateOrCreate(
+                        ['case_id' => $caseData['case_id']],
+                        [
+                            'case_number' => $caseData['case_number'],
+                            'crime_committed' => $caseData['crime_committed'],
+                            'date_committed' => $caseData['date_committed'],
+                            'time_committed' => $caseData['time_committed'],
+                            'case_status' => $caseData['case_status'],
+                            'case_remarks' => $caseData['case_remarks'],
+                            'security_classification' => $caseData['security_classification'],
+                        ]
+                    );
+                } else {
+                    $pdl->cases()->create([
+                        'case_number' => $caseData['case_number'],
+                        'crime_committed' => $caseData['crime_committed'],
+                        'date_committed' => $caseData['date_committed'],
+                        'time_committed' => $caseData['time_committed'],
+                        'case_status' => $caseData['case_status'],
+                        'case_remarks' => $caseData['case_remarks'],
+                        'security_classification' => $caseData['security_classification'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('pdl-management.index')
+                ->with('success', 'PDL record updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to update PDL record: ' . $e->getMessage());
+        }
+    }
+
+
     public function store_create(CreatePDLOnePageRequest $request)
     {
         DB::beginTransaction();

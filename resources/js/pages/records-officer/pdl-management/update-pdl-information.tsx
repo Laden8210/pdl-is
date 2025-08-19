@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { PageProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 import { useForm, usePage } from '@inertiajs/react';
@@ -16,20 +16,28 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { useEffect } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Create PDL Management',
+        title: 'Update PDL Management',
         href: '/pdl-management',
     },
 ];
 
-export default function CreatePDLInformation() {
+export default function UpdatePDLInformation() {
+
+    const { props } = usePage();
+
+    const { pdl } = props;
+    console.log('PDL:', pdl);
+
     const [activeCaseIndex, setActiveCaseIndex] = useState(0);
     const handleAddNewCase = () => {
         setData('cases', [
             ...data.cases,
             {
+                case_id: '',
                 case_number: '',
                 crime_committed: '',
                 date_committed: '',
@@ -54,7 +62,8 @@ export default function CreatePDLInformation() {
         newCases[index] = { ...newCases[index], [field]: value };
         setData('cases', newCases);
     };
-    const { data, setData, post, processing, errors, reset } = useForm<{
+    const { data, setData, put, processing, errors, reset } = useForm<{
+        id: number;
         fname: string;
         lname: string;
         alias: string;
@@ -66,6 +75,8 @@ export default function CreatePDLInformation() {
         brgy: string;
         city: string;
         province: string;
+
+        court_order_id: number;
         court_order_number: string;
         order_type: string;
         order_date: string;
@@ -74,12 +85,15 @@ export default function CreatePDLInformation() {
         court_branch: string;
         cod_remarks: string;
 
+        medical_record_id: number;
         complaint: string;
         date: string;
         prognosis: string;
         laboratory: string;
         prescription: string;
         findings: string;
+
+        physical_characteristic_id: number;
         height: number;
         weight: number;
         build: string;
@@ -89,7 +103,9 @@ export default function CreatePDLInformation() {
         identification_marks: string;
         mark_location: string;
         pc_remark: string;
+
         cases: {
+            case_id: number;
             case_number: string;
             crime_committed: string;
             date_committed: string;
@@ -99,55 +115,79 @@ export default function CreatePDLInformation() {
             security_classification: string;
         }[];
     }>({
-        fname: '',
-        lname: '',
-        alias: '',
-        birthdate: '',
-        age: '',
-        gender: '',
-        ethnic_group: '',
-        civil_status: '',
-        brgy: '',
-        city: '',
-        province: '',
-        court_order_number: '',
-        order_type: '',
-        order_date: '',
-        received_date: '',
-        document_type: '',
-        court_branch: '',
-        cod_remarks: '',
+        id: pdl.id,
+        fname: pdl.fname || '',
+        lname: pdl.lname || '',
+        alias: pdl.alias || '',
+        birthdate: pdl.birthdate || '',
+        age: pdl.age ? pdl.age.toString() : '',
+        gender: pdl.gender || '',
+        ethnic_group: pdl.ethnic_group || '',
+        civil_status: pdl.civil_status || '',
+        brgy: pdl.brgy || '',
+        city: pdl.city || '',
+        province: pdl.province || '',
 
-        complaint: '',
-        date: new Date().toISOString().split('T')[0],
-        prognosis: '',
-        laboratory: '',
-        prescription: '',
-        findings: '',
-        height: 170,
-        weight: 70,
-        build: '',
-        complexion: '',
-        hair_color: '',
-        eye_color: '',
-        identification_marks: '',
-        mark_location: '',
-        pc_remark: '',
-        cases: [
-            {
-                case_number: '',
-                crime_committed: '',
-                date_committed: '',
-                time_committed: '',
-                case_status: 'open',
-                case_remarks: '',
-                security_classification: 'medium',
-            },
-        ],
+        // Court order
+        court_order_id: pdl.court_orders?.[0]?.court_order_id || 0,
+        court_order_number: pdl.court_orders?.[0]?.court_order_number || '',
+        order_type: pdl.court_orders?.[0]?.order_type || '',
+        order_date: pdl.court_orders?.[0]?.order_date || '',
+        received_date: pdl.court_orders?.[0]?.received_date || '',
+        document_type: pdl.court_orders?.[0]?.document_type || '',
+        court_branch: pdl.court_orders?.[0]?.court_branch || '',
+        cod_remarks: pdl.court_orders?.[0]?.remarks || '',
+
+        // Medical record
+        medical_record_id: pdl.medical_records?.[0]?.medical_record_id || 0,
+        complaint: pdl.medical_records?.[0]?.complaint || '',
+        date: pdl.medical_records?.[0]?.date || new Date().toISOString().split('T')[0],
+        prognosis: pdl.medical_records?.[0]?.prognosis || '',
+        laboratory: pdl.medical_records?.[0]?.laboratory || '',
+        prescription: pdl.medical_records?.[0]?.prescription || '',
+        findings: pdl.medical_records?.[0]?.findings || '',
+
+        // Physical characteristic
+        physical_characteristic_id: pdl.physical_characteristics?.[0]?.characteristic_id || 0,
+        height: pdl.physical_characteristics?.[0]?.height ?? 170,
+        weight: pdl.physical_characteristics?.[0]?.weight ?? 70,
+        build: pdl.physical_characteristics?.[0]?.build || '',
+        complexion: pdl.physical_characteristics?.[0]?.complexion || '',
+        hair_color: pdl.physical_characteristics?.[0]?.hair_color || '',
+        eye_color: pdl.physical_characteristics?.[0]?.eye_color || '',
+        identification_marks: pdl.physical_characteristics?.[0]?.identification_marks || '',
+        mark_location: pdl.physical_characteristics?.[0]?.mark_location || '',
+        pc_remark: pdl.physical_characteristics?.[0]?.remark || '',
+
+        // Cases
+        cases:
+            Array.isArray(pdl.cases) && pdl.cases.length > 0
+                ? pdl.cases.map((c) => ({
+                      case_id: c.case_id,
+                      case_number: c.case_number || '',
+                      crime_committed: c.crime_committed || '',
+                      date_committed: c.date_committed || '',
+                      time_committed: c.time_committed || '',
+                      case_status: c.case_status || 'open',
+                      case_remarks: c.case_remarks || '',
+                      security_classification: c.security_classification || 'medium',
+                  }))
+                : [
+                      {
+                          case_id: 0,
+                          case_number: '',
+                          crime_committed: '',
+                          date_committed: '',
+                          time_committed: '',
+                          case_status: 'open',
+                          case_remarks: '',
+                          security_classification: 'medium',
+                      },
+                  ],
     });
 
-    const { props } = usePage();
     const successMessage = (props as any).success;
+
 
     const [date, setDate] = useState<Date | undefined>(undefined);
 
@@ -169,14 +209,18 @@ export default function CreatePDLInformation() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('pdl-management.personal-information.create'), {
-            preserveScroll: true,
 
+        put(route('pdl-management.personal-information.update', pdl.id), {
+            preserveScroll: true,
             onSuccess: () => {
                 reset();
                 setDate(undefined);
-
                 setActiveCaseIndex(0);
+
+                // Show success alert for 5 seconds, then redirect
+                setTimeout(() => {
+                    window.location.href = route('pdl-management.index');
+                }, 5000);
             },
         });
     };
@@ -209,6 +253,8 @@ export default function CreatePDLInformation() {
         }
     };
 
+
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create PDL Information" />
@@ -216,7 +262,7 @@ export default function CreatePDLInformation() {
             <div className="mx-auto w-full space-y-6 p-5">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Create PDL Information</h1>
+                        <h1 className="text-3xl font-bold tracking-tight">Update PDL Information</h1>
                         <p className="mt-2 text-muted-foreground">Fill in the required information to create a new PDL record.</p>
                     </div>
                 </div>
@@ -895,16 +941,16 @@ export default function CreatePDLInformation() {
                                 }}
                                 disabled={processing}
                             >
-                                Reset Form
+                                Cancel
                             </Button>
                             <Button type="submit" disabled={processing} className="min-w-[120px]">
                                 {processing ? (
                                     <div className="flex items-center gap-2">
                                         <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent"></div>
-                                        Creating...
+                                        Updating...
                                     </div>
                                 ) : (
-                                    'Create PDL Record'
+                                    'Update PDL Record'
                                 )}
                             </Button>
                         </div>
