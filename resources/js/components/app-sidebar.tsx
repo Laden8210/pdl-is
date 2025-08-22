@@ -43,19 +43,19 @@ const mainNavItems: NavItem[] = [
         userType: 'record-officer',
         children: [
             {
-                title: 'Personal Information',
+                title: 'List of PDLs',
                 href: 'record-officer/pdl-management/personal-information',
                 icon: UserCheck,
             },
             {
-                title: 'Health Assessment',
-                href: 'record-officer/pdl-management/health-assessment',
+                title: 'Cell Assignment',
+                href: 'record-officer/pdl-management/cell-assignment',
                 icon: UserCheck,
             },
             {
-                title: 'Medical Records',
-                href: 'record-officer/pdl-management/medical-records',
-                icon: FileSearch,
+                title: 'Time Allowance',
+                href: 'record-officer/pdl-management/time-allowance',
+                icon: UserCheck,
             },
         ],
     },
@@ -108,7 +108,6 @@ const mainNavItems: NavItem[] = [
         userType: 'admin',
     },
 
-
     {
         title: 'PDL Management',
         icon: Calendar,
@@ -128,7 +127,7 @@ const mainNavItems: NavItem[] = [
                 title: 'Time Allowance',
                 href: 'admin/pdl-management/time-allowance',
                 icon: UserCheck,
-            }
+            },
         ],
     },
 
@@ -148,10 +147,10 @@ const mainNavItems: NavItem[] = [
                 icon: UserCheck,
             },
             {
-                title:'Inmate Population Reports',
+                title: 'Inmate Population Reports',
                 href: 'admin/report/inmate-population',
                 icon: UserCheck,
-            }
+            },
         ],
     },
 

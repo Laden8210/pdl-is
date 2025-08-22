@@ -75,8 +75,8 @@ Route::get('/record-officer/verification', [VerificationController::class, 'inde
 Route::get('/record-officer/pdl-management/personal-information', [PDLManagementController::class, 'personal_information'])->name('pdl-management.personal-information');
 Route::get('/record-officer/pdl-management/health-assessment', [PDLManagementController::class, 'health_assessment'])->name('pdl-management.health-assessment');
 Route::get('/record-officer/pdl-management/medical-records', [PDLManagementController::class, 'medical_records'])->name('pdl-management.medical-records');
-
-
+Route::get('/record-officer/pdl-management/cell-assignment', [CellAssignmentController::class, 'index'])->name('cell-assignments.index');
+Route::get('/record-officer/pdl-management/time-allowance', [TimeAllowanceController::class, 'index'])->name('pdl-management.time-allowance');
 
 
 // Law Enforcement Routes
