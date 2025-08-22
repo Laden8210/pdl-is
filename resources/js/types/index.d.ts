@@ -78,6 +78,7 @@ export interface Cells {
 
 export interface Pdl {
     id: number;
+    name: string;
     fname: string;
     lname: string;
     alias?: string | null;
@@ -100,6 +101,11 @@ export interface Pdl {
     cases?: CaseInformation[];
     personnel?: Personnel;
     verifications?: Verification[];
+    case_no: string;
+    crime_committed: string;
+    date_of_birth: string;
+    date_committed: string;
+    no_of_cases: number;
 }
 
 export interface CellAssignment {
