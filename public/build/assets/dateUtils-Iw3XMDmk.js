@@ -1,0 +1,1 @@
+function o(a){console.log("Birthdate:",a);const t=new Date(a),e=new Date;let g=e.getFullYear()-t.getFullYear();return e.getMonth()>t.getMonth()||e.getMonth()===t.getMonth()&&e.getDate()>=t.getDate()||g--,g}export{o as g};
