@@ -138,10 +138,20 @@ const mainNavItems: NavItem[] = [
         userType: 'admin',
         children: [
             {
-                title: 'Personal Information',
-                href: 'admin/pdl-management/personal-information',
+                title: 'List of PDL Reports',
+                href: 'admin/report/list-of-pdl-reports',
                 icon: UserCheck,
             },
+            {
+                title: 'GCTA and TASTM Reports',
+                href: 'admin/report/gcta-and-tastm',
+                icon: UserCheck,
+            },
+            {
+                title:'Inmate Population Reports',
+                href: 'admin/report/inmate-population',
+                icon: UserCheck,
+            }
         ],
     },
 

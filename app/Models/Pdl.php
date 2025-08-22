@@ -61,5 +61,8 @@ class Pdl extends Model
         return $this->hasMany(CaseInformation::class);
     }
 
-
+    public function timeAllowances()
+    {
+        return $this->hasMany(TimeAllowance::class);
+    }
 }

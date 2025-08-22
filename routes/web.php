@@ -16,7 +16,9 @@ use App\Http\Controllers\CellAssignmentController;
 use App\Http\Controllers\MedicalRecordController;
 use App\Http\Controllers\PhysicalCharacteristicController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\TimeAllowanceController;
 use App\Http\Controllers\UserPDLArchiveController;
+use App\Http\Controllers\ReportController;
 
 Route::get('/', [AuthController::class, 'index'])->name('home');
 
@@ -44,10 +46,21 @@ Route::post('/admin/cell-management/update', [CellAssignmentController::class, '
 Route::post('/admin/cell-management/assign', [CellAssignmentController::class, 'assign'])->name('cell.assign');
 
 
+Route::get('/admin/report/list-of-pdl-reports', [ReportController::class, 'index'])->name('reports.pdl-list');
+Route::get('admin/report/list-of-pdl-reports/export', [ReportController::class, 'export'])->name('reports.pdl-list.export');
+
+Route::get('/admin/report/inmate-population', [ReportController::class, 'populationReport'])->name('reports.population');
+Route::get('/admin/report/inmate-population/generate', [ReportController::class, 'generatePopulationReport'])->name('reports.population.generate');
+Route::post('/admin/report/inmate-population/generate', [ReportController::class, 'generatePopulationReport'])->name('reports.population.generate');
+
 Route::get('/admin/court-hearing-calendar', [CourtHearingCalendarController::class, 'index'])->name('court-hearing.calendar');
 Route::get('/admin/verification', [VerificationController::class, 'index'])->name('verification.index');
 Route::patch('/admin/verification/{verification}/update', [VerificationController::class, 'update'])
     ->name('admin.verification.update');
+
+Route::get('admin/pdl-management/time-allowance', [TimeAllowanceController::class, 'index'])->name('pdl-management.time-allowance');
+
+Route::post('admin/pdl-management/time-allowance/{pdl}', [TimeAllowanceController::class, 'updateTimeAllowance'])->name('time-allowance.update');
 
 Route::get('/admin/user-pdl-archive', [UserPDLArchiveController::class, 'index'])->name('user-pdl-archive.index');
 
