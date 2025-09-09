@@ -1,14 +1,13 @@
 import InputError from '@/components/input-error';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { type SharedData } from '@/types';
-import { Head, useForm, usePage } from '@inertiajs/react';
-import { LoaderCircle, Eye, EyeOff, User, Lock, CheckCircle, AlertCircle } from 'lucide-react';
-import { FormEventHandler, useState, useEffect } from 'react';
-import { Link } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { AlertCircle, CheckCircle, Eye, EyeOff, LoaderCircle, Lock, User } from 'lucide-react';
+import { FormEventHandler, useEffect, useState } from 'react';
 
 type LoginForm = {
     username: string;
@@ -34,7 +33,7 @@ export default function Welcome({ status }: WelcomeProps) {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        setAttemptCount(prev => prev + 1);
+        setAttemptCount((prev) => prev + 1);
 
         post(route('login'), {
             onFinish: () => reset('password'),
@@ -45,7 +44,7 @@ export default function Welcome({ status }: WelcomeProps) {
             onSuccess: () => {
                 // Reset attempt count on success
                 setAttemptCount(0);
-            }
+            },
         });
     };
 
@@ -86,14 +85,16 @@ export default function Welcome({ status }: WelcomeProps) {
                 <div className="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 lg:grow starting:opacity-0">
                     <main className="flex w-full max-w-[335px] flex-col-reverse lg:max-w-2xl lg:flex-row">
                         {/* Login Form Section */}
-                        <div className="flex-1 rounded-br-lg rounded-bl-lg bg-white/80 backdrop-blur-sm p-6 pb-12 text-[13px] leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.12),0_4px_12px_rgba(0,0,0,0.05)] lg:rounded-tl-lg lg:rounded-br-none lg:p-20 transition-all duration-300 hover:shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16),0_8px_24px_rgba(0,0,0,0.08)]">
-
+                        <div className="flex-1 rounded-br-lg rounded-bl-lg bg-white/80 p-6 pb-12 text-[13px] leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.12),0_4px_12px_rgba(0,0,0,0.05)] backdrop-blur-sm transition-all duration-300 hover:shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16),0_8px_24px_rgba(0,0,0,0.08)] lg:rounded-tl-lg lg:rounded-br-none lg:p-20">
                             {/* Header */}
-                            <div className="mb-8">
-                                <h1 className="mb-3 text-3xl font-semibold text-[#1b1b18] lg:text-4xl">
-                                    Welcome back
-                                </h1>
-                                <p className="text-base text-[#6b6b6b] lg:text-lg">
+                            <div className="mb-8 flex flex-col items-center">
+                                <div className="mb-6 flex items-center gap-6">
+                                    <img src="/PGO.jpg" alt="Logo 1" className="h-20 w-auto rounded-full p-1" />
+
+                                    <img src="/scrdc.jpg" alt="Logo 2" className="h-20 w-auto rounded-full p-1" />
+                                </div>
+                                <h1 className="mb-3 text-3xl font-semibold text-[#1b1b18] lg:text-4xl">Welcome</h1>
+                                <p className="text-center text-base text-[#6b6b6b] lg:text-lg">
                                     Sign in to South Cotabato Rehabilitation and Detention Center.
                                 </p>
                             </div>
@@ -102,9 +103,7 @@ export default function Welcome({ status }: WelcomeProps) {
                             {status && (
                                 <Alert className="mb-6 border-green-200 bg-green-50/80 backdrop-blur-sm">
                                     <CheckCircle className="h-4 w-4 text-green-600" />
-                                    <AlertDescription className="text-green-800 font-medium">
-                                        {status}
-                                    </AlertDescription>
+                                    <AlertDescription className="font-medium text-green-800">{status}</AlertDescription>
                                 </Alert>
                             )}
 
@@ -120,14 +119,13 @@ export default function Welcome({ status }: WelcomeProps) {
                             {/* Login Form */}
                             <form className="flex flex-col gap-6" onSubmit={submit} noValidate>
                                 <div className="grid gap-6">
-
                                     {/* Username Field */}
                                     <div className="grid gap-3">
                                         <Label htmlFor="username" className="text-sm font-medium text-[#1b1b18]">
                                             Username
                                         </Label>
-                                        <div className="relative group">
-                                            <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b6b6b] transition-colors group-focus-within:text-[#1b1b18]" />
+                                        <div className="group relative">
+                                            <User className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[#6b6b6b] transition-colors group-focus-within:text-[#1b1b18]" />
                                             <Input
                                                 id="username"
                                                 type="text"
@@ -138,10 +136,10 @@ export default function Welcome({ status }: WelcomeProps) {
                                                 value={data.username}
                                                 onChange={handleUsernameChange}
                                                 placeholder="Enter your username"
-                                                className={`pl-10 h-12 text-base transition-all duration-200 ${
+                                                className={`h-12 pl-10 text-base transition-all duration-200 ${
                                                     errors.username
-                                                        ? 'border-red-300 focus-visible:ring-red-200 bg-red-50/50'
-                                                        : 'border-gray-200 focus-visible:ring-blue-200 hover:border-gray-300'
+                                                        ? 'border-red-300 bg-red-50/50 focus-visible:ring-red-200'
+                                                        : 'border-gray-200 hover:border-gray-300 focus-visible:ring-blue-200'
                                                 } ${isTyping && !errors.username ? 'border-blue-300' : ''}`}
                                                 aria-invalid={errors.username ? 'true' : 'false'}
                                                 aria-describedby={errors.username ? 'username-error' : undefined}
@@ -155,8 +153,8 @@ export default function Welcome({ status }: WelcomeProps) {
                                         <Label htmlFor="password" className="text-sm font-medium text-[#1b1b18]">
                                             Password
                                         </Label>
-                                        <div className="relative group">
-                                            <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b6b6b] transition-colors group-focus-within:text-[#1b1b18]" />
+                                        <div className="group relative">
+                                            <Lock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[#6b6b6b] transition-colors group-focus-within:text-[#1b1b18]" />
                                             <Input
                                                 id="password"
                                                 type={showPassword ? 'text' : 'password'}
@@ -166,10 +164,10 @@ export default function Welcome({ status }: WelcomeProps) {
                                                 value={data.password}
                                                 onChange={handlePasswordChange}
                                                 placeholder="Enter your password"
-                                                className={`pl-10 pr-12 h-12 text-base transition-all duration-200 ${
+                                                className={`h-12 pr-12 pl-10 text-base transition-all duration-200 ${
                                                     errors.password
-                                                        ? 'border-red-300 focus-visible:ring-red-200 bg-red-50/50'
-                                                        : 'border-gray-200 focus-visible:ring-blue-200 hover:border-gray-300'
+                                                        ? 'border-red-300 bg-red-50/50 focus-visible:ring-red-200'
+                                                        : 'border-gray-200 hover:border-gray-300 focus-visible:ring-blue-200'
                                                 } ${isTyping && !errors.password ? 'border-blue-300' : ''}`}
                                                 aria-invalid={errors.password ? 'true' : 'false'}
                                                 aria-describedby={errors.password ? 'password-error' : undefined}
@@ -177,15 +175,11 @@ export default function Welcome({ status }: WelcomeProps) {
                                             <button
                                                 type="button"
                                                 onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b6b6b] hover:text-[#1b1b18] focus:outline-none focus:text-[#1b1b18] transition-colors"
+                                                className="absolute top-1/2 right-3 -translate-y-1/2 text-[#6b6b6b] transition-colors hover:text-[#1b1b18] focus:text-[#1b1b18] focus:outline-none"
                                                 tabIndex={-1}
                                                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                                             >
-                                                {showPassword ? (
-                                                    <EyeOff className="h-4 w-4" />
-                                                ) : (
-                                                    <Eye className="h-4 w-4" />
-                                                )}
+                                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                             </button>
                                         </div>
                                         <InputError id="password-error" message={errors.password} />
@@ -200,16 +194,16 @@ export default function Welcome({ status }: WelcomeProps) {
                                                 checked={data.remember}
                                                 onCheckedChange={(checked) => setData('remember', !!checked)}
                                                 tabIndex={3}
-                                                className="data-[state=checked]:bg-[#1b1b18] data-[state=checked]:border-[#1b1b18]"
+                                                className="data-[state=checked]:border-[#1b1b18] data-[state=checked]:bg-[#1b1b18]"
                                             />
-                                            <Label htmlFor="remember" className="text-sm font-normal cursor-pointer text-[#1b1b18]">
+                                            <Label htmlFor="remember" className="cursor-pointer text-sm font-normal text-[#1b1b18]">
                                                 Remember me for 30 days
                                             </Label>
                                         </div>
 
                                         <Link
                                             href="/forgot-password"
-                                            className="text-sm text-[#6b6b6b] hover:text-[#1b1b18] hover:underline transition-colors font-medium"
+                                            className="text-sm font-medium text-[#6b6b6b] transition-colors hover:text-[#1b1b18] hover:underline"
                                             tabIndex={5}
                                         >
                                             Forgot password?
@@ -219,7 +213,7 @@ export default function Welcome({ status }: WelcomeProps) {
                                     {/* Submit Button */}
                                     <Button
                                         type="submit"
-                                        className="mt-6 w-full h-12 bg-[#1b1b18] hover:bg-[#2d2d2a] text-white font-medium text-base transition-all duration-200 disabled:opacity-50"
+                                        className="mt-6 h-12 w-full bg-[#1b1b18] text-base font-medium text-white transition-all duration-200 hover:bg-[#2d2d2a] disabled:opacity-50"
                                         tabIndex={4}
                                         disabled={processing || !isFormValid}
                                     >

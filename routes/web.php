@@ -53,6 +53,9 @@ Route::get('/admin/report/inmate-population', [ReportController::class, 'populat
 Route::get('/admin/report/inmate-population/generate', [ReportController::class, 'generatePopulationReport'])->name('reports.population.generate');
 Route::post('/admin/report/inmate-population/generate', [ReportController::class, 'generatePopulationReport'])->name('reports.population.generate');
 
+Route::get('/admin/report/gcta-and-tastm', [ReportController::class, 'gctaTastmReport'])->name('reports.gcta-tastm');
+Route::get('/admin/report/gcta-and-tastm/generate', [ReportController::class, 'generateGCTATASTM'])->name('reports.gcta-tastm.export');
+
 Route::get('/admin/court-hearing-calendar', [CourtHearingCalendarController::class, 'index'])->name('court-hearing.calendar');
 Route::get('/admin/verification', [VerificationController::class, 'index'])->name('verification.index');
 Route::patch('/admin/verification/{verification}/update', [VerificationController::class, 'update'])

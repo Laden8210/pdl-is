@@ -218,6 +218,7 @@ export function AppSidebar() {
     const fullName = user ? `${user.fname} ${user.lname}` : 'Guest';
     const position = user?.position ? user.position.charAt(0).toUpperCase() + user.position.slice(1) : '';
     const avatar = user?.avatar ? `/storage/${user.avatar}` : '/images/default-avatar.jpg';
+    const url = user?.position ? `/${user.position}/profile-management` : '/';
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -225,7 +226,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard" prefetch>
+                            <Link href={url} prefetch>
                                 <AppLogo imageUrl={avatar} name={fullName} role={position} />
                             </Link>
                         </SidebarMenuButton>

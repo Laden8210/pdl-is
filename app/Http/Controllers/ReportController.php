@@ -8,6 +8,7 @@ use App\Models\Pdl;
 use App\Models\CaseInformation;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Verifications;
 
 class ReportController extends Controller
 {
@@ -119,7 +120,7 @@ class ReportController extends Controller
         return $pdf->download($fileName);
     }
 
-      public function populationReport()
+    public function populationReport()
     {
         return Inertia::render('admin/report/population-report');
     }
@@ -266,14 +267,14 @@ class ReportController extends Controller
         foreach ($statusGroups as $status) {
             $maleCount = $cases->filter(function ($case) use ($status) {
                 return $case->case_status === $status &&
-                       $case->pdl &&
-                       $case->pdl->gender === 'Male';
+                    $case->pdl &&
+                    $case->pdl->gender === 'Male';
             })->count();
 
             $femaleCount = $cases->filter(function ($case) use ($status) {
                 return $case->case_status === $status &&
-                       $case->pdl &&
-                       $case->pdl->gender === 'Female';
+                    $case->pdl &&
+                    $case->pdl->gender === 'Female';
             })->count();
 
             $total = $maleCount + $femaleCount;
@@ -359,6 +360,8 @@ class ReportController extends Controller
         ];
     }
 
+
+
     private function exportPdfReport($data, $reportType, $reportDate)
     {
         $fileName = str_replace(' ', '_', strtolower($data['title'])) . '_' . $reportDate->format('Y_m_d') . '.pdf';
@@ -375,5 +378,180 @@ class ReportController extends Controller
         $dompdf->render();
 
         return $dompdf->stream($fileName);
+    }
+
+    public function gctaTastmReport(Request $request)
+    {
+        $query = Verifications::with([
+            'personnel:id,fname,lname',
+            'pdl' => function ($query) {
+                $query->with([
+                    'physicalCharacteristics',
+                    'courtOrders',
+                    'medicalRecords',
+                    'cases',
+                    'personnel:id,fname,lname',
+                    'timeAllowances'
+                ]);
+            },
+            'reviewer:id,fname,lname'
+        ])
+            ->where('status', '=', 'approved');
+
+        if ($request->has('search')) {
+            $searchTerm = $request->search;
+            $query->whereHas('pdl', function ($q) use ($searchTerm) {
+                $q->where('fname', 'like', "%{$searchTerm}%")
+                    ->orWhere('lname', 'like', "%{$searchTerm}%")
+                    ->orWhere('alias', 'like', "%{$searchTerm}%")
+                    ->orWhere('id', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        $verifications = $query->latest()->get();
+
+        return Inertia::render('admin/report/gcta-tastm-report', [
+            'verifications' => $verifications->map(function ($verification) {
+                $pdl = $verification->pdl;
+
+                $gcta = 0;
+                $tastm = 0;
+
+                if ($pdl && $pdl->timeAllowances) {
+                    foreach ($pdl->timeAllowances as $allowance) {
+                        if ($allowance->type === 'gcta') {
+                            $gcta += $allowance->days;
+                        } elseif ($allowance->type === 'tastm') {
+                            $tastm += $allowance->days;
+                        }
+                    }
+                }
+
+                return [
+                    'verification_id' => $verification->verification_id,
+                    'reason' => $verification->reason,
+                    'status' => $verification->status,
+                    'feedback' => $verification->feedback,
+                    'reviewed_at' => $verification->reviewed_at,
+                    'personnel' => $verification->personnel,
+                    'reviewer' => $verification->reviewer,
+                    'created_at' => $verification->created_at,
+                    'gcta_days' => $gcta,
+                    'tastm_days' => $tastm,
+                    'pdl' => $pdl ? [
+                        'id' => $pdl->id,
+                        'fname' => $pdl->fname,
+                        'lname' => $pdl->lname,
+                        'alias' => $pdl->alias,
+                        'birthdate' => $pdl->birthdate,
+                        'age' => $pdl->age,
+                        'gender' => $pdl->gender,
+                        'ethnic_group' => $pdl->ethnic_group,
+                        'civil_status' => $pdl->civil_status,
+                        'brgy' => $pdl->brgy,
+                        'city' => $pdl->city,
+                        'province' => $pdl->province,
+                        'personnel' => $pdl->personnel,
+                        'physical_characteristics' => $pdl->physicalCharacteristics,
+                        'court_orders' => $pdl->courtOrders,
+                        'medical_records' => $pdl->medicalRecords,
+                        'cases' => $pdl->cases,
+                    ] : null,
+                ];
+            }),
+            'filters' => $request->only(['start_date', 'end_date', 'search']),
+        ]);
+    }
+
+
+    public function generateGCTATASTM(Request $request)
+    {
+        $verificationId = $request->input('verification_id');
+
+        $verification = Verifications::with([
+            'personnel:id,fname,lname',
+            'pdl' => function ($query) {
+                $query->with([
+                    'physicalCharacteristics',
+                    'courtOrders',
+                    'medicalRecords',
+                    'cases',
+                    'personnel:id,fname,lname',
+                    'timeAllowances'
+                ]);
+            },
+            'reviewer:id,fname,lname'
+        ])->findOrFail($verificationId);
+
+        $pdl = $verification->pdl;
+
+        // Calculate GCTA and TASTM days
+        $gcta = 0;
+        $tastm = 0;
+
+        if ($pdl && $pdl->timeAllowances) {
+            foreach ($pdl->timeAllowances as $allowance) {
+                if ($allowance->type === 'gcta') {
+                    $gcta += $allowance->days;
+                } elseif ($allowance->type === 'tastm') {
+                    $tastm += $allowance->days;
+                }
+            }
+        }
+
+        // Calculate time served (this would need your actual logic)
+        $commitmentDate = $pdl->created_at; // This should be replaced with actual commitment date
+        $currentDate = now();
+        $timeServed = $commitmentDate->diff($currentDate);
+
+        // Convert days to years, months, days
+        function convertDaysToYMD($days)
+        {
+            $years = floor($days / 365);
+            $remainingDays = $days % 365;
+            $months = floor($remainingDays / 30);
+            $days = $remainingDays % 30;
+
+            return [
+                'years' => $years,
+                'months' => $months,
+                'days' => $days
+            ];
+        }
+
+        $gctaYMD = convertDaysToYMD($gcta);
+        $tastmYMD = convertDaysToYMD($tastm);
+
+        $totalDaysServed = $commitmentDate->diffInDays($currentDate);
+        $totalWithAllowances = $totalDaysServed + $gcta + $tastm;
+        $totalYMD = convertDaysToYMD($totalWithAllowances);
+
+        $data = [
+            'verification' => $verification,
+            'pdl' => $pdl,
+            'gcta_days' => $gcta,
+            'tastm_days' => $tastm,
+            'gcta_ymd' => $gctaYMD,
+            'tastm_ymd' => $tastmYMD,
+            'commitment_date' => $commitmentDate->format('F j, Y'),
+            'current_date' => $currentDate->format('F j, Y'),
+            'time_served' => [
+                'years' => $timeServed->y,
+                'months' => $timeServed->m,
+                'days' => $timeServed->d
+            ],
+            'total_with_allowances' => $totalYMD
+        ];
+
+        $html = view('reports.gcta-tastm', $data)->render();
+
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->loadHtml($html);
+        $dompdf->render();
+
+        return response($dompdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="gcta-tastm-report-' . $pdl->id . '.pdf"');
     }
 }
