@@ -1,8 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { PageProps, type BreadcrumbItem } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
@@ -29,19 +29,21 @@ export default function ListOfPdlReports() {
     });
 
     const handleFilter = () => {
-        get(route('reports.pdl-list', {
-            start_date: data.start_date,
-            end_date: data.end_date
-        }));
+        get(
+            route('reports.pdl-list', {
+                start_date: data.start_date,
+                end_date: data.end_date,
+            }),
+        );
     };
 
-const handleExport = () => {
-    const params = new URLSearchParams();
-    if (data.start_date) params.append('start_date', data.start_date);
-    if (data.end_date) params.append('end_date', data.end_date);
+    const handleExport = () => {
+        const params = new URLSearchParams();
+        if (data.start_date) params.append('start_date', data.start_date);
+        if (data.end_date) params.append('end_date', data.end_date);
 
-    window.location.href = route('reports.pdl-list.export') + '?' + params.toString();
-};
+        window.location.href = route('reports.pdl-list.export') + '?' + params.toString();
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -57,44 +59,37 @@ const handleExport = () => {
                         <CardTitle>Filter Reports</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
                             <div>
                                 <Label htmlFor="start_date">Start Date</Label>
-                                <Input
-                                    id="start_date"
-                                    type="date"
-                                    value={data.start_date}
-                                    onChange={(e) => setData('start_date', e.target.value)}
-                                />
+                                <Input id="start_date" type="date" value={data.start_date} onChange={(e) => setData('start_date', e.target.value)} />
                             </div>
                             <div>
                                 <Label htmlFor="end_date">End Date</Label>
-                                <Input
-                                    id="end_date"
-                                    type="date"
-                                    value={data.end_date}
-                                    onChange={(e) => setData('end_date', e.target.value)}
-                                />
+                                <Input id="end_date" type="date" value={data.end_date} onChange={(e) => setData('end_date', e.target.value)} />
                             </div>
                             <div className="flex items-end gap-2">
                                 <Button onClick={handleFilter} className="bg-blue-500 hover:bg-blue-600">
                                     Apply Filter
                                 </Button>
-                                <Button variant="outline" onClick={() => {
-                                    setData({ start_date: '', end_date: '' });
-                                    get(route('reports.pdl-list'));
-                                }}>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        setData({ start_date: '', end_date: '' });
+                                        get(route('reports.pdl-list'));
+                                    }}
+                                >
                                     Clear
                                 </Button>
                             </div>
                         </div>
 
-                        <div className="flex justify-between items-center">
+                        <div className="flex items-center justify-between">
                             <p className="text-sm text-gray-600">
                                 Showing {pdls.length} records
-                                {data.start_date && data.end_date &&
-                                    ` from ${format(new Date(data.start_date), 'MMM dd, yyyy')} to ${format(new Date(data.end_date), 'MMM dd, yyyy')}`
-                                }
+                                {data.start_date &&
+                                    data.end_date &&
+                                    ` from ${format(new Date(data.start_date), 'MMM dd, yyyy')} to ${format(new Date(data.end_date), 'MMM dd, yyyy')}`}
                             </p>
                             <Button onClick={handleExport} variant="outline" className="bg-green-500 text-white hover:bg-green-600">
                                 Export to PDF
@@ -141,7 +136,7 @@ const handleExport = () => {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={10} className="text-center py-4">
+                                        <TableCell colSpan={10} className="py-4 text-center">
                                             No records found for the selected date range.
                                         </TableCell>
                                     </TableRow>
