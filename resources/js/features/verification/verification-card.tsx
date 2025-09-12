@@ -108,7 +108,9 @@ export default function VerificationCard({ verification, onUpdate }: Verificatio
               <DialogHeader>
                 <DialogTitle>Verification Request Details</DialogTitle>
                 <DialogDescription>
-                  Review verification request for <strong>{pdlName}</strong>
+                  Review verification request for <strong>{pdlName}</strong> <br />
+                    <br />
+                    Submitted on: <strong>{format(new Date(verification.created_at), "MMM dd, yyyy, hh:mm a")}</strong>
                 </DialogDescription>
               </DialogHeader>
 
@@ -357,7 +359,7 @@ export default function VerificationCard({ verification, onUpdate }: Verificatio
                     (statusUpdate === "rejected" && !feedback.trim())
                   }
                 >
-                  {isSubmitting ? 'Submitting...' : 'Submit Review'}
+                  {isSubmitting ? 'Submitting...' : 'Submit'}
                 </Button>
               </div>
             </DialogContent>

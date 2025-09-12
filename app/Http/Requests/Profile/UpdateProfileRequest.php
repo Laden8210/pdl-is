@@ -27,9 +27,9 @@ class UpdateProfileRequest extends FormRequest
             'lastName' => 'required|string|max:255',
             'middleName' => 'nullable|string|max:255',
             'position' => 'required|string|max:255',
-            'status' => 'required|in:active,inactive',
+
             'password' => 'nullable|string|min:8|confirmed',
-            'profileImage' => 'nullable|image|max:2048',
+            'profileImage' => 'nullable|image|max:25600',
         ];
     }
 
@@ -39,7 +39,7 @@ class UpdateProfileRequest extends FormRequest
             'firstName.required' => 'First name is required.',
             'lastName.required' => 'Last name is required.',
             'position.required' => 'Position is required.',
-            'status.required' => 'Status is required.',
+
             'password.min' => 'Password must be at least 8 characters.',
             'profileImage.image' => 'Profile image must be an image file.',
         ];

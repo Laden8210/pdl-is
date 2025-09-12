@@ -26,6 +26,7 @@ class VerificationController extends Controller
             'reviewer:id,fname,lname'
         ])
             ->where('status', '!=', 'approved')
+            ->where('status', '!=', 'rejected')
             ->latest();
 
         if ($request->search) {

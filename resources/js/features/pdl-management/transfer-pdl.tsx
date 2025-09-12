@@ -31,7 +31,7 @@ export function TransferPDL({ pdl }: { pdl: { id: number; full_name: string } })
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
+                <Button variant="ghost" >
                     Transfer PDL
                 </Button>
             </DialogTrigger>

@@ -27,7 +27,7 @@ class ProfileManagementController extends Controller
         $user->lname = $request->input('lastName');
         $user->mname = $request->input('middleName');
         $user->position = $request->input('position');
-        $user->status = $request->input('status');
+
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->input('password'));

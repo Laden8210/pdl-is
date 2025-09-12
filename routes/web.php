@@ -34,6 +34,8 @@ Route::delete('/user-management/{id}', [UserManagementController::class, 'destro
     ->name('user-management.destroy');
 Route::put('/user-management/{id}', [UserManagementController::class, 'update'])
     ->name('user-management.update');
+
+    Route::post('/admin/user-management/reset-password/{id}', [UserManagementController::class, 'resetPassword'])->name('user-management.reset-password');
 Route::post('/admin/user-management', [UserManagementController::class, 'store'])->name('user-management.store');
 Route::get('/admin/pdl-management/personal-information', [PDLManagementController::class, 'personal_information_admin'])->name('pdl-management.personal-information');
 Route::get('/admin/pdl-management/health-assessment', [PDLManagementController::class, 'health_assessment'])->name('pdl-management.health-assessment');
@@ -55,6 +57,8 @@ Route::post('/admin/report/inmate-population/generate', [ReportController::class
 
 Route::get('/admin/report/gcta-and-tastm', [ReportController::class, 'gctaTastmReport'])->name('reports.gcta-tastm');
 Route::get('/admin/report/gcta-and-tastm/generate', [ReportController::class, 'generateGCTATASTM'])->name('reports.gcta-tastm.export');
+
+Route::get('/admin/report/pdl/{pdl}/report/{type}', [ReportController::class, 'generatePDLReport'])->name('reports.pdl.report');
 
 Route::get('/admin/court-hearing-calendar', [CourtHearingCalendarController::class, 'index'])->name('court-hearing.calendar');
 Route::get('/admin/verification', [VerificationController::class, 'index'])->name('verification.index');

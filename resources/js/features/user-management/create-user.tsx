@@ -14,7 +14,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Head, useForm, usePage } from '@inertiajs/react';
+import { after } from 'node:test';
 import { FormEventHandler, useRef } from 'react';
+import { useEffect } from 'react';
 
 export function CreateUser() {
     const avatarRef = useRef<HTMLInputElement>(null);
@@ -40,9 +42,32 @@ export function CreateUser() {
         post(route('user-management.store'), {
             preserveScroll: true,
             forceFormData: true,
-            onSuccess: () => {},
+            onSuccess: () => {
+                setData({
+                    firstName: '',
+                    middleName: '',
+                    lastName: '',
+                    contactNumber: '',
+                    avatar: null,
+                    username: '',
+                    password: '',
+                    position: '',
+                    agency: '',
+                });
+
+
+                setTimeout(() => {
+                 const closeButton = document.querySelector('.dialog-close-button') as HTMLElement;
+                 if (closeButton) {
+                      closeButton.click();
+                 }
+                }, 3000);
+
+            },
         });
     };
+
+
 
     return (
         <Dialog>
@@ -80,7 +105,7 @@ export function CreateUser() {
 
                     <div className="grid grid-cols-3 gap-4 py-2">
                         <div className="col-span-2">
-                            <Label htmlFor="firstName">First Name</Label>
+                            <Label htmlFor="firstName">First Name *</Label>
                             <Input
                                 id="firstName"
                                 name="firstName"
@@ -101,7 +126,7 @@ export function CreateUser() {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="lastName">Last Name</Label>
+                            <Label htmlFor="lastName">Last Name *</Label>
                             <Input
                                 id="lastName"
                                 name="lastName"
@@ -112,7 +137,7 @@ export function CreateUser() {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="contactNumber">Contact Number</Label>
+                            <Label htmlFor="contactNumber">Contact Number *</Label>
                             <Input
                                 id="contactNumber"
                                 name="contactNumber"
@@ -123,7 +148,7 @@ export function CreateUser() {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="avatar">Avatar</Label>
+                            <Label htmlFor="avatar">Avatar *</Label>
                             <Input
                                 id="avatar"
                                 name="avatar"
@@ -135,7 +160,7 @@ export function CreateUser() {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="username">Username</Label>
+                            <Label htmlFor="username">Username *</Label>
                             <Input
                                 id="username"
                                 name="username"
@@ -146,7 +171,7 @@ export function CreateUser() {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">Password *</Label>
                             <Input
                                 id="password"
                                 name="password"
@@ -158,7 +183,7 @@ export function CreateUser() {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="userType">User Type</Label>
+                            <Label htmlFor="userType">User Type *</Label>
                             <Select
                                 value={data.position}
                                 onValueChange={(value) => setData('position', value)}
@@ -177,7 +202,7 @@ export function CreateUser() {
 
 
                         <div className="col-span-3">
-                            <Label htmlFor="agency">Agency</Label>
+                            <Label htmlFor="agency">Agency *    </Label>
                             <Input
                                 id="agency"
                                 name="agency"

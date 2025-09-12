@@ -554,4 +554,34 @@ class ReportController extends Controller
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'inline; filename="gcta-tastm-report-' . $pdl->id . '.pdf"');
     }
+
+    public function generatePDLReport(Request $request, Pdl $pdl, $type)
+    {
+        $validTypes = ['inmate-status', 'inmate-population', 'inmate-daily-status'];
+
+        if (!in_array($type, $validTypes)) {
+            return redirect()->back()->with('error', 'Invalid report type.');
+        }
+
+        $pdl->load(['cases', 'personnel', 'physicalCharacteristics', 'courtOrders', 'medicalRecords']);
+
+        $data = [
+            'pdl' => $pdl,
+            'report_type' => $type,
+            'generated_at' => now()->format('Y-m-d H:i:s')
+        ];
+
+        $fileName = strtolower(str_replace(' ', '_', $type)) . '_report_pdl_' . $pdl->id . '.pdf';
+
+        $html = view('reports.pdl-report', $data)->render();
+
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->loadHtml($html);
+        $dompdf->render();
+
+        return response($dompdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="' . $fileName . '"');
+    }
 }
