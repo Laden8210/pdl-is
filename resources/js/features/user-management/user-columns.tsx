@@ -3,6 +3,13 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { DeleteUser } from './delete-user';
 import { EditUser } from './edit-user';
+import { ResetPasswordDialog } from './reset-password-dialog';
+export type PasswordReset = {
+    id: number;
+    personnel_id: number;
+    is_used: boolean;
+    created_at: string;
+};
 
 export type Personnel = {
     id: number;
@@ -15,6 +22,7 @@ export type Personnel = {
     password: string;
     position: string;
     agency: string;
+    password_resets?: PasswordReset[];
 };
 
 export const user_columns: ColumnDef<Personnel>[] = [
@@ -59,6 +67,17 @@ export const user_columns: ColumnDef<Personnel>[] = [
         accessorKey: 'agency',
         header: 'Agency',
     },
+    {
+        accessorKey: 'password',
+        header: 'Request Password Reset',
+        cell: ({ row }) => {
+            const user = row.original;
+            const hasActiveRequest = user.password_resets && user.password_resets.length > 0;
+
+            return hasActiveRequest ? <ResetPasswordDialog user={user} /> : <span className="text-muted-foreground">No active request</span>;
+        },
+    },
+
     {
         id: 'actions',
         header: 'Actions',

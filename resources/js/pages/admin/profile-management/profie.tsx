@@ -97,6 +97,7 @@ export default function ProfileManagement() {
                             <div>
                                 <Label htmlFor="first-name">First Name</Label>
                                 <Input
+                                    readOnly
                                     id="first-name"
                                     type="text"
                                     placeholder="Enter your first name"
@@ -107,6 +108,7 @@ export default function ProfileManagement() {
                             <div>
                                 <Label htmlFor="last-name">Last Name</Label>
                                 <Input
+                                    readOnly
                                     id="last-name"
                                     type="text"
                                     placeholder="Enter your last name"
@@ -131,6 +133,7 @@ export default function ProfileManagement() {
                             <div>
                                 <Label htmlFor="middle-name">Middle Name</Label>
                                 <Input
+                                    readOnly
                                     id="middle-name"
                                     type="text"
                                     placeholder="Enter your middle name"
@@ -141,6 +144,7 @@ export default function ProfileManagement() {
                             <div>
                                 <Label htmlFor="role">Position</Label>
                                 <Input
+
                                     id="role"
                                     type="text"
                                     placeholder="Enter your position"
@@ -148,19 +152,6 @@ export default function ProfileManagement() {
                                     onChange={(e) => setData('position', e.target.value)}
                                     readOnly
                                 />
-                            </div>
-                            <div>
-                                <Label htmlFor="status">Status</Label>
-                                <Select value={data.status} onValueChange={(value) => setData('status', value)}>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="active">Active</SelectItem>
-                                        <SelectItem value="inactive">Inactive</SelectItem>
-                                        <SelectItem value="suspended">Suspended</SelectItem>
-                                    </SelectContent>
-                                </Select>
                             </div>
 
                             <div className="flex justify-end gap-2 pt-2">

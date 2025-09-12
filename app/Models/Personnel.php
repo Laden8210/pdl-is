@@ -67,4 +67,17 @@ class Personnel extends Authenticatable
     {
         return $query->whereNotNull('deleted_at');
     }
+
+    public function passwordResets()
+    {
+        return $this->hasMany(PasswordReset::class);
+    }
+
+    public function getActivePasswordResetAttribute()
+    {
+        return $this->passwordResets()
+            ->where('is_used', false)
+            ->where('created_at', '>', now()->subHours(24))
+            ->first();
+    }
 }

@@ -16,6 +16,8 @@ import { format } from 'date-fns';
 
 // import { CreatePersonalInformation } from '@/features/pdl-management/create-pdl-personal-information';
 import { TransferPDL } from '@/features/pdl-management/transfer-pdl';
+import { ViewPdlInformation } from '@/features/pdl-management/view-pdl-information';
+import { Button } from '@/components/ui/button';
 import { usePage } from '@inertiajs/react';
 
 export default function PersonalInformation() {
@@ -51,7 +53,7 @@ export default function PersonalInformation() {
                                     href="/law-enforcement/pdl-management/personal-information/create"
                                     className="flex items-center gap-2 rounded-sm bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
                                 >
-                                    Add Personal Information
+                                    Add PDL Information
                                 </Link>
                             </div>
                         </CardTitle>
@@ -92,15 +94,22 @@ export default function PersonalInformation() {
                                                 ? pdl.verifications[0].status.charAt(0).toUpperCase() + pdl.verifications[0].status.slice(1)
                                                 : 'No Verification'}
                                         </TableCell>
-                                        <TableCell className="space-x-1">
-                                            {/* <EditPersonalInformation pdl={pdl} /> */}
-                                            <Link
-                                                href={`/law-enforcement/pdl-management/personal-information/${pdl.id}`}
-                                                className="inline-flex items-center gap-2 rounded-sm bg-yellow-500 px-4 py-2 text-sm text-white hover:bg-yellow-600"
-                                            >
-                                                Edit
-                                            </Link>
-                                            <TransferPDL pdl={pdl} />
+                                        <TableCell>
+                                            {/* Dropdown menu using shadcn and horizontal ellipse icon */}
+                                            <div className="flex gap-2">
+                                                <ViewPdlInformation pdl={pdl} />
+
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onAbort={() => {
+                                                        window.location.href = `/law-enforcement/pdl-management/personal-information/${pdl.id}/edit`;
+                                                    }}
+                                                >
+                                                    Edit
+                                                </Button>
+                                                <TransferPDL pdl={pdl} />
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))}
