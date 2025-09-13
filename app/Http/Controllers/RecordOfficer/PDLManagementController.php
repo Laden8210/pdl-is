@@ -22,7 +22,10 @@ class PDLManagementController extends Controller
         $pdls = Pdl::with([
             'personnel:id,fname,lname',
             'verifications:verification_id,status,pdl_id,reviewed_by,reviewed_at'
-        ])->latest()->get();
+        ])->latest()
+        ->where('personnel_id', Auth::id())
+        ->get();
+
 
         return Inertia::render('records-officer/pdl-management/personal-information', [
             'pdls' => $pdls->map(function ($pdl) {

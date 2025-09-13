@@ -18,6 +18,8 @@ class TimeAllowance extends Model
         'awarded_at'
     ];
 
+    protected $dates = ['awarded_at'];
+
     public function pdl()
     {
         return $this->belongsTo(Pdl::class);

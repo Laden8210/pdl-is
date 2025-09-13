@@ -1,5 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogClose,
@@ -12,10 +13,9 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Search } from 'lucide-react';
 import { useForm, usePage } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { Search, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface Pdl {
     id: number;
@@ -35,37 +35,78 @@ interface Pdl {
 export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredPdls, setFilteredPdls] = useState<Pdl[]>(pdls || []);
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [selectedCount, setSelectedCount] = useState(0);
 
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing } = useForm({
         activity_name: '',
         activity_date: '',
         activity_time: '',
         category: '',
-        pdl_id: '',
+        pdl_ids: [] as number[],
     });
 
     useEffect(() => {
         setFilteredPdls(
-            pdls.filter(pdl =>
-                `${pdl.fname} ${pdl.lname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                pdl.alias?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                pdl.id.toString().includes(searchTerm)
-            )
+            pdls.filter(
+                (pdl) =>
+                    `${pdl.fname} ${pdl.lname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    pdl.alias?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    pdl.id.toString().includes(searchTerm),
+            ),
         );
     }, [searchTerm, pdls]);
+
+    useEffect(() => {
+        setSelectedCount(data.pdl_ids.length);
+    }, [data.pdl_ids]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         post(route('jail-events.store'), {
             preserveScroll: true,
             onSuccess: () => {
-                reset();
+                setShowSuccess(true);
+                // Reset form fields except for PDL selection
+                setData({
+                    ...data,
+                    activity_name: '',
+                    activity_date: '',
+                    activity_time: '',
+                    category: '',
+                });
             },
         });
     };
 
-    const { props } = usePage<{ success?: string }>();
+    const togglePdlSelection = (pdlId: number) => {
+        setData('pdl_ids', data.pdl_ids.includes(pdlId) ? data.pdl_ids.filter((id) => id !== pdlId) : [...data.pdl_ids, pdlId]);
+    };
+
+    const selectAllFiltered = () => {
+        const filteredIds = filteredPdls.map((pdl) => pdl.id);
+        setData('pdl_ids', (prev) => {
+            // If all filtered are already selected, deselect all
+            if (filteredIds.every((id) => prev.includes(id))) {
+                return prev.filter((id) => !filteredIds.includes(id));
+            }
+            // Otherwise, add all filtered that aren't already selected
+            return [...new Set([...prev, ...filteredIds])];
+        });
+    };
+
+    const { props } = usePage<any>();
     const successMessage = props.success;
+    const errors = props.errors || {};
+
+    useEffect(() => {
+        if (showSuccess) {
+            const timer = setTimeout(() => {
+                setShowSuccess(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [showSuccess]);
 
     return (
         <Dialog>
@@ -78,28 +119,44 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
                         <DialogTitle>Add New Event</DialogTitle>
-                        <DialogDescription>
-                            Fill in the details of the event you want to add.
-                        </DialogDescription>
+                        <DialogDescription>Fill in the details of the event you want to add.</DialogDescription>
                     </DialogHeader>
 
                     {Object.keys(errors).length > 0 && (
-                        <Alert variant="destructive" className="mt-4 mb-4">
-                            <AlertTitle>Unable to process request</AlertTitle>
-                            <AlertDescription>
-                                <ul className="list-inside list-disc text-sm">
-                                    {Object.values(errors).map((error, index) => (
-                                        <li key={index}>{error}</li>
-                                    ))}
-                                </ul>
-                            </AlertDescription>
-                        </Alert>
+                        <div data-alert-container className="relative">
+                            <Alert variant="destructive">
+                                <button
+                                    type="button"
+                                    aria-label="Close"
+                                    onClick={(e) => {
+                                        const container = (e.currentTarget.closest('[data-alert-container]') as HTMLElement) || undefined;
+                                        if (container) container.style.display = 'none';
+                                    }}
+                                    className="absolute top-2 right-2 rounded p-1 text-lg leading-none hover:bg-muted"
+                                >
+                                    ×
+                                </button>
+                                <AlertTitle>Unable to process request</AlertTitle>
+                                <AlertDescription>
+                                    <ul className="list-inside list-disc space-y-1">
+                                        {Object.values(errors).map((error, index) => (
+                                            <li key={index} className="text-sm">
+                                                {error}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </AlertDescription>
+                            </Alert>
+                        </div>
                     )}
 
-                    {successMessage && (
-                        <Alert variant="default" className="mb-4">
+                    {showSuccess && successMessage && (
+                        <Alert variant="default" className="relative mb-4">
                             <AlertTitle>Success</AlertTitle>
                             <AlertDescription>{successMessage}</AlertDescription>
+                            <button onClick={() => setShowSuccess(false)} className="absolute top-3 right-3">
+                                <X className="h-4 w-4" />
+                            </button>
                         </Alert>
                     )}
 
@@ -139,7 +196,7 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                             <Label htmlFor="category">Event Category</Label>
                             <select
                                 id="category"
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                 value={data.category}
                                 onChange={(e) => setData('category', e.target.value)}
                                 required
@@ -151,9 +208,13 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Person Involved (PDL)</Label>
+                            <div className="flex items-center justify-between">
+                                <Label>Persons Involved (PDLs)</Label>
+
+                            </div>
+
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
                                     placeholder="Search PDLs by name, alias or ID..."
                                     className="pl-9"
@@ -163,42 +224,36 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                             </div>
 
                             <div className="mt-2 max-h-60 overflow-y-auto rounded-md border">
-                                <RadioGroup
-                                    value={data.pdl_id}
-                                    onValueChange={(value) => setData('pdl_id', value)}
-                                    required
-                                >
-                                    {filteredPdls.length === 0 ? (
-                                        <div className="p-4 text-center text-sm text-muted-foreground">
-                                            No PDLs found matching your search
-                                        </div>
-                                    ) : (
-                                        <div className="divide-y">
-                                            {filteredPdls.map((pdl) => (
-                                                <label
-                                                    key={pdl.id}
-                                                    className="flex items-center gap-3 p-3 hover:bg-muted/50 cursor-pointer"
-                                                >
-                                                    <RadioGroupItem value={pdl.id.toString()} />
-                                                    <div>
-                                                        <div className="font-medium">
-                                                            {pdl.fname} {pdl.lname}
-                                                            {pdl.alias && ` (${pdl.alias})`}
-                                                        </div>
-                                                        <div className="text-sm text-muted-foreground">
-                                                            ID: {pdl.id} | {pdl.age} years | {pdl.gender}
-                                                        </div>
+                                {filteredPdls.length === 0 ? (
+                                    <div className="p-4 text-center text-sm text-muted-foreground">No PDLs found matching your search</div>
+                                ) : (
+                                    <div className="divide-y">
+                                        {filteredPdls.map((pdl) => (
+                                            <label key={pdl.id} className="flex cursor-pointer items-center gap-3 p-3 hover:bg-muted/50">
+                                                <Checkbox
+                                                    checked={data.pdl_ids.includes(pdl.id)}
+                                                    onCheckedChange={() => togglePdlSelection(pdl.id)}
+                                                />
+                                                <div>
+                                                    <div className="font-medium">
+                                                        {pdl.fname} {pdl.lname}
+                                                        {pdl.alias && ` (${pdl.alias})`}
                                                     </div>
-                                                </label>
-                                            ))}
-                                        </div>
-                                    )}
-                                </RadioGroup>
+                                                    <div className="text-sm text-muted-foreground">
+                                                        ID: {pdl.id} | {pdl.age} years | {pdl.gender}
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
+
+                            {selectedCount > 0 && <div className="text-sm text-muted-foreground">Selected: {selectedCount} PDL(s)</div>}
                         </div>
                     </div>
 
-                    <DialogFooter className="gap-2 ">
+                    <DialogFooter className="gap-2">
                         <DialogClose asChild>
                             <Button type="button" variant="secondary">
                                 Cancel

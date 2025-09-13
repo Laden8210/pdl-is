@@ -24,10 +24,7 @@ class AuthController extends Controller
         return Inertia::render('welcome');
     }
 
-    public function dashboard()
-    {
-        return Inertia::render('dashboard');
-    }
+
 
     public function store(LoginRequest $request): RedirectResponse
     {

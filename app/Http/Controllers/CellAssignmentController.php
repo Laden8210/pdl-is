@@ -56,33 +56,51 @@ class CellAssignmentController extends Controller
     {
         $validated = $request->validate([
             'cell_id' => 'required|exists:cells,cell_id',
-            'pdl_id' => 'required|exists:pdl,id',
+            'pdl_ids' => 'required|array',
+            'pdl_ids.*' => 'exists:pdl,id',
         ]);
-
 
         $cell = Cells::find($validated['cell_id']);
         $currentOccupancy = CellAssignment::where('cell_id', $validated['cell_id'])->count();
+        $selectedPdlsCount = count($validated['pdl_ids']);
 
-        if ($currentOccupancy >= $cell->capacity) {
+        if ($currentOccupancy + $selectedPdlsCount > $cell->capacity) {
+            $availableSpots = $cell->capacity - $currentOccupancy;
             return back()->withErrors([
-                'cell_id' => 'This cell has reached its capacity'
+                'cell_id' => "This cell only has {$availableSpots} available spot(s). You selected {$selectedPdlsCount} PDL(s)."
             ]);
         }
 
-        $existingAssignment = CellAssignment::where('pdl_id', $validated['pdl_id'])->first();
-        if ($existingAssignment) {
-            return back()->withErrors([
-                'pdl_id' => 'This PDL is already assigned to a cell'
+        $errors = [];
+        $successfulAssignments = 0;
+
+        foreach ($validated['pdl_ids'] as $pdlId) {
+            $existingAssignment = CellAssignment::where('pdl_id', $pdlId)->first();
+            if ($existingAssignment) {
+                $pdl = Pdl::find($pdlId);
+                $errors[] = "PDL {$pdl->fname} {$pdl->lname} is already assigned to a cell";
+                continue;
+            }
+
+            CellAssignment::create([
+                'cell_id' => $validated['cell_id'],
+                'pdl_id' => $pdlId,
             ]);
+            $successfulAssignments++;
         }
 
-        $assignment = CellAssignment::create([
-            'cell_id' => $validated['cell_id'],
-            'pdl_id' => $validated['pdl_id'],
-        ]);
+        if ($successfulAssignments > 0) {
+            $message = "Successfully assigned {$successfulAssignments} PDL(s) to the cell.";
+            if (!empty($errors)) {
+                $message .= " Some assignments failed.";
+            }
 
-        return redirect()->route('cell-assignments.index')
-            ->with('success', 'Cell assignment created successfully');
+            return redirect()->route('cell-assignments.index')
+                ->with('success', $message)
+                ->withErrors($errors);
+        }
+
+        return back()->withErrors($errors);
     }
 
 
