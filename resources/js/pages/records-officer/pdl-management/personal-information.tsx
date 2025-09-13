@@ -14,7 +14,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 import { PageProps } from '@/types';
 import { format } from 'date-fns';
 
-// import { CreatePersonalInformation } from '@/features/pdl-management/create-pdl-personal-information';
+
 import { TransferPDL } from '@/features/pdl-management/transfer-pdl';
 import { ViewPdlInformation } from '@/features/pdl-management/view-pdl-information';
 import { Button } from '@/components/ui/button';
@@ -102,8 +102,8 @@ export default function PersonalInformation() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    onAbort={() => {
-                                                        window.location.href = `/law-enforcement/pdl-management/personal-information/${pdl.id}/edit`;
+                                                    onClick={() => {
+                                                        window.location.href = `/law-enforcement/pdl-management/personal-information/${pdl.id}`;
                                                     }}
                                                 >
                                                     Edit

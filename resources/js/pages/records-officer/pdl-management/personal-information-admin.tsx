@@ -1,6 +1,6 @@
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { EditPersonalInformation } from '@/features/pdl-management/edit-pdl-personal-information';
 import { ViewPdlInformation } from '@/features/pdl-management/view-pdl-information';
 import AppLayout from '@/layouts/app-layout';
 import { getAge } from '@/lib/dateUtils';
@@ -20,6 +20,10 @@ export default function PersonalInformation() {
     const { verifications } = props;
     console.log('Verifications:', verifications);
 
+    const { auth } = props;
+    const isAdmin = auth?.user?.position === 'admin';
+
+    console.log('Is Admin:', isAdmin);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Personal Information" />
@@ -72,7 +76,20 @@ export default function PersonalInformation() {
                                                 </TableCell>
                                                 <TableCell className="space-x-1">
                                                     <ViewPdlInformation pdl={verification.pdl} />
-                                                    <EditPersonalInformation pdl={verification.pdl} />
+
+
+
+                                                    {!isAdmin && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                window.location.href = `/record-officer/pdl-management/personal-information/${verification.pdl.id}`;
+                                                            }}
+                                                        >
+                                                            Edit
+                                                        </Button>
+                                                    )}
                                                 </TableCell>
                                             </TableRow>
                                         ),

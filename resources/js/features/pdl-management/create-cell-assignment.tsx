@@ -1,124 +1,218 @@
 // CreateCellAssignment.tsx
-'use client';
-
-import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Cells, Pdl } from '@/types';
+import { router } from '@inertiajs/react';
+import { useMemo, useState } from 'react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { usePage } from '@inertiajs/react';
 
 interface CreateCellAssignmentProps {
-  cells: Cells[];
-  pdls: Pdl[];
+    cells: Cells[];
+    pdls: Pdl[];
 }
 
 export function CreateCellAssignment({ cells, pdls }: CreateCellAssignmentProps) {
-  const { data, setData, post, processing, errors, reset } = useForm<{
-    cell_id: string;
-    pdl_id: string;
-  }>({
-    cell_id: '',
-    pdl_id: '',
-  });
+    const [open, setOpen] = useState(false);
+    const [selectedCell, setSelectedCell] = useState<string>('');
+    const [selectedPdls, setSelectedPdls] = useState<number[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    post(route('cell-assignments.store'), {
-      preserveScroll: true,
-      onSuccess: () => reset(),
-    });
-  };
+    // Filter PDLs based on search term
+    const filteredPdls = useMemo(() => {
+        if (!searchTerm) return pdls;
+        return pdls.filter(
+            (pdl) => `${pdl.fname} ${pdl.lname}`.toLowerCase().includes(searchTerm.toLowerCase()) || pdl.id.toString().includes(searchTerm),
+        );
+    }, [pdls, searchTerm]);
 
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Assign Cell</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Assign Cell to PDL</DialogTitle>
-          <DialogDescription>Select a cell and a PDL to create a new assignment.</DialogDescription>
-        </DialogHeader>
+    const handleSubmit = () => {
+        if (!selectedCell || selectedPdls.length === 0) return;
 
-        <form onSubmit={handleSubmit} className="mx-auto w-full space-y-4">
-          {Object.keys(errors).length > 0 && (
-            <Alert variant="destructive" className="mt-4 mb-4">
-              <AlertTitle>Unable to process request</AlertTitle>
-              <AlertDescription>
-                <ul className="list-inside list-disc text-sm">
-                  {Object.values(errors).map((error, index) => (
-                    <li key={index}>{error}</li>
-                  ))}
-                </ul>
-              </AlertDescription>
-            </Alert>
-          )}
+        router.post(
+            route('cell-assignments.store'),
+            {
+                cell_id: selectedCell,
+                pdl_ids: selectedPdls,
+            },
+            {
+                onSuccess: () => {
+                    setOpen(false);
+                    setSelectedCell('');
+                    setSelectedPdls([]);
+                    setSearchTerm('');
+                },
+            },
+        );
+    };
 
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <Label>Cell</Label>
-              <Select
-                value={data.cell_id}
-                onValueChange={(value) => setData('cell_id', value)}
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a cell" />
-                </SelectTrigger>
-                <SelectContent>
-                  {cells.map((cell) => (
-                    <SelectItem key={cell.cell_id} value={cell.cell_id.toString()}>
-                      {cell.cell_name} (Capacity: {cell.capacity})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+    const togglePdlSelection = (pdlId: number) => {
+        setSelectedPdls((prev) => (prev.includes(pdlId) ? prev.filter((id) => id !== pdlId) : [...prev, pdlId]));
+    };
 
-            <div>
-              <Label>PDL (Persons Deprived of Liberty)</Label>
-              <Select
-                value={data.pdl_id}
-                onValueChange={(value) => setData('pdl_id', value)}
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a PDL" />
-                </SelectTrigger>
-                <SelectContent>
-                  {pdls.map((pdl) => (
-                    <SelectItem key={pdl.id} value={pdl.id.toString()}>
-                      {pdl.fname} {pdl.lname} (ID: {pdl.id})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+    const selectAllFiltered = () => {
+        const filteredIds = filteredPdls.map((pdl) => pdl.id);
+        setSelectedPdls((prev) => {
+            // If all filtered are already selected, deselect all
+            if (filteredIds.every((id) => prev.includes(id))) {
+                return prev.filter((id) => !filteredIds.includes(id));
+            }
+            // Otherwise, add all filtered that aren't already selected
+            return [...new Set([...prev, ...filteredIds])];
+        });
+    };
+    const { props } = usePage<any>();
+    const successMessage = props.success;
+    const errors = props.errors || {};
 
-          <DialogFooter>
-            <Button type="submit" disabled={processing}>
-              {processing ? 'Assigning...' : 'Assign Cell'}
-            </Button>
-            <DialogClose asChild>
-              <Button variant="outline" type="button">
-                Cancel
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button>Assign PDL to Cell</Button>
+            </DialogTrigger>
+            <DialogContent className="max-h-[80vh] max-w-3xl overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>Assign PDLs to Cell</DialogTitle>
+                    <DialogDescription>Select a cell and choose PDLs to assign to it.</DialogDescription>
+                </DialogHeader>
+
+                {/* Error Alert */}
+                {Object.keys(errors).length > 0 && (
+                    <div data-alert-container className="relative">
+                        <Alert variant="destructive">
+                            <button
+                                type="button"
+                                aria-label="Close"
+                                onClick={(e) => {
+                                    const container = (e.currentTarget.closest('[data-alert-container]') as HTMLElement) || undefined;
+                                    if (container) container.style.display = 'none';
+                                }}
+                                className="absolute top-2 right-2 rounded p-1 text-lg leading-none hover:bg-muted"
+                            >
+                                ×
+                            </button>
+                            <AlertTitle>Unable to process request</AlertTitle>
+                            <AlertDescription>
+                                <ul className="list-inside list-disc space-y-1">
+                                    {Object.values(errors).map((error, index) => (
+                                        <li key={index} className="text-sm">
+                                            {error}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </AlertDescription>
+                        </Alert>
+                    </div>
+                )}
+
+                {/* Success Alert (auto-dismiss in 3s, closable) */}
+                {successMessage && (
+                    <div
+                        data-alert-container
+                        className="relative"
+                        ref={(el) => {
+                            if (!el) return;
+                            el.style.display = '';
+                            const anyEl = el as any;
+                            if (anyEl._timer) clearTimeout(anyEl._timer);
+                            anyEl._timer = setTimeout(() => {
+                                el.style.display = 'none';
+                            }, 3000);
+                        }}
+                    >
+                        <Alert>
+                            <button
+                                type="button"
+                                aria-label="Close"
+                                onClick={(e) => {
+                                    const container = (e.currentTarget.closest('[data-alert-container]') as HTMLElement) || undefined;
+                                    if (container) container.style.display = 'none';
+                                }}
+                                className="absolute top-2 right-2 rounded p-1 text-sm leading-none hover:bg-muted"
+                            >
+                                ×
+                            </button>
+                            <AlertTitle>Success</AlertTitle>
+                            <AlertDescription>{successMessage}</AlertDescription>
+                        </Alert>
+                    </div>
+                )}
+
+                <div className="grid gap-4 py-4">
+                    <div className="grid gap-2">
+                        <Label htmlFor="cell">Select Cell</Label>
+                        <Select value={selectedCell} onValueChange={setSelectedCell}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Choose a cell" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {cells.map((cell) => (
+                                    <SelectItem key={cell.cell_id} value={cell.cell_id.toString()}>
+                                        {cell.cell_name} (Capacity: {cell.capacity})
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {selectedCell && (
+                        <div className="grid gap-2">
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="pdl-search">Select PDLs</Label>
+                                <Button variant="outline" size="sm" onClick={selectAllFiltered} disabled={filteredPdls.length === 0}>
+                                    Toggle All Filtered
+                                </Button>
+                            </div>
+
+                            <Input
+                                id="pdl-search"
+                                placeholder="Search PDLs by name or ID"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+
+                            <div className="max-h-60 overflow-y-auto rounded-md border p-2">
+                                {filteredPdls.length > 0 ? (
+                                    filteredPdls.map((pdl) => (
+                                        <div key={pdl.id} className="flex items-center space-x-2 p-2 hover:bg-gray-50">
+                                            <Checkbox
+                                                id={`pdl-${pdl.id}`}
+                                                checked={selectedPdls.includes(pdl.id)}
+                                                onCheckedChange={() => togglePdlSelection(pdl.id)}
+                                            />
+                                            <label
+                                                htmlFor={`pdl-${pdl.id}`}
+                                                className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                                {pdl.fname} {pdl.lname} (ID: {pdl.id})
+                                            </label>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="p-2 text-sm text-muted-foreground">
+                                        {searchTerm ? 'No PDLs match your search' : 'No PDLs available'}
+                                    </div>
+                                )}
+                            </div>
+
+                            {selectedPdls.length > 0 && <div className="text-sm text-muted-foreground">Selected: {selectedPdls.length} PDL(s)</div>}
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => setOpen(false)}>
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSubmit} disabled={!selectedCell || selectedPdls.length === 0}>
+                        Assign Selected
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
 }

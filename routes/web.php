@@ -19,10 +19,10 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TimeAllowanceController;
 use App\Http\Controllers\UserPDLArchiveController;
 use App\Http\Controllers\ReportController;
-
+use App\Http\Controllers\DashboardController;
 Route::get('/', [AuthController::class, 'index'])->name('home');
 
-Route::get('/admin/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::get('/admin/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management.index');
 Route::post('/admin/profile/update', [ProfileManagementController::class, 'update'])->name('admin.profile.update');
@@ -72,7 +72,7 @@ Route::post('admin/pdl-management/time-allowance/{pdl}', [TimeAllowanceControlle
 Route::get('/admin/user-pdl-archive', [UserPDLArchiveController::class, 'index'])->name('user-pdl-archive.index');
 
 // Record Officer Routes
-Route::get('/record-officer/dashboard', [AuthController::class, 'dashboard'])->name('dashboard.record-officer');
+Route::get('/record-officer/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard.record-officer');
 Route::get('/record-officer/jail-events', [JailEventsController::class, 'index'])->name('jail-events.index');
 Route::post('/record-officer/jail-events', [JailEventsController::class, 'store'])->name('jail-events.store');
 
@@ -88,7 +88,7 @@ Route::get('/record-officer/pdl-management/time-allowance', [TimeAllowanceContro
 
 // Law Enforcement Routes
 Route::get('/law-enforcement/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management.index');
-Route::get('/law-enforcement/dashboard', [AuthController::class, 'dashboard'])->name('dashboard.law-enforcement');
+Route::get('/law-enforcement/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard.law-enforcement');
 Route::get('/law-enforcement/pdl-management/personal-information', [PDLManagementController::class, 'personal_information'])->name('pdl-management.personal-information');
 Route::post('/law-enforcement/pdl-management/personal-information/transfer/', [PDLManagementController::class, 'transfer'])->name('pdl-management.transfer');
 Route::get('/law-enforcement/pdl-management/personal-information/create', [PDLManagementController::class, 'view_create'])->name('pdl-management.personal-information.create');
@@ -97,6 +97,7 @@ Route::post('/law-enforcement/pdl-management/personal-information/create', [PDLM
 Route::get('/law-enforcement/pdl-management/personal-information/{pdl_id}', [PDLManagementController::class, 'view_update'])->name('pdl-management.personal-information.update');
 Route::put('/law-enforcement/pdl-management/personal-information/{pdl_id}', [PDLManagementController::class, 'update_personal_information'])->name('pdl-management.personal-information.update');
 
+Route::get('/record-officer/pdl-management/personal-information/{pdl_id}', [PDLManagementController::class, 'view_update'])->name('pdl-management.personal-information.update');
 
 Route::get('/law-enforcement/pdl-management/court-order', [PDLManagementController::class, 'court_order'])->name('pdl-management.court-order');
 Route::post('/law-enforcement/pdl-management/court-order', [PDLManagementController::class, 'store_court_order'])->name('court-orders.store');
