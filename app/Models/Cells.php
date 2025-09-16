@@ -17,6 +17,7 @@ class Cells extends Model
     protected $fillable = [
         'cell_name',
         'capacity',
+        'gender',
         'description',
         'status',
     ];

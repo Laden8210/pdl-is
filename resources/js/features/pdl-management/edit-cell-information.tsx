@@ -26,6 +26,7 @@ type Props = {
         cell_id: number;
         cell_name: string;
         capacity: number;
+        gender: 'male' | 'female';
         description: string;
         status: string;
     };
@@ -36,6 +37,7 @@ export function UpdateCellInformation({ cell }: Props) {
         cell_id: cell.cell_id,
         cell_name: cell.cell_name,
         capacity: cell.capacity.toString(),
+        gender: cell.gender,
         description: cell.description ?? '',
         status: cell.status,
     });
@@ -113,12 +115,20 @@ export function UpdateCellInformation({ cell }: Props) {
                             <Input id="capacity" name="capacity" type="number" value={data.capacity} onChange={(e) => setData('capacity', e.target.value)} />
                         </div>
 
-                        <div className="md:col-span-2">
-                            <Label htmlFor="description">Description</Label>
-                            <Input id="description" name="description" value={data.description} onChange={(e) => setData('description', e.target.value)} />
+                        <div>
+                            <Label>Gender</Label>
+                            <Select value={data.gender} onValueChange={(value) => setData('gender', value)}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select gender" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="male">Male</SelectItem>
+                                    <SelectItem value="female">Female</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
 
-                        <div className="md:col-span-2">
+                        <div>
                             <Label>Status</Label>
                             <Select value={data.status} onValueChange={(value) => setData('status', value)}>
                                 <SelectTrigger>
@@ -129,6 +139,11 @@ export function UpdateCellInformation({ cell }: Props) {
                                     <SelectItem value="inactive">Inactive</SelectItem>
                                 </SelectContent>
                             </Select>
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <Label htmlFor="description">Description</Label>
+                            <Input id="description" name="description" value={data.description} onChange={(e) => setData('description', e.target.value)} />
                         </div>
                     </div>
 

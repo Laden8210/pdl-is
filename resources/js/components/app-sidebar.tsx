@@ -4,7 +4,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Calendar, FileSearch, LayoutGrid, User, UserCheck, Users } from 'lucide-react';
+import { Calendar, FileSearch, FileText, LayoutGrid, Shield, User, UserCheck, Users, Archive } from 'lucide-react';
 import AppLogo from './app-logo';
 
 import type { PageProps } from '@/types';
@@ -56,6 +56,11 @@ const mainNavItems: NavItem[] = [
                 title: 'Time Allowance',
                 href: 'record-officer/pdl-management/time-allowance',
                 icon: UserCheck,
+            },
+            {
+                title: 'Archived PDLs',
+                href: 'pdl/archived',
+                icon: Archive,
             },
         ],
     },
@@ -136,19 +141,41 @@ const mainNavItems: NavItem[] = [
         icon: Calendar,
         userType: 'admin',
         children: [
+
             {
-                title: 'List of PDL Reports',
-                href: 'admin/report/list-of-pdl-reports',
-                icon: UserCheck,
-            },
-            {
-                title: 'GCTA and TASTM Reports',
+                title: 'GCTA & TASTM Reports',
                 href: 'admin/report/gcta-and-tastm',
                 icon: UserCheck,
             },
             {
-                title: 'Inmate Population Reports',
+                title: 'Inmates Population Report',
                 href: 'admin/report/inmate-population',
+                icon: UserCheck,
+            },
+            {
+                title: 'Inmates Status Daily Report',
+                href: 'admin/report/inmates-status-daily',
+                icon: UserCheck,
+            },
+
+            {
+                title: 'Certificate of No Records',
+                href: 'admin/report/no-records-certificate',
+                icon: FileText,
+            },
+            {
+                title: 'Inmates Status Report',
+                href: 'admin/report/inmates-status',
+                icon: UserCheck,
+            },
+            {
+                title: 'List of PDL Report',
+                href: 'admin/report/list-of-pdl-reports',
+                icon: UserCheck,
+            },
+            {
+                title: 'Population of Drug-Related Cases Monthly',
+                href: 'admin/report/drug-related-cases-monthly',
                 icon: UserCheck,
             },
         ],

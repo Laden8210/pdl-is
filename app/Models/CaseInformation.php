@@ -20,10 +20,12 @@ class CaseInformation extends Model
         'case_remarks',
         'pdl_id',
         'security_classification',
+        'drug_related',
     ];
 
     protected $casts = [
         'date_committed' => 'date',
+        'drug_related' => 'boolean',
     ];
 
     public function pdl()

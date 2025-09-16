@@ -21,14 +21,52 @@ export function CreateCellAssignment({ cells, pdls }: CreateCellAssignmentProps)
     const [selectedCell, setSelectedCell] = useState<string>('');
     const [selectedPdls, setSelectedPdls] = useState<number[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [genderFilter, setGenderFilter] = useState<string>('all');
 
-    // Filter PDLs based on search term
+    // Filter PDLs based on search term and selected cell gender
     const filteredPdls = useMemo(() => {
-        if (!searchTerm) return pdls;
-        return pdls.filter(
-            (pdl) => `${pdl.fname} ${pdl.lname}`.toLowerCase().includes(searchTerm.toLowerCase()) || pdl.id.toString().includes(searchTerm),
-        );
-    }, [pdls, searchTerm]);
+        let filtered = pdls;
+
+        // Apply search filter
+        if (searchTerm) {
+            filtered = filtered.filter(
+                (pdl) => `${pdl.fname} ${pdl.lname}`.toLowerCase().includes(searchTerm.toLowerCase()) || pdl.id.toString().includes(searchTerm),
+            );
+        }
+
+        // Apply gender filter based on selected cell
+        if (selectedCell) {
+            const selectedCellData = cells.find(cell => cell.cell_id.toString() === selectedCell);
+            if (selectedCellData) {
+                // Filter PDLs to match the cell's gender
+                filtered = filtered.filter(pdl => {
+                    // Convert PDL gender to lowercase to match cell gender format
+                    const pdlGender = pdl.gender?.toLowerCase();
+                    return pdlGender === selectedCellData.gender;
+                });
+            }
+        }
+
+        return filtered;
+    }, [pdls, searchTerm, selectedCell, cells]);
+
+    // Filter cells based on gender filter (simplified since PDLs are now filtered by cell)
+    const compatibleCells = useMemo(() => {
+        let filteredCells = cells;
+
+        // Apply gender filter
+        if (genderFilter !== 'all') {
+            filteredCells = filteredCells.filter(cell => cell.gender === genderFilter);
+        }
+
+        return filteredCells;
+    }, [cells, genderFilter]);
+
+    const handleCellChange = (cellId: string) => {
+        setSelectedCell(cellId);
+        // Clear selected PDLs when cell changes since available PDLs will change
+        setSelectedPdls([]);
+    };
 
     const handleSubmit = () => {
         if (!selectedCell || selectedPdls.length === 0) return;
@@ -45,6 +83,7 @@ export function CreateCellAssignment({ cells, pdls }: CreateCellAssignmentProps)
                     setSelectedCell('');
                     setSelectedPdls([]);
                     setSearchTerm('');
+                    setGenderFilter('all');
                 },
             },
         );
@@ -144,15 +183,29 @@ export function CreateCellAssignment({ cells, pdls }: CreateCellAssignmentProps)
 
                 <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
+                        <Label htmlFor="gender-filter">Filter by Gender</Label>
+                        <Select value={genderFilter} onValueChange={setGenderFilter}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select gender filter" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Genders</SelectItem>
+                                <SelectItem value="male">Male Only</SelectItem>
+                                <SelectItem value="female">Female Only</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="grid gap-2">
                         <Label htmlFor="cell">Select Cell</Label>
-                        <Select value={selectedCell} onValueChange={setSelectedCell}>
+                        <Select value={selectedCell} onValueChange={handleCellChange}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Choose a cell" />
                             </SelectTrigger>
                             <SelectContent>
-                                {cells.map((cell) => (
+                                {compatibleCells.map((cell) => (
                                     <SelectItem key={cell.cell_id} value={cell.cell_id.toString()}>
-                                        {cell.cell_name} (Capacity: {cell.capacity})
+                                        {cell.cell_name} (Capacity: {cell.capacity}, Gender: {cell.gender})
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -175,6 +228,17 @@ export function CreateCellAssignment({ cells, pdls }: CreateCellAssignmentProps)
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
 
+                            {/* Gender compatibility info */}
+                            {selectedCell && (
+                                <div className="text-sm text-gray-600 bg-blue-50 p-2 rounded">
+                                    <strong>Note:</strong> Only PDLs matching the selected cell's gender are shown.
+                                    {(() => {
+                                        const selectedCellData = cells.find(cell => cell.cell_id.toString() === selectedCell);
+                                        return selectedCellData ? ` Showing ${selectedCellData.gender} PDLs only.` : '';
+                                    })()}
+                                </div>
+                            )}
+
                             <div className="max-h-60 overflow-y-auto rounded-md border p-2">
                                 {filteredPdls.length > 0 ? (
                                     filteredPdls.map((pdl) => (
@@ -194,7 +258,10 @@ export function CreateCellAssignment({ cells, pdls }: CreateCellAssignmentProps)
                                     ))
                                 ) : (
                                     <div className="p-2 text-sm text-muted-foreground">
-                                        {searchTerm ? 'No PDLs match your search' : 'No PDLs available'}
+                                        {selectedCell ?
+                                            'No PDLs available for the selected cell gender.' :
+                                            (searchTerm ? 'No PDLs match your search' : 'No PDLs available')
+                                        }
                                     </div>
                                 )}
                             </div>

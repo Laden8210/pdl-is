@@ -19,6 +19,7 @@ import { TransferPDL } from '@/features/pdl-management/transfer-pdl';
 import { ViewPdlInformation } from '@/features/pdl-management/view-pdl-information';
 import { Button } from '@/components/ui/button';
 import { usePage } from '@inertiajs/react';
+import { Archive, Calendar } from 'lucide-react';
 
 export default function PersonalInformation() {
     const { props } = usePage<PageProps>();
@@ -47,14 +48,22 @@ export default function PersonalInformation() {
                             <div className="flex items-center justify-between">
                                 <span>Personal Information List</span>
 
-                                {/* <CreatePersonalInformation /> */}
+                                <div className="flex gap-2">
+                                    <Link
+                                        href={route('pdl.archived')}
+                                        className="flex items-center gap-2 rounded-sm bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-600"
+                                    >
+                                        <Archive className="h-4 w-4" />
+                                        View Archived
+                                    </Link>
 
-                                <Link
-                                    href="/law-enforcement/pdl-management/personal-information/create"
-                                    className="flex items-center gap-2 rounded-sm bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
-                                >
-                                    Add PDL Information
-                                </Link>
+                                    <Link
+                                        href="/law-enforcement/pdl-management/personal-information/create"
+                                        className="flex items-center gap-2 rounded-sm bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
+                                    >
+                                        Add PDL Information
+                                    </Link>
+                                </div>
                             </div>
                         </CardTitle>
                     </CardHeader>
@@ -73,6 +82,7 @@ export default function PersonalInformation() {
                                     <TableHead>Address</TableHead>
                                     <TableHead>Added By</TableHead>
                                     <TableHead>Transfer Request</TableHead>
+                                    <TableHead>Archive Status</TableHead>
                                     <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -95,6 +105,17 @@ export default function PersonalInformation() {
                                                 : 'No Verification'}
                                         </TableCell>
                                         <TableCell>
+                                            {pdl.archived_at ? (
+                                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                    Archived
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    Active
+                                                </span>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
                                             {/* Dropdown menu using shadcn and horizontal ellipse icon */}
                                             <div className="flex gap-2">
                                                 <ViewPdlInformation pdl={pdl} />
@@ -109,6 +130,8 @@ export default function PersonalInformation() {
                                                     Edit
                                                 </Button>
                                                 <TransferPDL pdl={pdl} />
+
+
                                             </div>
                                         </TableCell>
                                     </TableRow>

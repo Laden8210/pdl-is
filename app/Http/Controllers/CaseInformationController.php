@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Pdl;
 use App\Models\CaseInformation;
+use App\Services\NotificationService;
+use App\Models\Pdl;
 
 class CaseInformationController extends Controller
 {
@@ -48,13 +49,17 @@ class CaseInformationController extends Controller
             'case_status' => 'required|in:open,closed,pending',
             'case_remarks' => 'nullable|string',
             'security_classification' => 'required|in:low,medium,high,maximum',
+            'drug_related' => 'required|boolean',
             'pdl_id' => 'required|exists:pdl,id',
         ]);
 
         // Format time properly
         $validated['time_committed'] = date('H:i:s', strtotime($validated['time_committed']));
 
-        CaseInformation::create($validated);
+        $case = CaseInformation::create($validated);
+        $pdl = Pdl::findOrFail($validated['pdl_id']);
+
+        NotificationService::caseCreated($case, $pdl, auth()->user());
 
         return redirect()->back()
             ->with('success', 'Case information created successfully');

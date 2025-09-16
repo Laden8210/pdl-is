@@ -28,6 +28,15 @@ export const cell_management_columns: ColumnDef<Cells>[] = [
     header: "Capacity",
   },
   {
+    accessorKey: "gender",
+    header: "Gender",
+    cell: ({ row }) => (
+      <Badge variant={row.original.gender === 'male' ? 'default' : 'secondary'}>
+        {row.original.gender.charAt(0).toUpperCase() + row.original.gender.slice(1)}
+      </Badge>
+    ),
+  },
+  {
     id: "occupied",
     header: "Occupied",
     cell: ({ row }) => row.original.assignments_count ?? 0,

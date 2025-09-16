@@ -10,12 +10,209 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Progress } from '@/components/ui/progress';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { Progress } from '@/components/ui/progress';
+import { Check, ChevronsUpDown, FileText, Image, Upload, X } from 'lucide-react';
+
+// Criminal case types for dropdown
+const criminalCaseTypes = [
+    // Violent Crimes
+    {
+        category: 'Violent Crimes',
+        cases: [
+            'Murder',
+            'Homicide',
+            'Manslaughter',
+            'Assault',
+            'Battery',
+            'Robbery',
+            'Armed Robbery',
+            'Kidnapping',
+            'Abduction',
+            'Rape',
+            'Sexual Assault',
+            'Domestic Violence',
+            'Child Abuse',
+            'Elder Abuse',
+            'Hate Crime',
+            'Terrorism',
+            'Mass Shooting',
+            'Gang Violence',
+        ],
+    },
+    // Property Crimes
+    {
+        category: 'Property Crimes',
+        cases: [
+            'Theft',
+            'Burglary',
+            'Larceny',
+            'Embezzlement',
+            'Fraud',
+            'Identity Theft',
+            'Credit Card Fraud',
+            'Insurance Fraud',
+            'Tax Evasion',
+            'Money Laundering',
+            'Arson',
+            'Vandalism',
+            'Trespassing',
+            'Shoplifting',
+            'Auto Theft',
+            'Grand Theft',
+            'Petty Theft',
+        ],
+    },
+    // Drug Crimes
+    {
+        category: 'Drug Crimes',
+        cases: [
+            'Drug Possession',
+            'Drug Trafficking',
+            'Drug Manufacturing',
+            'Drug Distribution',
+            'Drug Importation',
+            'Prescription Drug Fraud',
+            'Drug Paraphernalia',
+            'Marijuana Possession',
+            'Cocaine Possession',
+            'Heroin Possession',
+            'Methamphetamine',
+            'Ecstasy',
+            'LSD',
+            'Synthetic Drugs',
+        ],
+    },
+    // White Collar Crimes
+    {
+        category: 'White Collar Crimes',
+        cases: [
+            'Corporate Fraud',
+            'Securities Fraud',
+            'Bank Fraud',
+            'Wire Fraud',
+            'Mail Fraud',
+            'Internet Fraud',
+            'Ponzi Scheme',
+            'Insider Trading',
+            'Bribery',
+            'Corruption',
+            'Extortion',
+            'Racketeering',
+            'Organized Crime',
+            'Cybercrime',
+            'Identity Theft',
+            'Forgery',
+            'Counterfeiting',
+        ],
+    },
+    // Traffic Violations
+    {
+        category: 'Traffic Violations',
+        cases: [
+            'DUI/DWI',
+            'Reckless Driving',
+            'Hit and Run',
+            'Driving Without License',
+            'Driving Under Suspension',
+            'Speeding',
+            'Running Red Light',
+            'Illegal Parking',
+            'Vehicle Registration Violation',
+            'Driving Without Insurance',
+            'Vehicular Manslaughter',
+            'Street Racing',
+        ],
+    },
+    // Public Order Crimes
+    {
+        category: 'Public Order Crimes',
+        cases: [
+            'Disorderly Conduct',
+            'Public Intoxication',
+            'Disturbing the Peace',
+            'Loitering',
+            'Prostitution',
+            'Solicitation',
+            'Public Indecency',
+            'Trespassing',
+            'Vagrancy',
+            'Panhandling',
+            'Noise Violation',
+            'Public Nuisance',
+            'Obstruction of Justice',
+            'Resisting Arrest',
+            'Escape from Custody',
+        ],
+    },
+    // Juvenile Crimes
+    {
+        category: 'Juvenile Crimes',
+        cases: [
+            'Truancy',
+            'Curfew Violation',
+            'Underage Drinking',
+            'Underage Smoking',
+            'Graffiti',
+            'Vandalism',
+            'Shoplifting',
+            'Fighting',
+            'Bullying',
+            'Cyberbullying',
+            'Sexting',
+            'Gang Activity',
+        ],
+    },
+    // Federal Crimes
+    {
+        category: 'Federal Crimes',
+        cases: [
+            'Tax Evasion',
+            'Immigration Violation',
+            'Customs Violation',
+            'Border Crossing',
+            'Human Trafficking',
+            'Drug Trafficking',
+            'Weapons Trafficking',
+            'Terrorism',
+            'Espionage',
+            'Treason',
+            'Sedition',
+            'Federal Fraud',
+            'Bank Robbery',
+            'Postal Crime',
+            'Interstate Crime',
+        ],
+    },
+    // Other Crimes
+    {
+        category: 'Other Crimes',
+        cases: [
+            'Contempt of Court',
+            'Perjury',
+            'Obstruction of Justice',
+            'Escape',
+            'Parole Violation',
+            'Probation Violation',
+            'Failure to Appear',
+            'Bail Jumping',
+            'Witness Tampering',
+            'Jury Tampering',
+            'Election Fraud',
+            'Environmental Crime',
+            'Animal Cruelty',
+            'Stalking',
+            'Harassment',
+        ],
+    },
+];
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -33,11 +230,16 @@ const steps = [
     { id: 6, title: 'Review & Submit', description: 'Review all information before submission' },
 ];
 
+interface UpdatePDLInformationProps {
+    pdl: any; // TODO: Define proper PDL type
+    [key: string]: any;
+}
+
 export default function UpdatePDLInformation() {
     const [currentStep, setCurrentStep] = useState(1);
     const [activeCaseIndex, setActiveCaseIndex] = useState(0);
 
-    const { props } = usePage();
+    const { props } = usePage<UpdatePDLInformationProps>();
     const { pdl } = props;
 
     const handleAddNewCase = () => {
@@ -52,6 +254,7 @@ export default function UpdatePDLInformation() {
                 case_status: 'open',
                 case_remarks: '',
                 security_classification: 'medium',
+                drug_related: false,
             },
         ]);
         setActiveCaseIndex(data.cases.length);
@@ -64,7 +267,7 @@ export default function UpdatePDLInformation() {
         setActiveCaseIndex(Math.min(activeCaseIndex, newCases.length - 1));
     };
 
-    const handleCaseChange = (index: number, field: string, value: string) => {
+    const handleCaseChange = (index: number, field: string, value: string | boolean) => {
         const newCases = [...data.cases];
         newCases[index] = { ...newCases[index], [field]: value };
         setData('cases', newCases);
@@ -88,7 +291,9 @@ export default function UpdatePDLInformation() {
         order_type: string;
         order_date: string;
         received_date: string;
-        document_type: string;
+        document_type: File | null;
+        document_path?: string;
+        original_filename?: string;
         court_branch: string;
         cod_remarks: string;
         medical_record_id: number;
@@ -108,6 +313,7 @@ export default function UpdatePDLInformation() {
         identification_marks: string;
         mark_location: string;
         pc_remark: string;
+        medical_files: File[];
         cases: {
             case_id: number;
             case_number: string;
@@ -117,6 +323,7 @@ export default function UpdatePDLInformation() {
             case_status: string;
             case_remarks: string;
             security_classification: string;
+            drug_related: boolean;
         }[];
     }>({
         id: pdl.id,
@@ -136,7 +343,9 @@ export default function UpdatePDLInformation() {
         order_type: pdl.court_orders?.[0]?.order_type || '',
         order_date: pdl.court_orders?.[0]?.order_date || '',
         received_date: pdl.court_orders?.[0]?.received_date || '',
-        document_type: pdl.court_orders?.[0]?.document_type || '',
+        document_type: null,
+        document_path: pdl.court_orders?.[0]?.document_path || '',
+        original_filename: pdl.court_orders?.[0]?.original_filename || '',
         court_branch: pdl.court_orders?.[0]?.court_branch || '',
         cod_remarks: pdl.court_orders?.[0]?.remarks || '',
         medical_record_id: pdl.medical_records?.[0]?.medical_record_id || 0,
@@ -156,9 +365,10 @@ export default function UpdatePDLInformation() {
         identification_marks: pdl.physical_characteristics?.[0]?.identification_marks || '',
         mark_location: pdl.physical_characteristics?.[0]?.mark_location || '',
         pc_remark: pdl.physical_characteristics?.[0]?.remark || '',
+        medical_files: [],
         cases:
             Array.isArray(pdl.cases) && pdl.cases.length > 0
-                ? pdl.cases.map((c) => ({
+                ? pdl.cases.map((c: any) => ({
                       case_id: c.case_id,
                       case_number: c.case_number || '',
                       crime_committed: c.crime_committed || '',
@@ -167,6 +377,7 @@ export default function UpdatePDLInformation() {
                       case_status: c.case_status || 'open',
                       case_remarks: c.case_remarks || '',
                       security_classification: c.security_classification || 'medium',
+                      drug_related: c.drug_related || false,
                   }))
                 : [
                       {
@@ -178,14 +389,55 @@ export default function UpdatePDLInformation() {
                           case_status: 'open',
                           case_remarks: '',
                           security_classification: 'medium',
+                          drug_related: false,
                       },
                   ],
     });
 
     const successMessage = (props as any).success;
+    const errorMessage = (props as any).error;
     const [date, setDate] = useState<Date | undefined>(
         data.birthdate ? new Date(data.birthdate) : undefined
     );
+    const [crimeCommittedOpen, setCrimeCommittedOpen] = useState(false);
+    const [medicalFiles, setMedicalFiles] = useState<File[]>([]);
+
+    // Helper function to get all crime types as a flat array
+    const getAllCrimeTypes = () => {
+        return criminalCaseTypes.flatMap((category) => category.cases.map((crime) => ({ value: crime, label: crime, category: category.category })));
+    };
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(event.target.files || []);
+        setMedicalFiles((prev) => [...prev, ...files]);
+    };
+
+    const removeFile = (index: number) => {
+        setMedicalFiles((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const getFileIcon = (file: File) => {
+        const extension = file.name.split('.').pop()?.toLowerCase();
+        switch (extension) {
+            case 'pdf':
+                return <FileText className="h-5 w-5 text-red-500" />;
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'gif':
+                return <Image className="h-5 w-5 text-blue-500" />;
+            default:
+                return <FileText className="h-5 w-5 text-gray-500" />;
+        }
+    };
+
+    const formatFileSize = (bytes: number) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    };
 
     const handleDateSelect = (selectedDate: Date | undefined) => {
         setDate(selectedDate);
@@ -205,13 +457,15 @@ export default function UpdatePDLInformation() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Update form data with medical files
+        setData('medical_files', medicalFiles);
+
         put(route('pdl-management.personal-information.update', pdl.id), {
             preserveScroll: true,
             onSuccess: () => {
-                // Show success alert for 5 seconds, then redirect
-                setTimeout(() => {
-                    window.location.href = route('pdl-management.index');
-                }, 5000);
+                // Reset medical files after successful submission
+                setMedicalFiles([]);
             },
         });
     };
@@ -434,15 +688,29 @@ export default function UpdatePDLInformation() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="document_type">
-                                        Document Type <span className="text-red-500">*</span>
+                                        Upload Document <span className="text-red-500">*</span>
                                     </Label>
-                                    <Input
+                                    <input
+                                        type="file"
                                         id="document_type"
                                         name="document_type"
-                                        placeholder="e.g., PDF, IMS"
-                                        value={data.document_type}
-                                        onChange={handleChange}
+                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                setData('document_type', file);
+                                            }
+                                        }}
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                     />
+                                    <div className="text-xs text-muted-foreground">
+                                        Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
+                                    </div>
+                                    {data.original_filename && (
+                                        <div className="text-sm text-blue-600">
+                                            Current file: {data.original_filename}
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="court_branch">
@@ -545,12 +813,59 @@ export default function UpdatePDLInformation() {
                                             <Label htmlFor="crime_committed">
                                                 Crime Committed <span className="text-red-500">*</span>
                                             </Label>
-                                            <Input
-                                                id="crime_committed"
-                                                value={data.cases[activeCaseIndex].crime_committed}
-                                                onChange={(e) => handleCaseChange(activeCaseIndex, 'crime_committed', e.target.value)}
-                                                placeholder="Enter crime committed"
-                                            />
+                                            <Popover open={crimeCommittedOpen} onOpenChange={setCrimeCommittedOpen}>
+                                                <PopoverTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        role="combobox"
+                                                        aria-expanded={crimeCommittedOpen}
+                                                        className="w-full justify-between"
+                                                    >
+                                                        {data.cases[activeCaseIndex].crime_committed || 'Select or type crime committed...'}
+                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-full p-0" align="start">
+                                                    <Command>
+                                                        <CommandInput
+                                                            placeholder="Search crimes or type custom..."
+                                                            value={data.cases[activeCaseIndex].crime_committed}
+                                                            onValueChange={(value) => handleCaseChange(activeCaseIndex, 'crime_committed', value)}
+                                                        />
+                                                        <CommandList>
+                                                            <CommandEmpty>
+                                                                <div className="p-2 text-sm text-muted-foreground">
+                                                                    No crime found. Press Enter to add "{data.cases[activeCaseIndex].crime_committed}"
+                                                                    as custom crime.
+                                                                </div>
+                                                            </CommandEmpty>
+                                                            {criminalCaseTypes.map((category) => (
+                                                                <CommandGroup key={category.category} heading={category.category}>
+                                                                    {category.cases.map((crime) => (
+                                                                        <CommandItem
+                                                                            key={crime}
+                                                                            value={crime}
+                                                                            onSelect={(currentValue) => {
+                                                                                handleCaseChange(activeCaseIndex, 'crime_committed', currentValue);
+                                                                                setCrimeCommittedOpen(false);
+                                                                            }}
+                                                                        >
+                                                                            <Check
+                                                                                className={`mr-2 h-4 w-4 ${
+                                                                                    data.cases[activeCaseIndex].crime_committed === crime
+                                                                                        ? 'opacity-100'
+                                                                                        : 'opacity-0'
+                                                                                }`}
+                                                                            />
+                                                                            {crime}
+                                                                        </CommandItem>
+                                                                    ))}
+                                                                </CommandGroup>
+                                                            ))}
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="date_committed">
@@ -608,6 +923,23 @@ export default function UpdatePDLInformation() {
                                                     <SelectItem value="maximum">Maximum</SelectItem>
                                                 </SelectContent>
                                             </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Drug Related</Label>
+                                            <RadioGroup
+                                                value={data.cases[activeCaseIndex].drug_related ? 'yes' : 'no'}
+                                                onValueChange={(value) => handleCaseChange(activeCaseIndex, 'drug_related', value === 'yes')}
+                                            >
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem value="yes" id="drug_yes" />
+                                                    <Label htmlFor="drug_yes">Yes</Label>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem value="no" id="drug_no" />
+                                                    <Label htmlFor="drug_no">No</Label>
+                                                </div>
+                                            </RadioGroup>
+                                            <div className="text-xs text-muted-foreground">Indicate if this case is related to drug offenses</div>
                                         </div>
                                     </div>
 
@@ -677,8 +1009,63 @@ export default function UpdatePDLInformation() {
                                         value={data.prognosis}
                                         onChange={handleChange}
                                         rows={3}
-                                        placeholder="Enter medical prognosis..."
+                                        placeholder="Enter medical prognosis (e.g., Good prognosis with treatment, Poor prognosis due to complications, etc.)"
                                     />
+                                    <div className="text-xs text-muted-foreground">Specify prognosis details in parentheses for clarity</div>
+                                </div>
+
+                                {/* Medical Document Upload Section */}
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label>Medical Documents</Label>
+                                        <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-gray-400">
+                                            <input
+                                                type="file"
+                                                id="medical_files"
+                                                name="medical_files"
+                                                multiple
+                                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                                                onChange={handleFileUpload}
+                                                className="hidden"
+                                            />
+                                            <label htmlFor="medical_files" className="cursor-pointer">
+                                                <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                                                <div className="mt-2">
+                                                    <span className="text-sm font-medium text-gray-900">Upload medical documents and images</span>
+                                                    <p className="text-xs text-gray-500">Click to upload or drag and drop</p>
+                                                    <p className="mt-1 text-xs text-gray-400">Supports: Images (JPG, PNG, GIF), PDF, DOC, DOCX, TXT</p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    {/* Display uploaded files */}
+                                    {medicalFiles.length > 0 && (
+                                        <div className="space-y-2">
+                                            <Label>Uploaded Files</Label>
+                                            <div className="space-y-2">
+                                                {medicalFiles.map((file, index) => (
+                                                    <div key={index} className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                                        <div className="flex items-center space-x-3">
+                                                            {getFileIcon(file)}
+                                                            <div>
+                                                                <p className="text-sm font-medium">{file.name}</p>
+                                                                <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                                                            </div>
+                                                        </div>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => removeFile(index)}
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="laboratory">
@@ -981,27 +1368,63 @@ export default function UpdatePDLInformation() {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Error Alert */}
-                    {Object.keys(errors).length > 0 && (
-                        <Alert variant="destructive">
-                            <AlertTitle>Unable to process request</AlertTitle>
-                            <AlertDescription>
-                                <ul className="list-inside list-disc space-y-1">
-                                    {Object.values(errors).map((error, index) => (
-                                        <li key={index} className="text-sm">
-                                            {error}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </AlertDescription>
-                        </Alert>
+                    {(Object.keys(errors).length > 0 || errorMessage) && (
+                        <div data-alert-container className="relative">
+                            <Alert variant="destructive">
+                                <button
+                                    type="button"
+                                    aria-label="Close"
+                                    onClick={(e) => {
+                                        const container = (e.currentTarget.closest('[data-alert-container]') as HTMLElement) || undefined;
+                                        if (container) container.style.display = 'none';
+                                    }}
+                                    className="absolute top-2 right-2 rounded p-1 text-lg leading-none hover:bg-muted"
+                                >
+                                    ×
+                                </button>
+                                <AlertTitle>Unable to process request</AlertTitle>
+                                <AlertDescription>
+                                    {errorMessage ? (
+                                        <div className="text-sm">{errorMessage}</div>
+                                    ) : (
+                                        <ul className="list-inside list-disc space-y-1">
+                                            {Object.values(errors).map((error, index) => (
+                                                <li key={index} className="text-sm">
+                                                    {error}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </AlertDescription>
+                            </Alert>
+                        </div>
                     )}
 
-                    {/* Success Alert */}
+                    {/* Success Alert (auto-dismiss in 3s, closable) */}
                     {successMessage && (
-                        <Alert>
-                            <AlertTitle>Success</AlertTitle>
-                            <AlertDescription>{successMessage}</AlertDescription>
-                        </Alert>
+                        <div
+                            data-alert-container
+                            className="relative"
+                            style={{
+                                animation: 'fadeIn 0.3s ease-in-out',
+                            }}
+                        >
+                            <Alert className="border-green-200 bg-green-50 text-green-800">
+                                <button
+                                    type="button"
+                                    aria-label="Close"
+                                    onClick={(e) => {
+                                        const container = (e.currentTarget.closest('[data-alert-container]') as HTMLElement) || undefined;
+                                        if (container) container.style.display = 'none';
+                                    }}
+                                    className="absolute top-2 right-2 rounded p-1 text-sm leading-none hover:bg-muted"
+                                >
+                                    ×
+                                </button>
+                                <AlertTitle>Success</AlertTitle>
+                                <AlertDescription>{successMessage}</AlertDescription>
+                            </Alert>
+                        </div>
                     )}
 
                     {/* Step Content */}
@@ -1026,7 +1449,7 @@ export default function UpdatePDLInformation() {
                                 type="button"
                                 variant="outline"
                                 onClick={() => {
-                                    window.location.href = route('pdl-management.index');
+                                    window.location.href = route('pdl-management.personal-information');
                                 }}
                                 disabled={processing}
                             >

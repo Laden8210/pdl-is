@@ -20,6 +20,7 @@ export type CaseInformation = {
   case_status: string;
   case_remarks: string;
   security_classification: string;
+  drug_related: boolean;
   pdl_id: number;
   pdl?: {
     fname: string;
@@ -65,6 +66,15 @@ export const case_information_columns: ColumnDef<CaseInformation>[] = [
   {
     accessorKey: "security_classification",
     header: "Security Classification",
+  },
+  {
+    accessorKey: "drug_related",
+    header: "Drug Related",
+    cell: ({ row }) => (
+      <Badge variant={row.original.drug_related ? 'destructive' : 'secondary'}>
+        {row.original.drug_related ? 'Yes' : 'No'}
+      </Badge>
+    ),
   },
   {
     id: "actions",

@@ -65,4 +65,10 @@ class Pdl extends Model
     {
         return $this->hasMany(TimeAllowance::class);
     }
+
+    // Get full name
+    public function getFullNameAttribute()
+    {
+        return trim($this->fname . ' ' . $this->lname);
+    }
 }

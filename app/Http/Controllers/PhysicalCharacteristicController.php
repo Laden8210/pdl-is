@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\PhysicalCharacteristic;
+use App\Services\NotificationService;
 use App\Models\Pdl;
 use Illuminate\Support\Facades\Validator;
 
@@ -54,7 +54,10 @@ class PhysicalCharacteristicController extends Controller
             'remark' => 'nullable|string|max:1000',
         ]);
 
-        PhysicalCharacteristic::create($validated);
+        $physicalCharacteristic = PhysicalCharacteristic::create($validated);
+        $pdl = Pdl::findOrFail($validated['pdl_id']);
+
+        NotificationService::physicalCharacteristicCreated($physicalCharacteristic, $pdl, auth()->user());
 
         return redirect()->route('physical-characteristics.index')
             ->with('success', 'Physical characteristic created successfully');
