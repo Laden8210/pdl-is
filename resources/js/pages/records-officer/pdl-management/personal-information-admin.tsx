@@ -1,4 +1,3 @@
-import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,11 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
 import { ViewPdlInformation } from '@/features/pdl-management/view-pdl-information';
 import AppLayout from '@/layouts/app-layout';
 import { getAge } from '@/lib/dateUtils';
 import { PageProps, type BreadcrumbItem } from '@/types';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { AlertCircle, Archive, Edit } from 'lucide-react';
 import { useState } from 'react';
@@ -201,6 +201,15 @@ export default function PersonalInformation() {
                         <CardTitle>
                             <div className="flex items-center justify-between">
                                 <span>Personal Information List</span>
+
+                                <div className="flex gap-2">
+                                    <Link
+                                        href="/law-enforcement/pdl-management/personal-information/create"
+                                        className="flex items-center gap-2 rounded-sm bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
+                                    >
+                                        Add PDL Information
+                                    </Link>
+                                </div>
                             </div>
                         </CardTitle>
                     </CardHeader>
@@ -535,9 +544,7 @@ export default function PersonalInformation() {
                                     onChange={(e) => setArchiveData('archive_court_order_file', e.target.files?.[0] || null)}
                                     className={errors?.archive_court_order_file ? 'border-red-500' : ''}
                                 />
-                                <p className="text-sm text-gray-500">
-                                    Upload PDF, JPG, JPEG, or PNG file (max 10MB)
-                                </p>
+                                <p className="text-sm text-gray-500">Upload PDF, JPG, JPEG, or PNG file (max 10MB)</p>
                             </div>
 
                             <div className="space-y-2">
