@@ -18,7 +18,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'lname' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'alias' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'birthdate' => 'required|date',
-            'age' => 'required|integer',
+            'age' => 'required|integer|min:18',
             'gender' => 'required|string|in:Male,Female',
             'ethnic_group' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'civil_status' => 'required|string|in:Single,Married,Widowed,Divorced',
@@ -82,7 +82,8 @@ class CreatePDLOnePageRequest extends FormRequest
 
             'birthdate.required' => 'Birthdate is required',
             'birthdate.date' => 'Birthdate must be a valid date',
-            'age.required' => 'Age is required',
+                'age.required' => 'Age is required',
+            'age.min' => 'Age must be at least 18',
             'age.integer' => 'Age must be a number',
             'gender.required' => 'Gender is required',
             'gender.in' => 'Gender must be either Male or Female',

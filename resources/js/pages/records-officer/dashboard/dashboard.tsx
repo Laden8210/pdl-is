@@ -63,6 +63,12 @@ interface DashboardProps {
       verifications_processed: number;
     }[];
     recentActivities: { type: string; title: string; description: string; badge: string; color: string; priority?: string }[];
+    timeAllowanceData: {
+      type: string;
+      count: number;
+      color: string;
+      description: string;
+    }[];
     metrics: {
       totalPDL: number;
       pendingVerifications: number;
@@ -88,6 +94,7 @@ export default function RecordsOfficerDashboard() {
       caseStatusData,
       monthlyProcessing,
       recentActivities,
+      timeAllowanceData,
       metrics
     } = dashboardData;
 
@@ -424,6 +431,95 @@ export default function RecordsOfficerDashboard() {
                   ) : (
                     <div className="text-center py-8 text-gray-500">No incomplete records</div>
                   )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Time Allowances Section */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {/* GCTA Time Allowances */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    GCTA Time Allowances
+                  </CardTitle>
+                  <CardDescription>Good Conduct Time Allowance distribution</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {(() => {
+                    const gctaData = timeAllowanceData.find(item => item.type === 'GCTA');
+                    const totalTimeAllowances = timeAllowanceData.reduce((sum, item) => sum + item.count, 0);
+                    return gctaData ? (
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <div className="h-4 w-4 rounded-full" style={{ backgroundColor: gctaData.color }} />
+                            <span className="text-lg font-semibold">{gctaData.type}</span>
+                          </div>
+                          <Badge variant="secondary" className="text-lg px-3 py-1">{gctaData.count}</Badge>
+                        </div>
+                        <div className="text-sm text-muted-foreground mb-2">{gctaData.description}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div
+                            className="h-3 rounded-full transition-all duration-300"
+                            style={{
+                              width: `${totalTimeAllowances > 0 ? (gctaData.count / totalTimeAllowances * 100) : 0}%`,
+                              backgroundColor: gctaData.color
+                            }}
+                          />
+                        </div>
+                        <div className="mt-2 text-xs text-gray-500">
+                          {totalTimeAllowances > 0 ? (gctaData.count / totalTimeAllowances * 100).toFixed(1) : 0}% of total allowances
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">No GCTA data available</div>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+
+              {/* TASTM Time Allowances */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    TASTM Time Allowances
+                  </CardTitle>
+                  <CardDescription>Time Allowance for Study, Teaching, and Mentoring distribution</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {(() => {
+                    const tastmData = timeAllowanceData.find(item => item.type === 'TASTM');
+                    const totalTimeAllowances = timeAllowanceData.reduce((sum, item) => sum + item.count, 0);
+                    return tastmData ? (
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <div className="h-4 w-4 rounded-full" style={{ backgroundColor: tastmData.color }} />
+                            <span className="text-lg font-semibold">{tastmData.type}</span>
+                          </div>
+                          <Badge variant="secondary" className="text-lg px-3 py-1">{tastmData.count}</Badge>
+                        </div>
+                        <div className="text-sm text-muted-foreground mb-2">{tastmData.description}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div
+                            className="h-3 rounded-full transition-all duration-300"
+                            style={{
+                              width: `${totalTimeAllowances > 0 ? (tastmData.count / totalTimeAllowances * 100) : 0}%`,
+                              backgroundColor: tastmData.color
+                            }}
+                          />
+                        </div>
+                        <div className="mt-2 text-xs text-gray-500">
+                          {totalTimeAllowances > 0 ? (tastmData.count / totalTimeAllowances * 100).toFixed(1) : 0}% of total allowances
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">No TASTM data available</div>
+                    );
+                  })()}
                 </CardContent>
               </Card>
             </div>

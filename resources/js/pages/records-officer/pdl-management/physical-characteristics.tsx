@@ -26,16 +26,36 @@ interface PageProps {
     filters?: {
         search: string;
     };
+    searchPerformed?: boolean;
+    totalResults?: number;
+    auth?: {
+        user?: {
+            position?: string;
+        };
+    };
 }
 
 export default function PhysicalCharacteristics() {
     const { props } = usePage<PageProps>();
-    const { characteristics, pdls, filters } = props;
+    const { characteristics, pdls, filters, auth, searchPerformed, totalResults } = props;
 
     const [searchInput, setSearchInput] = useState(filters?.search || '');
 
+    const getUserRoute = () => {
+        const userPosition = auth?.user?.position;
+        switch (userPosition) {
+            case 'admin':
+                return '/admin/pdl-management/physical-characteristics';
+            case 'law-enforcement':
+                return '/law-enforcement/pdl-management/physical-characteristics';
+            case 'record-officer':
+            default:
+                return '/record-officer/pdl-management/physical-characteristics';
+        }
+    };
+
     const handleSearch = () => {
-        router.get('/physical-characteristics', {
+        router.get(getUserRoute(), {
             search: searchInput,
         }, {
             preserveState: true,
@@ -83,6 +103,31 @@ export default function PhysicalCharacteristics() {
                         </div>
 
                         <DataTable data={characteristics} columns={physical_characteristic_columns} />
+
+                        {/* Search Results Message */}
+                        {searchPerformed && (
+                            <div className="mt-4 text-center">
+                                {totalResults === 0 ? (
+                                    <div className="text-muted-foreground">
+                                        <p className="text-lg font-medium">No physical characteristics found</p>
+                                        <p className="mt-2">No physical characteristics match your search criteria: "{filters?.search}"</p>
+                                        <p className="mt-1 text-sm">Try searching with different keywords or check your spelling.</p>
+                                    </div>
+                                ) : (
+                                    <div className="text-muted-foreground">
+                                        <p className="text-sm">Found {totalResults} physical characteristic{totalResults !== 1 ? 's' : ''} matching "{filters?.search}"</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* No Characteristics Message (when no search performed) */}
+                        {!searchPerformed && characteristics.length === 0 && (
+                            <div className="mt-4 text-center text-muted-foreground">
+                                <p className="text-lg font-medium">No physical characteristics found</p>
+                                <p className="mt-2">Physical characteristics will appear here once they are created.</p>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>

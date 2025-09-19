@@ -22,7 +22,9 @@ class TimeAllowanceController extends Controller
                     'medicalRecords',
                     'cases',
                     'personnel:id,fname,lname',
-                    'timeAllowances'
+                    'timeAllowances' => function ($query) {
+                        $query->with('awardedBy:id,fname,lname')->orderBy('awarded_at', 'desc');
+                    }
                 ]);
             },
             'reviewer:id,fname,lname'
@@ -78,6 +80,26 @@ class TimeAllowanceController extends Controller
                         'court_orders' => $pdl->courtOrders,
                         'medical_records' => $pdl->medicalRecords,
                         'cases' => $pdl->cases,
+                        'years_served' => $pdl->years_served,
+                        'default_gcta_days' => $pdl->default_gcta_days,
+                        'default_tastm_days' => $pdl->default_tastm_days,
+                        'admission_date' => $pdl->courtOrders()->whereNotNull('admission_date')->orderBy('admission_date', 'asc')->first()?->admission_date,
+                        'release_date' => $pdl->courtOrders()->whereNotNull('release_date')->orderBy('release_date', 'desc')->first()?->release_date,
+                        'time_allowance_records' => $pdl->timeAllowances->map(function ($allowance) {
+                            return [
+                                'id' => $allowance->id,
+                                'type' => $allowance->type,
+                                'days' => $allowance->days,
+                                'reason' => $allowance->reason,
+                                'awarded_by' => $allowance->awarded_by,
+                                'awarded_at' => $allowance->awarded_at,
+                                'awardedBy' => $allowance->awardedBy ? [
+                                    'id' => $allowance->awardedBy->id,
+                                    'fname' => $allowance->awardedBy->fname,
+                                    'lname' => $allowance->awardedBy->lname,
+                                ] : null,
+                            ];
+                        }),
                     ] : null,
                 ];
             }),
@@ -105,5 +127,40 @@ class TimeAllowanceController extends Controller
         NotificationService::timeAllowanceUpdated($pdl, $request->type, auth()->user());
 
         return redirect()->back()->with('success', 'Time allowance updated successfully.');
+    }
+
+    public function updateRecord(Request $request, $recordId)
+    {
+        $request->validate([
+            'type' => 'required|in:gcta,tastm',
+            'days' => 'required|integer|min:0',
+            'reason' => 'required|string'
+        ]);
+
+        $record = TimeAllowance::findOrFail($recordId);
+
+        $record->update([
+            'type' => $request->type,
+            'days' => $request->days,
+            'reason' => $request->reason,
+        ]);
+
+        $pdl = $record->pdl;
+        NotificationService::timeAllowanceUpdated($pdl, $request->type, auth()->user());
+
+        return redirect()->back()->with('success', 'Time allowance record updated successfully.');
+    }
+
+    public function revoke($recordId)
+    {
+        $record = TimeAllowance::findOrFail($recordId);
+        $pdl = $record->pdl;
+        $type = $record->type;
+
+        $record->delete();
+
+        NotificationService::timeAllowanceUpdated($pdl, $type, auth()->user());
+
+        return redirect()->back()->with('success', 'Time allowance record revoked successfully.');
     }
 }

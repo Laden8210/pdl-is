@@ -39,16 +39,36 @@ interface PageProps {
     filters?: {
         search: string;
     };
+    searchPerformed?: boolean;
+    totalResults?: number;
+    auth?: {
+        user?: {
+            position?: string;
+        };
+    };
 }
 
 export default function MedicalRecords() {
     const { props } = usePage<PageProps>();
-    const { records, pdls, filters } = props;
+    const { records, pdls, filters, auth, searchPerformed, totalResults } = props;
 
     const [searchInput, setSearchInput] = useState(filters?.search || '');
 
+    const getUserRoute = () => {
+        const userPosition = auth?.user?.position;
+        switch (userPosition) {
+            case 'admin':
+                return '/admin/pdl-management/medical-records';
+            case 'law-enforcement':
+                return '/law-enforcement/pdl-management/medical-records';
+            case 'record-officer':
+            default:
+                return '/record-officer/pdl-management/medical-records';
+        }
+    };
+
     const handleSearch = () => {
-        router.get('/medical-records', {
+        router.get(getUserRoute(), {
             search: searchInput,
         }, {
             preserveState: true,
@@ -96,6 +116,31 @@ export default function MedicalRecords() {
                         </div>
 
                         <DataTable data={records ?? []} columns={medical_record_columns} />
+
+                        {/* Search Results Message */}
+                        {searchPerformed && (
+                            <div className="mt-4 text-center">
+                                {totalResults === 0 ? (
+                                    <div className="text-muted-foreground">
+                                        <p className="text-lg font-medium">No medical records found</p>
+                                        <p className="mt-2">No medical records match your search criteria: "{filters?.search}"</p>
+                                        <p className="mt-1 text-sm">Try searching with different keywords or check your spelling.</p>
+                                    </div>
+                                ) : (
+                                    <div className="text-muted-foreground">
+                                        <p className="text-sm">Found {totalResults} medical record{totalResults !== 1 ? 's' : ''} matching "{filters?.search}"</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* No Records Message (when no search performed) */}
+                        {!searchPerformed && records.length === 0 && (
+                            <div className="mt-4 text-center text-muted-foreground">
+                                <p className="text-lg font-medium">No medical records found</p>
+                                <p className="mt-2">Medical records will appear here once they are created.</p>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>

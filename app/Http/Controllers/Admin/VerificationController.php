@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Controller;
 use App\Models\Verifications;
 use Illuminate\Support\Facades\Auth;
+use App\Services\NotificationService;
 
 class VerificationController extends Controller
 {
@@ -68,6 +69,7 @@ class VerificationController extends Controller
                 ];
             }),
             'filters' => $request->only(['search']),
+            'userRole' => Auth::user()->position ?? 'admin',
         ]);
     }
 
@@ -86,6 +88,15 @@ class VerificationController extends Controller
             'reviewed_by' => $user->id,
             'reviewed_at' => now(),
         ]);
+
+        // Send appropriate notifications based on verification status
+        if ($verification->pdl) {
+            if ($validated['status'] === 'approved') {
+                NotificationService::pdlTransferAccepted($verification->pdl, $user);
+            } elseif ($validated['status'] === 'rejected') {
+                NotificationService::pdlTransferRejected($verification->pdl, $validated['feedback'] ?? 'No reason provided', $user);
+            }
+        }
 
         return back()->with('success', 'Verification status updated successfully');
     }

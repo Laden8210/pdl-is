@@ -40,6 +40,7 @@ interface SystemNotification {
   pdl_id: number | null;
   created_at: string;
   read_at: string | null;
+  is_read: boolean;
   sender?: Personnel;
   pdl?: {
     id: number;
@@ -76,7 +77,8 @@ export function AppSidebarHeader({ breadcrumbs = [], notifications = [], auth }:
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<SystemNotification | null>(null);
   const [showAll, setShowAll] = useState(false);
-  const [readNotifications, setReadNotifications] = useState<Set<number>>(new Set());
+  const [localNotifications, setLocalNotifications] = useState<SystemNotification[]>(notifications);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Search states
   const [searchQuery, setSearchQuery] = useState('');
@@ -87,8 +89,22 @@ export function AppSidebarHeader({ breadcrumbs = [], notifications = [], auth }:
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const unreadCount = notifications.filter(n => !n.read_at && !readNotifications.has(n.id)).length;
-  const displayedNotifications = showAll ? notifications : notifications.slice(0, 5);
+  // Update local notifications when props change
+  useEffect(() => {
+    setLocalNotifications(notifications);
+    setIsRefreshing(false); // Stop refreshing indicator when new data arrives
+  }, [notifications]);
+
+  // Sort notifications: unread first, then by creation date
+  const sortedNotifications = [...localNotifications].sort((a, b) => {
+    if (a.is_read !== b.is_read) {
+      return a.is_read ? 1 : -1; // Unread first
+    }
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+
+  const unreadCount = sortedNotifications.filter(n => !n.is_read).length;
+  const displayedNotifications = showAll ? sortedNotifications : sortedNotifications.slice(0, 5);
 
   const getPdlManagementUrl = (pdlId: number) => {
     // Get current user's role from the auth data
@@ -110,49 +126,43 @@ export function AppSidebarHeader({ breadcrumbs = [], notifications = [], auth }:
     setIsPopoverOpen(false);
 
     // Mark as read first if not already read
-    if (!notification.read_at) {
+    if (!notification.is_read) {
       // Mark as read locally immediately for better UX
-      setReadNotifications(prev => new Set([...prev, notification.id]));
+      setLocalNotifications(prev =>
+        prev.map(n =>
+          n.id === notification.id
+            ? { ...n, is_read: true, read_at: new Date().toISOString() }
+            : n
+        )
+      );
 
       router.post(`/notifications/${notification.id}/read`, {}, {
         preserveScroll: true,
         onSuccess: () => {
-          // Navigate after marking as read
-          if (notification.action_url) {
-            router.visit(notification.action_url);
-          } else if (notification.pdl_id) {
-            router.visit(getPdlManagementUrl(notification.pdl_id));
-          } else {
-            setSelectedNotification(notification);
-          }
+          // Refresh notifications to get updated data
+          setIsRefreshing(true);
+          router.reload({ only: ['notifications'] });
+
+          // Always open in modal instead of redirecting
+          setSelectedNotification(notification);
         },
         onError: () => {
           // Revert local state if server request fails
-          setReadNotifications(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(notification.id);
-            return newSet;
-          });
+          setLocalNotifications(prev =>
+            prev.map(n =>
+              n.id === notification.id
+                ? { ...n, is_read: false, read_at: null }
+                : n
+            )
+          );
 
-          // Still navigate even if marking as read fails
-          if (notification.action_url) {
-            router.visit(notification.action_url);
-          } else if (notification.pdl_id) {
-            router.visit(getPdlManagementUrl(notification.pdl_id));
-          } else {
-            setSelectedNotification(notification);
-          }
+          // Still open modal even if marking as read fails
+          setSelectedNotification(notification);
         }
       });
     } else {
-      // Already read, just navigate
-      if (notification.action_url) {
-        router.visit(notification.action_url);
-      } else if (notification.pdl_id) {
-        router.visit(`/admin/pdl-management/personal-information?pdl_id=${notification.pdl_id}`);
-      } else {
-        setSelectedNotification(notification);
-      }
+      // Already read, just open modal
+      setSelectedNotification(notification);
     }
   };
 
@@ -170,6 +180,11 @@ export function AppSidebarHeader({ breadcrumbs = [], notifications = [], auth }:
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
     return `${Math.floor(diffInSeconds / 86400)}d ago`;
+  };
+
+  const handleRefreshNotifications = () => {
+    setIsRefreshing(true);
+    router.reload({ only: ['notifications'] });
   };
 
   // Search functions
@@ -317,7 +332,7 @@ export function AppSidebarHeader({ breadcrumbs = [], notifications = [], auth }:
     <header className="flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/50 px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
       <div className="flex items-center gap-2">
         <SidebarTrigger className="-ml-1" />
-        <Breadcrumbs breadcrumbs={breadcrumbs} />
+
       </div>
       <div className="ml-auto flex items-center gap-4">
         {/* Search Component */}
@@ -519,21 +534,41 @@ export function AppSidebarHeader({ breadcrumbs = [], notifications = [], auth }:
               <div className="grid gap-1">
                 <div className="px-4 py-3 border-b">
                   <div className="flex items-center justify-between">
-                  <h4 className="font-medium leading-none">Notifications</h4>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <span>{unreadCount} unread</span>
-                      <span>•</span>
-                      <span>{notifications.length} total</span>
+                    <h4 className="font-medium leading-none">Notifications</h4>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <span>{unreadCount} unread</span>
+                        <span>•</span>
+                        <span>{sortedNotifications.length} total</span>
+                        {isRefreshing && (
+                          <span className="text-blue-500">Refreshing...</span>
+                        )}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleRefreshNotifications}
+                        disabled={isRefreshing}
+                        className="h-6 w-6 p-0"
+                      >
+                        <svg className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                      </Button>
                     </div>
                   </div>
                 </div>
                 <ScrollArea className="h-[400px]">
-                  {notifications.length > 0 ? (
+                  {sortedNotifications.length > 0 ? (
                     <div className="divide-y">
                       {displayedNotifications.map((notification) => (
                         <div
                           key={notification.id}
-                          className={`p-4 ${(notification.read_at || readNotifications.has(notification.id)) ? 'bg-white' : 'bg-blue-50'} hover:bg-gray-50 cursor-pointer transition-colors`}
+                          className={`p-4 transition-all duration-200 ${
+                            notification.is_read
+                              ? 'bg-white hover:bg-gray-50'
+                              : 'bg-blue-50 hover:bg-blue-100 border-l-4 border-l-blue-500'
+                          } cursor-pointer`}
                           onClick={() => handleNotificationClick(notification)}
                         >
                           <div className="flex justify-between items-start">
@@ -541,31 +576,39 @@ export function AppSidebarHeader({ breadcrumbs = [], notifications = [], auth }:
                               <div className="flex items-center gap-2">
                                 <div className="flex items-center gap-2">
                                   {notification.notification_type && (
-                                    <div className="p-1 bg-gray-100 rounded">
-                                      {React.createElement(getNotificationIcon(notification.notification_type), { className: "h-3 w-3 text-gray-600" })}
+                                    <div className={`p-1 rounded ${
+                                      notification.is_read ? 'bg-gray-100' : 'bg-blue-100'
+                                    }`}>
+                                      {React.createElement(getNotificationIcon(notification.notification_type), {
+                                        className: `h-3 w-3 ${notification.is_read ? 'text-gray-600' : 'text-blue-600'}`
+                                      })}
                                     </div>
                                   )}
-                              <h3 className="font-medium text-sm">{notification.title}</h3>
+                                  <h3 className={`font-medium text-sm ${
+                                    notification.is_read ? 'text-gray-900' : 'text-blue-900'
+                                  }`}>
+                                    {notification.title}
+                                  </h3>
                                 </div>
                                 {notification.pdl_id && (
                                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                     PDL Related
                                   </span>
                                 )}
-                                {!notification.read_at && !readNotifications.has(notification.id) && (
-                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                {!notification.is_read && (
+                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse">
                                     New
                                   </span>
                                 )}
                               </div>
-                              <p className="text-sm text-gray-600 line-clamp-2">
+                              <p className={`text-sm line-clamp-2 ${
+                                notification.is_read ? 'text-gray-600' : 'text-blue-700'
+                              }`}>
                                 {notification.message}
                               </p>
-                              {notification.pdl_id && (
-                                <p className="text-xs text-blue-600 font-medium">
-                                  Click to view PDL details →
-                                </p>
-                              )}
+                              <p className="text-xs text-gray-500 font-medium">
+                                Click to view details →
+                              </p>
                             </div>
                             <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
                               {formatTimeAgo(notification.created_at)}
@@ -590,14 +633,14 @@ export function AppSidebarHeader({ breadcrumbs = [], notifications = [], auth }:
                     </div>
                   )}
                 </ScrollArea>
-                {notifications.length > 5 && (
+                {sortedNotifications.length > 5 && (
                   <div className="px-4 py-2 border-t text-center">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setShowAll(!showAll)}
                     >
-                      {showAll ? 'Show Recent Only' : `Show All ${notifications.length} Notifications`}
+                      {showAll ? 'Show Recent Only' : `Show All ${sortedNotifications.length} Notifications`}
                     </Button>
                   </div>
                 )}
@@ -607,48 +650,111 @@ export function AppSidebarHeader({ breadcrumbs = [], notifications = [], auth }:
 
           {/* Notification Detail Dialog */}
           <Dialog open={!!selectedNotification} onOpenChange={(open) => !open && setSelectedNotification(null)}>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>{selectedNotification?.title}</DialogTitle>
+                <div className="flex items-center gap-3">
+                  {selectedNotification?.notification_type && (
+                    <div className={`p-2 rounded-lg ${
+                      selectedNotification.is_read ? 'bg-gray-100' : 'bg-blue-100'
+                    }`}>
+                      {React.createElement(getNotificationIcon(selectedNotification.notification_type), {
+                        className: `h-5 w-5 ${selectedNotification.is_read ? 'text-gray-600' : 'text-blue-600'}`
+                      })}
+                    </div>
+                  )}
+                  <div>
+                    <DialogTitle className="text-left">{selectedNotification?.title}</DialogTitle>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-gray-500">
+                        {selectedNotification && formatTimeAgo(selectedNotification.created_at)}
+                      </span>
+                      {!selectedNotification?.is_read && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          New
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </DialogHeader>
 
-              <div className="space-y-4">
-                <div className="text-sm text-gray-600 whitespace-pre-line">
-                  {selectedNotification?.message}
+              <div className="space-y-6">
+                {/* Main Message */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                    {selectedNotification?.message}
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <h4 className="font-medium text-gray-500">Created At</h4>
-                    <p>{selectedNotification && formatDateTime(selectedNotification.created_at)}</p>
+                {/* Notification Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium text-gray-500 text-xs uppercase tracking-wide">Created At</h4>
+                      <p className="text-sm text-gray-900 mt-1">
+                        {selectedNotification && formatDateTime(selectedNotification.created_at)}
+                      </p>
+                    </div>
+
+                    {selectedNotification?.sender && (
+                      <div>
+                        <h4 className="font-medium text-gray-500 text-xs uppercase tracking-wide">From</h4>
+                        <p className="text-sm text-gray-900 mt-1">
+                          {selectedNotification.sender.fname} {selectedNotification.sender.lname}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
-                  {selectedNotification?.sender && (
-                    <div>
-                      <h4 className="font-medium text-gray-500">From</h4>
-                      <p>{selectedNotification.sender.fname} {selectedNotification.sender.lname}</p>
-                    </div>
-                  )}
+                  <div className="space-y-3">
+                    {selectedNotification?.pdl && (
+                      <div>
+                        <h4 className="font-medium text-gray-500 text-xs uppercase tracking-wide">Related PDL</h4>
+                        <p className="text-sm text-gray-900 mt-1">{selectedNotification.pdl.name}</p>
+                      </div>
+                    )}
 
-                  {selectedNotification?.pdl && (
-                    <div className="col-span-2">
-                      <h4 className="font-medium text-gray-500">Related PDL</h4>
-                      <p>{selectedNotification.pdl.name}</p>
-                    </div>
-                  )}
+                    {selectedNotification?.notification_type && (
+                      <div>
+                        <h4 className="font-medium text-gray-500 text-xs uppercase tracking-wide">Type</h4>
+                        <p className="text-sm text-gray-900 mt-1 capitalize">
+                          {selectedNotification.notification_type.replace(/_/g, ' ')}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex justify-between pt-4">
-                  {selectedNotification?.pdl_id && (
-                    <Button
-                      onClick={() => {
-                        setSelectedNotification(null);
-                        router.visit(getPdlManagementUrl(selectedNotification.pdl_id!));
-                      }}
-                    >
-                      View PDL Details
-                    </Button>
-                  )}
+                {/* Action Buttons */}
+                <div className="flex justify-between pt-4 border-t">
+                  <div className="flex gap-2">
+                    {selectedNotification?.pdl_id && (
+                      <Button
+                        onClick={() => {
+                          setSelectedNotification(null);
+                          router.visit(getPdlManagementUrl(selectedNotification.pdl_id!));
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        View PDL Details
+                      </Button>
+                    )}
+
+                    {selectedNotification?.action_url && (
+                      <Button
+                        onClick={() => {
+                          setSelectedNotification(null);
+                          router.visit(selectedNotification.action_url!);
+                        }}
+                        variant="outline"
+                      >
+                        <ArrowRight className="h-4 w-4 mr-2" />
+                        View Related Page
+                      </Button>
+                    )}
+                  </div>
+
                   <Button
                     variant="outline"
                     onClick={() => setSelectedNotification(null)}

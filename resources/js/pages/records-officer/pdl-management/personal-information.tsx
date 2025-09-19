@@ -49,13 +49,6 @@ export default function PersonalInformation() {
                                 <span>Personal Information List</span>
 
                                 <div className="flex gap-2">
-                                    <Link
-                                        href={route('pdl.archived')}
-                                        className="flex items-center gap-2 rounded-sm bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-600"
-                                    >
-                                        <Archive className="h-4 w-4" />
-                                        View Archived
-                                    </Link>
 
                                     <Link
                                         href="/law-enforcement/pdl-management/personal-information/create"

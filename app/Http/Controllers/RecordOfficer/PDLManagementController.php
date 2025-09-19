@@ -77,11 +77,14 @@ class PDLManagementController extends Controller
                     'medicalRecords',
                     'cases',
                     'personnel:id,fname,lname'
-                ]);
+                ])->whereNull('archive_status'); // Exclude archived PDLs
             },
             'reviewer:id,fname,lname'
         ])
             ->where('status', '=', 'approved')
+            ->whereHas('pdl', function ($query) {
+                $query->whereNull('archive_status'); // Ensure PDL exists and is not archived
+            })
             ->latest()
             ->get();
 
