@@ -82,6 +82,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('/report/no-records-certificate/generate', [ReportController::class, 'generateNoRecordsCertificate'])->name('reports.no-records-certificate.generate');
     Route::get('/report/no-records-certificate/export', [ReportController::class, 'exportNoRecordsCertificatePdf'])->name('reports.no-records-certificate.export');
 
+    Route::get('/report/certificate-of-detention', [ReportController::class, 'certificateOfDetention'])->name('reports.certificate-of-detention');
+    Route::get('/report/certificate-of-detention/generate', [ReportController::class, 'generateCertificateOfDetention'])->name('reports.certificate-of-detention.generate');
+
     Route::get('/report/pdl/{pdl}/report/{type}', [ReportController::class, 'generatePDLReport'])->name('reports.pdl.report');
 
     Route::get('/court-hearing-calendar', [CourtHearingCalendarController::class, 'index'])->name('court-hearing.calendar');

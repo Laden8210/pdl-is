@@ -9,6 +9,7 @@ use App\Models\CaseInformation;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Verifications;
+use Illuminate\Support\Facades\Validator;
 
 class ReportController extends Controller
 {
@@ -63,6 +64,149 @@ class ReportController extends Controller
         $committed = Carbon::parse($dateCommitted);
 
         return $now->diffInYears($committed);
+    }
+
+    /**
+     * Certificate of Detention - Show form
+     */
+    public function certificateOfDetention()
+    {
+        $pdls = Pdl::with(['cases', 'personnel'])
+            ->whereHas('cases')
+            ->orderBy('lname')
+            ->get()
+            ->map(function ($pdl) {
+                $mainCase = $pdl->cases->first();
+                return [
+                    'id' => $pdl->id,
+                    'name' => $pdl->fname . ' ' . $pdl->lname,
+                    'case_number' => $mainCase->case_number ?? 'N/A',
+                    'crime_committed' => $mainCase->crime_committed ?? 'N/A',
+                    'date_committed' => $mainCase->date_committed ?? null,
+                ];
+            });
+
+        return Inertia::render('admin/report/certificate-of-detention', [
+            'pdls' => $pdls
+        ]);
+    }
+
+    /**
+     * Certificate of Detention - Generate PDF
+     */
+    public function generateCertificateOfDetention(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'pdl_id' => 'required|exists:pdl,id',
+            'issue_date' => 'required|date',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $pdl = Pdl::with(['cases', 'personnel'])->findOrFail($request->pdl_id);
+        $mainCase = $pdl->cases->first();
+
+        if (!$mainCase) {
+            return back()->withErrors(['error' => 'No case information found for this PDL.']);
+        }
+
+        // Calculate detention period
+        $dateCommitted = Carbon::parse($mainCase->date_committed);
+        $issueDate = Carbon::parse($request->issue_date);
+        $detentionPeriod = $dateCommitted->diff($issueDate);
+
+        $years = $detentionPeriod->y;
+        $months = $detentionPeriod->m;
+        $days = $detentionPeriod->d;
+
+        // Format detention period text
+        $detentionText = '';
+        if ($years > 0) {
+            $detentionText .= $years . ' (' . $this->numberToWords($years) . ') year' . ($years > 1 ? 's' : '');
+        }
+        if ($months > 0) {
+            if ($detentionText) $detentionText .= ', ';
+            $detentionText .= $months . ' (' . $this->numberToWords($months) . ') month' . ($months > 1 ? 's' : '');
+        }
+        if ($days > 0) {
+            if ($detentionText) $detentionText .= ', and ';
+            $detentionText .= $days . ' (' . $this->numberToWords($days) . ') day' . ($days > 1 ? 's' : '');
+        }
+
+        $data = [
+            'pdl_name' => strtoupper($pdl->fname . ' ' . $pdl->lname),
+            'date_committed' => $dateCommitted->format('F j, Y'),
+            'court_branch' => 'Regional Court Branch 26, Surallah, South Cotabato',
+            'crime_committed' => strtoupper($mainCase->crime_committed),
+            'case_number' => $mainCase->case_number,
+            'detention_period' => $detentionText,
+            'issue_date' => $issueDate->format('jS \d\a\y \o\f F Y'),
+            'issue_city' => 'City of Koronadal',
+            'warden_name' => 'JUAN R. LANZADERAS, JR., MPA',
+            'warden_title' => 'Provincial Warden'
+        ];
+
+        $pdf = Pdf::loadView('reports.certificate-of-detention', $data);
+        $pdf->setPaper('A4', 'portrait');
+
+
+
+        return response($pdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="certificate-of-detention-' . $pdl->id . '.pdf"',
+        ]);
+    }
+
+    /**
+     * Convert number to words (basic implementation)
+     */
+    private function numberToWords($number)
+    {
+        $ones = [
+            0 => '',
+            1 => 'One',
+            2 => 'Two',
+            3 => 'Three',
+            4 => 'Four',
+            5 => 'Five',
+            6 => 'Six',
+            7 => 'Seven',
+            8 => 'Eight',
+            9 => 'Nine',
+            10 => 'Ten',
+            11 => 'Eleven',
+            12 => 'Twelve',
+            13 => 'Thirteen',
+            14 => 'Fourteen',
+            15 => 'Fifteen',
+            16 => 'Sixteen',
+            17 => 'Seventeen',
+            18 => 'Eighteen',
+            19 => 'Nineteen'
+        ];
+
+        $tens = [
+            20 => 'Twenty',
+            30 => 'Thirty',
+            40 => 'Forty',
+            50 => 'Fifty',
+            60 => 'Sixty',
+            70 => 'Seventy',
+            80 => 'Eighty',
+            90 => 'Ninety'
+        ];
+
+        if ($number < 20) {
+            return $ones[$number];
+        } elseif ($number < 100) {
+            $ten = intval($number / 10) * 10;
+            $one = $number % 10;
+            return $tens[$ten] . ($one > 0 ? '-' . $ones[$one] : '');
+        } else {
+            return 'More than 99'; // For simplicity, handle only up to 99
+        }
     }
 
     public function export(Request $request)
@@ -641,19 +785,30 @@ class ReportController extends Controller
             $startDate = Carbon::create($year, $monthNumber, 1)->startOfMonth();
             $endDate = Carbon::create($year, $monthNumber, 1)->endOfMonth();
 
-            // Get detainees count for the month
-            $detainees = Pdl::whereBetween('created_at', [$startDate, $endDate])->get();
+            // Get detainees count for the month (filter for drug-related through case information)
+            $detainees = Pdl::with('cases')
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->whereHas('cases', function ($query) {
+                    $query->where('drug_related', true);
+                })
+                ->get();
+
             $maleDetainees = $detainees->where('gender', 'Male')->count();
             $femaleDetainees = $detainees->where('gender', 'Female')->count();
             $totalDetainees = $maleDetainees + $femaleDetainees;
 
-            // Get committed count (PDLs created in this month)
-            $committed = Pdl::whereBetween('created_at', [$startDate, $endDate])->count();
-
-            // Get discharged count (PDLs with discharge status)
-            $discharged = Pdl::whereBetween('updated_at', [$startDate, $endDate])
+            // Get committed count (drug-related PDLs created in this month)
+            $committed = Pdl::whereBetween('created_at', [$startDate, $endDate])
                 ->whereHas('cases', function ($query) {
-                    $query->whereIn('case_status', ['SERVED SENTENCE', 'DISMISSED', 'TRANSFERRED', 'DECEASED', 'ACQUITTED']);
+                    $query->where('drug_related', true);
+                })
+                ->count();
+
+            // Get discharged count (drug-related PDLs with discharge status)
+            $discharged = Pdl::whereBetween('updated_at', [$startDate, $endDate])
+                ->where('archive_status', '!=', null)
+                ->whereHas('cases', function ($query) {
+                    $query->where('drug_related', true);
                 })
                 ->count();
 
@@ -662,16 +817,39 @@ class ReportController extends Controller
                 ->where('drug_related', true)
                 ->whereBetween('date_committed', [$startDate, $endDate])
                 ->get();
+            // Get discharge causes for drug-related cases using the actual database values
+            $bonded = $drugCases->filter(function ($case) {
+                return $case->pdl && $case->pdl->archive_status === 'BONDED';
+            })->count();
 
-            // Get discharge causes for drug-related cases
-            $bonded = $drugCases->where('case_status', 'BONDED')->count();
-            $servedSentence = $drugCases->where('case_status', 'SERVED SENTENCE')->count();
-            $dismissed = $drugCases->whereIn('case_status', ['PROV. DISMISSED', 'DISMISSED'])->count();
-            $transferred = $drugCases->where('case_status', 'TRANSFER TO OTHER FACILITY')->count();
-            $dapecol = $drugCases->where('case_status', 'DAPECOL')->count();
-            $probation = $drugCases->where('case_status', 'PROBATION')->count();
-            $deceased = $drugCases->where('case_status', 'DECEASED')->count();
-            $acquitted = $drugCases->where('case_status', 'ACQUITTED')->count();
+            $servedSentence = $drugCases->filter(function ($case) {
+                return $case->pdl && $case->pdl->archive_status === 'SERVED_SENTENCE';
+            })->count();
+
+            $dismissed = $drugCases->filter(function ($case) {
+                return $case->pdl && in_array($case->pdl->archive_status, ['PROV_DISMISSED', 'DISMISSED']);
+            })->count();
+
+            $transferred = $drugCases->filter(function ($case) {
+                return $case->pdl && $case->pdl->archive_status === 'TRANSFER_TO_OTHER_FACILITY';
+            })->count();
+
+            $dapecol = $drugCases->filter(function ($case) {
+                return $case->pdl && $case->pdl->archive_status === 'DAPECOL';
+            })->count();
+
+            $probation = $drugCases->filter(function ($case) {
+                return $case->pdl && $case->pdl->archive_status === 'PROBATION';
+            })->count();
+
+            $deceased = $drugCases->filter(function ($case) {
+                return $case->pdl && $case->pdl->archive_status === 'DECEASED';
+            })->count();
+
+            $acquitted = $drugCases->filter(function ($case) {
+                return $case->pdl && $case->pdl->archive_status === 'ACQUITTED';
+            })->count();
+
             $totalDischargedDrug = $bonded + $servedSentence + $dismissed + $transferred + $dapecol + $probation + $deceased + $acquitted;
 
             // Calculate percentage of drug offenders from total population
@@ -1135,7 +1313,7 @@ class ReportController extends Controller
 
         // Get escorted PDL for court hearings
         $escortedPdls = Pdl::whereBetween('updated_at', [$startOfDay, $endOfDay])
-            ->whereHas('cases', function($query) {
+            ->whereHas('cases', function ($query) {
                 $query->where('case_status', 'On Trial');
             })
             ->get();
@@ -1144,7 +1322,7 @@ class ReportController extends Controller
 
         // Get released PDL from courts
         $releasedPdls = Pdl::whereBetween('updated_at', [$startOfDay, $endOfDay])
-            ->whereHas('cases', function($query) {
+            ->whereHas('cases', function ($query) {
                 $query->whereIn('case_status', ['SERVED SENTENCE', 'DISMISSED', 'ACQUITTED']);
             })
             ->get();
@@ -1252,7 +1430,7 @@ class ReportController extends Controller
 
         // Get escorted PDL for court hearings
         $escortedPdls = Pdl::whereBetween('updated_at', [$startOfDay, $endOfDay])
-            ->whereHas('cases', function($query) {
+            ->whereHas('cases', function ($query) {
                 $query->where('case_status', 'On Trial');
             })
             ->get();
@@ -1261,7 +1439,7 @@ class ReportController extends Controller
 
         // Get released PDL from courts
         $releasedPdls = Pdl::whereBetween('updated_at', [$startOfDay, $endOfDay])
-            ->whereHas('cases', function($query) {
+            ->whereHas('cases', function ($query) {
                 $query->whereIn('case_status', ['SERVED SENTENCE', 'DISMISSED', 'ACQUITTED']);
             })
             ->get();
@@ -1366,7 +1544,7 @@ class ReportController extends Controller
     {
         // Get all PDLs with drug-related cases
         $pdls = Pdl::with(['cases'])
-            ->whereHas('cases', function($query) {
+            ->whereHas('cases', function ($query) {
                 $query->where('drug_related', true);
             })
             ->get();
