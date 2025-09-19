@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 
 import { ViewPdlInformation } from '@/features/pdl-management/view-pdl-information';
 import { ManageTimeAllowance } from '@/features/time-allowance/manage-time-allowance';
+import { CustodyManagement } from '@/features/custody/custody-management';
 import AppLayout from '@/layouts/app-layout';
 import { getAge } from '@/lib/dateUtils';
 import { PageProps, type BreadcrumbItem } from '@/types';
@@ -18,7 +19,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function PersonalInformation() {
-    const { props } = usePage<PageProps>();
+    const { props } = usePage<PageProps & { verifications: any[] } & { [key: string]: unknown }>();
     const { verifications } = props;
     console.log('Verifications:', verifications);
 
@@ -46,9 +47,11 @@ export default function PersonalInformation() {
                                     <TableHead>Gender</TableHead>
                                     <TableHead>GCTA Days</TableHead>
                                     <TableHead>TASTM Days</TableHead>
+                                    <TableHead>Admission Date</TableHead>
+                                    <TableHead>Release Date</TableHead>
                                     <TableHead>Date of Birth</TableHead>
                                     <TableHead>Age</TableHead>
-                                    <TableHead>Address</TableHead>
+
                                     <TableHead>Added By</TableHead>
                                     <TableHead>Actions</TableHead>
                                 </TableRow>
@@ -64,21 +67,33 @@ export default function PersonalInformation() {
                                                 <TableCell>{verification.pdl.gender ?? '-'}</TableCell>
                                                 <TableCell className="font-medium">{verification.gcta_days}</TableCell>
                                                 <TableCell className="font-medium">{verification.tastm_days}</TableCell>
+                                                <TableCell>
+                                                    {verification.pdl.admission_date
+                                                        ? format(new Date(verification.pdl.admission_date), 'MMM dd, yyyy')
+                                                        : '—'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {verification.pdl.release_date
+                                                        ? format(new Date(verification.pdl.release_date), 'MMM dd, yyyy')
+                                                        : '—'}
+                                                </TableCell>
                                                 <TableCell>{format(new Date(verification.pdl.birthdate), 'MMMM dd, yyyy')}</TableCell>
                                                 <TableCell>{getAge(verification.pdl.birthdate)}</TableCell>
-                                                <TableCell>{`${verification.pdl.brgy ?? ''}, ${verification.pdl.city ?? ''}, ${verification.pdl.province ?? ''}`}</TableCell>
-                                                <TableCell>
+                                                 <TableCell>
                                                     {verification.pdl.personnel
                                                         ? `${verification.pdl.personnel.fname} ${verification.pdl.personnel.lname}`
                                                         : '—'}
                                                 </TableCell>
-                                                <TableCell className="space-x-1">
+                                                <TableCell className="space-x-1 flex items-center gap-2">
 
                                                     <ManageTimeAllowance
                                                         pdl={verification.pdl}
                                                         gctaDays={verification.gcta_days}
                                                         tastmDays={verification.tastm_days}
+                                                        records={verification.pdl?.time_allowance_records || []}
                                                     />
+
+                                                    <CustodyManagement pdl={verification.pdl} />
                                                 </TableCell>
                                             </TableRow>
                                         ),

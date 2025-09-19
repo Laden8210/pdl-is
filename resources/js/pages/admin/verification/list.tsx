@@ -24,7 +24,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function VerificationList() {
-  const { verifications, filters } = usePage().props as unknown as {
+  const { verifications, filters, userRole } = usePage().props as unknown as {
     verifications: (Verification & {
       pdl: Pdl;
       personnel: Personnel;
@@ -32,12 +32,14 @@ export default function VerificationList() {
     filters: {
       search: string;
     };
+    userRole: string;
   };
 
   const [searchInput, setSearchInput] = useState(filters.search || '');
 
   const refetchVerifications = () => {
-    router.get('/admin/verification', { search: searchInput }, { preserveState: true });
+    const baseUrl = userRole === 'admin' ? '/admin/verification' : '/record-officer/verification';
+    router.get(baseUrl, { search: searchInput }, { preserveState: true });
   };
 
   return (
@@ -81,6 +83,7 @@ export default function VerificationList() {
                 key={verification.verification_id}
                 verification={verification}
                 onUpdate={refetchVerifications}
+                updateRoute={userRole === 'admin' ? 'admin.verification.update' : 'record-officer.verification.update'}
               />
             ))}
           </ul>

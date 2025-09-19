@@ -91,17 +91,24 @@ class DashboardController extends Controller
                 ];
             });
 
-        // Get time allowances distribution
-        $timeAllowanceData = TimeAllowance::select('type', DB::raw('count(*) as count'))
-            ->groupBy('type')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'type' => strtoupper($item->type),
-                    'count' => $item->count,
-                    'color' => $item->type === 'gcta' ? '#10b981' : '#f59e0b'
-                ];
-            });
+        // Get time allowances distribution - separate GCTA and TASTM
+        $gctaCount = TimeAllowance::where('type', 'gcta')->count();
+        $tastmCount = TimeAllowance::where('type', 'tastm')->count();
+
+        $timeAllowanceData = collect([
+            [
+                'type' => 'GCTA',
+                'count' => $gctaCount,
+                'color' => '#10b981',
+                'description' => 'Good Conduct Time Allowance'
+            ],
+            [
+                'type' => 'TASTM',
+                'count' => $tastmCount,
+                'color' => '#f59e0b',
+                'description' => 'Time Allowance for Study, Teaching, and Mentoring'
+            ]
+        ]);
 
         // Get security classification distribution
         $securityClassificationData = CaseInformation::select('security_classification', DB::raw('count(*) as count'))
@@ -718,6 +725,25 @@ class DashboardController extends Controller
             ->whereNull('deleted_at')
             ->count();
 
+        // Get time allowances distribution - separate GCTA and TASTM for records officer
+        $gctaCount = TimeAllowance::where('type', 'gcta')->count();
+        $tastmCount = TimeAllowance::where('type', 'tastm')->count();
+
+        $timeAllowanceData = collect([
+            [
+                'type' => 'GCTA',
+                'count' => $gctaCount,
+                'color' => '#10b981',
+                'description' => 'Good Conduct Time Allowance'
+            ],
+            [
+                'type' => 'TASTM',
+                'count' => $tastmCount,
+                'color' => '#f59e0b',
+                'description' => 'Time Allowance for Study, Teaching, and Mentoring'
+            ]
+        ]);
+
         return Inertia::render('records-officer/dashboard/dashboard', [
             'dashboardData' => [
                 'pendingVerifications' => $pendingVerifications,
@@ -727,6 +753,7 @@ class DashboardController extends Controller
                 'caseStatusData' => $caseStatusData,
                 'monthlyProcessing' => $monthlyProcessing,
                 'recentActivities' => $recentActivities,
+                'timeAllowanceData' => $timeAllowanceData,
                 'metrics' => [
                     'totalPDL' => $totalPDL,
                     'pendingVerifications' => $pendingVerificationsCount,

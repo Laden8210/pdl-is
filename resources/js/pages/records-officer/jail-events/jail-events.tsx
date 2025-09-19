@@ -244,6 +244,24 @@ import { useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
 
 function SimpleEventForm({ pdls, preselectedDate, onSuccess }: { pdls: any[]; preselectedDate: string; onSuccess: () => void }) {
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    const activitySuggestions = [
+        'Court Hearing',
+        'Medical',
+        'Visitation',
+        'Rehabilitation',
+        'Jail Activity/Transfer',
+        'Other'
+    ];
+
+    const getFilteredSuggestions = () => {
+        if (!data.activity_name || data.activity_name.trim() === '') return [];
+        return activitySuggestions.filter(suggestion =>
+            suggestion.toLowerCase().includes(data.activity_name.toLowerCase())
+        );
+    };
+
     const { data, setData, post, processing, errors, reset } = useForm({
         activity_name: '',
         activity_date: preselectedDate,
@@ -254,7 +272,7 @@ function SimpleEventForm({ pdls, preselectedDate, onSuccess }: { pdls: any[]; pr
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('jail-events.store'), {
+        post(route('record-officer.jail-events.store'), {
             preserveScroll: true,
             onSuccess: () => {
                 reset();
@@ -267,14 +285,15 @@ function SimpleEventForm({ pdls, preselectedDate, onSuccess }: { pdls: any[]; pr
     const [selectedCount, setSelectedCount] = useState(0);
     const selectAllFiltered = () => {
         const filteredIds = filteredPdls.map((pdl) => pdl.id);
-        setData('pdl_ids', (prev) => {
-            // If all filtered are already selected, deselect all
-            if (filteredIds.every((id) => prev.includes(id))) {
-                return prev.filter((id) => !filteredIds.includes(id));
-            }
+        const currentIds = Array.isArray(data.pdl_ids) ? data.pdl_ids : [];
+
+        // If all filtered are already selected, deselect all
+        if (filteredIds.every((id) => currentIds.includes(id))) {
+            setData('pdl_ids', currentIds.filter((id) => !filteredIds.includes(id)));
+        } else {
             // Otherwise, add all filtered that aren't already selected
-            return [...new Set([...prev, ...filteredIds])];
-        });
+            setData('pdl_ids', [...new Set([...currentIds, ...filteredIds])]);
+        }
     };
 
     useEffect(() => {
@@ -289,10 +308,12 @@ function SimpleEventForm({ pdls, preselectedDate, onSuccess }: { pdls: any[]; pr
     }, [searchTerm, pdls]);
 
     useEffect(() => {
-        setSelectedCount(data.pdl_ids.length);
+        setSelectedCount(Array.isArray(data.pdl_ids) ? data.pdl_ids.length : 0);
     }, [data.pdl_ids]);
+
     const togglePdlSelection = (pdlId: number) => {
-        setData('pdl_ids', data.pdl_ids.includes(pdlId) ? data.pdl_ids.filter((id) => id !== pdlId) : [...data.pdl_ids, pdlId]);
+        const currentIds = Array.isArray(data.pdl_ids) ? data.pdl_ids : [];
+        setData('pdl_ids', currentIds.includes(pdlId) ? currentIds.filter((id) => id !== pdlId) : [...currentIds, pdlId]);
     };
 
     return (
@@ -315,14 +336,45 @@ function SimpleEventForm({ pdls, preselectedDate, onSuccess }: { pdls: any[]; pr
                     <label htmlFor="activity_name" className="text-sm font-medium">
                         Activity Name
                     </label>
-                    <input
-                        id="activity_name"
-                        placeholder="Enter activity name"
-                        value={data.activity_name}
-                        onChange={(e) => setData('activity_name', e.target.value)}
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                        required
-                    />
+                    <div className="relative">
+                        <input
+                            id="activity_name"
+                            placeholder="Type to search activities..."
+                            value={data.activity_name}
+                            onChange={(e) => {
+                                setData('activity_name', e.target.value);
+                                setShowSuggestions(e.target.value.trim() !== '');
+                            }}
+                            onFocus={() => setShowSuggestions(data.activity_name.trim() !== '')}
+                            onBlur={() => {
+                                // Delay hiding suggestions to allow clicking on them
+                                setTimeout(() => setShowSuggestions(false), 200);
+                            }}
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                            required
+                        />
+                        {showSuggestions && (
+                            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                                {getFilteredSuggestions().map((suggestion, index) => (
+                                    <div
+                                        key={index}
+                                        className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                        onClick={() => {
+                                            setData('activity_name', suggestion);
+                                            setShowSuggestions(false);
+                                        }}
+                                    >
+                                        {suggestion}
+                                    </div>
+                                ))}
+                                {getFilteredSuggestions().length === 0 && data.activity_name && (
+                                    <div className="px-3 py-2 text-sm text-gray-500">
+                                        No suggestions found
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -379,6 +431,13 @@ function SimpleEventForm({ pdls, preselectedDate, onSuccess }: { pdls: any[]; pr
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
                     <Label>Persons Involved (PDLs)</Label>
+                    <button
+                        type="button"
+                        onClick={selectAllFiltered}
+                        className="text-sm text-blue-600 hover:text-blue-800 underline"
+                    >
+                        {filteredPdls.every((pdl) => Array.isArray(data.pdl_ids) && data.pdl_ids.includes(pdl.id)) ? 'Deselect All' : 'Select All'}
+                    </button>
                 </div>
 
                 <div className="relative">
@@ -398,7 +457,7 @@ function SimpleEventForm({ pdls, preselectedDate, onSuccess }: { pdls: any[]; pr
                         <div className="divide-y">
                             {filteredPdls.map((pdl) => (
                                 <label key={pdl.id} className="flex cursor-pointer items-center gap-3 p-3 hover:bg-muted/50">
-                                    <Checkbox checked={data.pdl_ids.includes(pdl.id)} onCheckedChange={() => togglePdlSelection(pdl.id)} />
+                                    <Checkbox checked={Array.isArray(data.pdl_ids) && data.pdl_ids.includes(pdl.id)} onCheckedChange={() => togglePdlSelection(pdl.id)} />
                                     <div>
                                         <div className="font-medium">
                                             {pdl.fname} {pdl.lname}

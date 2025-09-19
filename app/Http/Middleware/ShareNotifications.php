@@ -35,7 +35,7 @@ class ShareNotifications
 
         // Map notification types to specific URLs
         return match($notificationType) {
-            'pdl_created', 'pdl_updated', 'pdl_transferred' =>
+            'pdl_created', 'pdl_updated', 'pdl_transferred', 'pdl_transfer_accepted', 'pdl_transfer_rejected' =>
                 "{$baseUrl}/pdl-management/personal-information?pdl_id={$pdlId}",
             'pdl_transfer' =>
                 "{$baseUrl}/pdl-management/personal-information?pdl_id={$pdlId}",
@@ -64,10 +64,26 @@ class ShareNotifications
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check()) {
-            $notifications = SystemNotification::with(['sender', 'pdl', 'readBy'])
+            $user = Auth::user();
+            $userRole = $user->position ?? 'admin';
+
+            // Build query with role-based filtering
+            $query = SystemNotification::with(['sender', 'pdl', 'readBy'])
                 ->latest()
-                ->take(20)
-                ->get()
+                ->take(20);
+
+            // Filter notifications based on user role
+            if ($userRole === 'law-enforcement') {
+                // Law enforcement officers only see transfer-related notifications
+                $query->whereIn('notification_type', [
+                    'pdl_transfer_accepted',
+                    'pdl_transfer_rejected',
+                    'pdl_transferred'
+                ]);
+            }
+            // Admin and record-officer see all notifications (no additional filtering)
+
+            $notifications = $query->get()
                 ->map(function ($notification) {
                     // Check if this notification has been read by current user
                     $readByCurrentUser = $notification->readBy->contains('personnel_id', Auth::id());
@@ -85,6 +101,7 @@ class ShareNotifications
                         'pdl_id' => $notification->pdl_id,
                         'created_at' => $notification->created_at->toISOString(),
                         'read_at' => $readByCurrentUser ? $notification->readBy->where('personnel_id', Auth::id())->first()?->created_at?->toISOString() : null,
+                        'is_read' => $readByCurrentUser,
                         'sender' => $notification->sender ? [
                             'fname' => $notification->sender->fname,
                             'lname' => $notification->sender->lname,
@@ -94,7 +111,12 @@ class ShareNotifications
                             'name' => $notification->pdl->fname . ' ' . $notification->pdl->lname,
                         ] : null,
                     ];
-                });
+                })
+                ->sortBy([
+                    ['is_read', 'asc'], // Unread notifications first
+                    ['created_at', 'desc'] // Then by creation date
+                ])
+                ->values();
 
             Inertia::share('notifications', $notifications);
         }

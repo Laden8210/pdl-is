@@ -40,17 +40,37 @@ interface PageProps {
     filters?: {
         search: string;
     };
+    searchPerformed?: boolean;
+    totalResults?: number;
+    auth?: {
+        user?: {
+            position?: string;
+        };
+    };
 }
 
 export default function CaseInformation() {
     const { props } = usePage<PageProps>();
-    const { cases, pdls, filters } = props;
+    const { cases, pdls, filters, auth, searchPerformed, totalResults } = props;
 
     // Safely handle undefined filters
     const [searchInput, setSearchInput] = useState(filters?.search || '');
 
+    const getUserRoute = () => {
+        const userPosition = auth?.user?.position;
+        switch (userPosition) {
+            case 'admin':
+                return '/admin/pdl-management/case-information';
+            case 'law-enforcement':
+                return '/law-enforcement/pdl-management/case-information';
+            case 'record-officer':
+            default:
+                return '/record-officer/pdl-management/case-information';
+        }
+    };
+
     const handleSearch = () => {
-        router.get('/case-information', {
+        router.get(getUserRoute(), {
             search: searchInput,
         }, {
             preserveState: true,
@@ -98,6 +118,31 @@ export default function CaseInformation() {
                         </div>
 
                         <DataTable data={cases} columns={case_information_columns} />
+
+                        {/* Search Results Message */}
+                        {searchPerformed && (
+                            <div className="mt-4 text-center">
+                                {totalResults === 0 ? (
+                                    <div className="text-muted-foreground">
+                                        <p className="text-lg font-medium">No cases found</p>
+                                        <p className="mt-2">No case records match your search criteria: "{filters?.search}"</p>
+                                        <p className="mt-1 text-sm">Try searching with different keywords or check your spelling.</p>
+                                    </div>
+                                ) : (
+                                    <div className="text-muted-foreground">
+                                        <p className="text-sm">Found {totalResults} case{totalResults !== 1 ? 's' : ''} matching "{filters?.search}"</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* No Cases Message (when no search performed) */}
+                        {!searchPerformed && cases.length === 0 && (
+                            <div className="mt-4 text-center text-muted-foreground">
+                                <p className="text-lg font-medium">No case records found</p>
+                                <p className="mt-2">Case information records will appear here once they are created.</p>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>

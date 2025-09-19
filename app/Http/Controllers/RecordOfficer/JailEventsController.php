@@ -23,12 +23,13 @@ class JailEventsController extends Controller
 
     public function store(Request $request)
     {
+
         $validated = $request->validate([
             'activity_name' => 'required|string|max:255',
             'activity_date' => [
                 'required',
                 'date',
-                'after_or_equal:today'
+                'after_or_equal:yesterday'
             ],
             'activity_time' => 'required|date_format:H:i',
             'category' => 'required|string',
@@ -39,16 +40,21 @@ class JailEventsController extends Controller
             'pdl_ids.required' => 'Please select at least one PDL.',
         ]);
 
+
+
         // Create an activity for each selected PDL
+        $createdActivities = [];
         foreach ($validated['pdl_ids'] as $pdlId) {
-            Activity::create([
+            $activity = Activity::create([
                 'activity_name' => $validated['activity_name'],
                 'activity_date' => $validated['activity_date'],
                 'activity_time' => $validated['activity_time'],
                 'category' => $validated['category'],
                 'pdl_id' => $pdlId,
             ]);
+            $createdActivities[] = $activity;
         }
+
 
         return redirect()->back()->with('success', 'Event created successfully for ' . count($validated['pdl_ids']) . ' PDL(s).');
     }

@@ -89,9 +89,9 @@ export default function Welcome({ status }: WelcomeProps) {
                             {/* Header */}
                             <div className="mb-8 flex flex-col items-center">
                                 <div className="mb-6 flex items-center gap-6">
-                                    <img src="/PGO.jpg" alt="Logo 1" className="h-20 w-auto rounded-full p-1" />
+                                    <img src="/scof.jpg" alt="Logo 1" className="h-20 w-auto rounded-full p-1" />
 
-                                    <img src="/SCRDC.jpg" alt="Logo 2" className="h-20 w-auto rounded-full p-1" />
+                                    <img src="/rdh.jpg" alt="Logo 2" className="h-20 w-auto rounded-full p-1" />
                                 </div>
                                 <h1 className="mb-3 text-3xl font-semibold text-[#1b1b18] lg:text-4xl">Welcome</h1>
                                 <p className="text-center text-base text-[#6b6b6b] lg:text-lg">

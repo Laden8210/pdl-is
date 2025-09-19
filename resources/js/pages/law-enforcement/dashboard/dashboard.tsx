@@ -237,34 +237,44 @@ export default function LawEnforcementDashboard() {
                 <CardDescription>Gender distribution of detained persons</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={pdlByGender}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {pdlByGender.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="flex justify-center space-x-4 mt-4">
-                  {pdlByGender.map((item, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: item.color }}
-                      />
-                      <span className="text-sm">{item.name}: {item.value}</span>
+                <div className="space-y-4">
+                  {/* Legend */}
+                  <div className="space-y-2">
+                    {pdlByGender.map((item, index) => (
+                      <div key={index} className="flex items-center gap-3">
+                        <div className="h-3 w-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+                        <span className="text-sm text-gray-600">
+                          <strong>{item.name}:</strong> {item.value} ({totalPDL > 0 ? (item.value / totalPDL * 100).toFixed(1) : 0}%)
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Chart */}
+                  <div className="flex justify-center">
+                    <div className="h-48 w-48">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={pdlByGender}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={40}
+                            outerRadius={70}
+                            paddingAngle={5}
+                            dataKey="value"
+                            label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+                            labelLine={false}
+                          >
+                            {pdlByGender.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value) => [`${value} PDL`, 'Count']} />
+                        </PieChart>
+                      </ResponsiveContainer>
                     </div>
-                  ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>

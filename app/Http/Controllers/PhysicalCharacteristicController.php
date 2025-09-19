@@ -7,6 +7,8 @@ use Inertia\Inertia;
 use App\Services\NotificationService;
 use App\Models\Pdl;
 use Illuminate\Support\Facades\Validator;
+use App\Models\PhysicalCharacteristic;
+
 
 class PhysicalCharacteristicController extends Controller
 {
@@ -16,14 +18,21 @@ class PhysicalCharacteristicController extends Controller
 
         $characteristics = PhysicalCharacteristic::with('pdl:id,fname,lname')
             ->when($search, function ($query, $search) {
-                $query->where('build', 'like', "%{$search}%")
-                    ->orWhere('complexion', 'like', "%{$search}%")
-                    ->orWhere('hair_color', 'like', "%{$search}%")
-                    ->orWhere('eye_color', 'like', "%{$search}%")
-                    ->orWhereHas('pdl', function ($q) use ($search) {
-                        $q->where('fname', 'like', "%{$search}%")
-                          ->orWhere('lname', 'like', "%{$search}%");
-                    });
+                $searchTerm = strtolower(trim($search));
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->whereRaw('LOWER(build) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereRaw('LOWER(complexion) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereRaw('LOWER(hair_color) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereRaw('LOWER(eye_color) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereRaw('LOWER(identification_marks) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereRaw('LOWER(mark_location) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereRaw('LOWER(remark) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereHas('pdl', function ($pdlQuery) use ($searchTerm) {
+                            $pdlQuery->whereRaw('LOWER(fname) LIKE ?', ["%{$searchTerm}%"])
+                                ->orWhereRaw('LOWER(lname) LIKE ?', ["%{$searchTerm}%"])
+                                ->orWhereRaw('LOWER(CONCAT(fname, " ", lname)) LIKE ?', ["%{$searchTerm}%"]);
+                        });
+                });
             })
             ->latest()
             ->get();
@@ -36,6 +45,8 @@ class PhysicalCharacteristicController extends Controller
             'filters' => [
                 'search' => $search,
             ],
+            'searchPerformed' => !empty($search),
+            'totalResults' => $characteristics->count(),
         ]);
     }
 

@@ -41,6 +41,8 @@ class NotificationService
             case 'pdl_created':
             case 'pdl_updated':
             case 'pdl_transferred':
+            case 'pdl_transfer_accepted':
+            case 'pdl_transfer_rejected':
                 return "{$baseUrl}/pdl-management/personal-information?pdl_id={$pdlId}";
 
             case 'case_created':
@@ -151,6 +153,38 @@ class NotificationService
             'pdl_transferred',
             $pdl->id,
             self::getNotificationUrl('pdl_transferred', $pdl->id, $user->id),
+            $user->id
+        );
+    }
+
+    /**
+     * Create notification for PDL transfer acceptance
+     */
+    public static function pdlTransferAccepted($pdl, $user = null): SystemNotification
+    {
+        $user = $user ?? Auth::user();
+        return self::createNotification(
+            'PDL Transfer Accepted',
+            "PDL {$pdl->fname} {$pdl->lname} (ID: {$pdl->id}) transfer request has been accepted by {$user->fname} {$user->lname}",
+            'pdl_transfer_accepted',
+            $pdl->id,
+            self::getNotificationUrl('pdl_transfer_accepted', $pdl->id, $user->id),
+            $user->id
+        );
+    }
+
+    /**
+     * Create notification for PDL transfer rejection
+     */
+    public static function pdlTransferRejected($pdl, $reason, $user = null): SystemNotification
+    {
+        $user = $user ?? Auth::user();
+        return self::createNotification(
+            'PDL Transfer Rejected',
+            "PDL {$pdl->fname} {$pdl->lname} (ID: {$pdl->id}) transfer request has been rejected by {$user->fname} {$user->lname}. Reason: {$reason}",
+            'pdl_transfer_rejected',
+            $pdl->id,
+            self::getNotificationUrl('pdl_transfer_rejected', $pdl->id, $user->id),
             $user->id
         );
     }

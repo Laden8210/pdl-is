@@ -16,31 +16,42 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import { TimeAllowanceRecords } from './time-allowance-records';
 
 interface ManageTimeAllowanceProps {
     pdl: any;
     gctaDays: number;
     tastmDays: number;
+    records: any[];
 }
 
-export function ManageTimeAllowance({ pdl, gctaDays, tastmDays }: ManageTimeAllowanceProps) {
+export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: ManageTimeAllowanceProps) {
     const { props } = usePage<any>();
     const successMessage = props.success;
 
     const { data, setData, post, processing, errors, reset } = useForm({
         type: 'gcta',
-        days: 0,
+        days: pdl?.default_gcta_days || 0,
         reason: '',
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('time-allowance.update', pdl.id), {
+        post(route('admin.time-allowance.update', pdl.id), {
             preserveScroll: true,
             onSuccess: () => {
                 reset();
             },
         });
+    };
+
+    const handleTypeChange = (value: 'gcta' | 'tastm') => {
+        setData('type', value);
+        if (value === 'gcta') {
+            setData('days', pdl?.default_gcta_days || 0);
+        } else {
+            setData('days', pdl?.default_tastm_days || 15);
+        }
     };
 
     return (
@@ -90,12 +101,26 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays }: ManageTimeAllo
                         </div>
                     </div>
 
+                    {/* Years Served Information */}
+                    <div className="bg-gray-50 p-3 rounded-md border border-gray-200 mb-4">
+                        <h3 className="text-sm font-medium text-gray-800">Years Served</h3>
+                        <p className="text-lg font-semibold text-gray-900">
+                            {typeof pdl?.years_served === 'object'
+                                ? pdl.years_served.formatted
+                                : `${pdl?.years_served || 0} years`}
+                        </p>
+                        <div className="mt-2 text-xs text-gray-600">
+                            <p><strong>GCTA Default:</strong> {pdl?.default_gcta_days || 0} days per month</p>
+                            <p><strong>TASTM Default:</strong> {pdl?.default_tastm_days || 15} days per year</p>
+                        </div>
+                    </div>
+
                     <div className="grid gap-4 py-2">
                         <div className="grid gap-2">
                             <Label htmlFor="type">Allowance Type</Label>
                             <Select
                                 value={data.type}
-                                onValueChange={(value: 'gcta' | 'tastm') => setData('type', value)}
+                                onValueChange={handleTypeChange}
                                 required
                             >
                                 <SelectTrigger>
@@ -135,17 +160,22 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays }: ManageTimeAllo
                     </div>
 
                     <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="secondary">Cancel</Button>
-                        </DialogClose>
-                        <Button
-                            type="submit"
-                            form="time-allowance-form"
-                            className="bg-blue-500 hover:bg-blue-600"
-                            disabled={processing}
-                        >
-                            {processing ? 'Adding...' : 'Add Allowance'}
-                        </Button>
+                        <div className="flex items-center justify-between w-full">
+                            <TimeAllowanceRecords pdl={pdl} records={records} />
+                            <div className="flex gap-2">
+                                <DialogClose asChild>
+                                    <Button variant="secondary">Cancel</Button>
+                                </DialogClose>
+                                <Button
+                                    type="submit"
+                                    form="time-allowance-form"
+                                    className="bg-blue-500 hover:bg-blue-600"
+                                    disabled={processing}
+                                >
+                                    {processing ? 'Adding...' : 'Add Allowance'}
+                                </Button>
+                            </div>
+                        </div>
                     </DialogFooter>
                 </form>
             </DialogContent>

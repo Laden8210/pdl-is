@@ -17,13 +17,19 @@ class CaseInformationController extends Controller
 
         $cases = CaseInformation::with('pdl:id,fname,lname')
             ->when($search, function ($query, $search) {
-                $query->where('case_number', 'like', "%{$search}%")
-                    ->orWhere('crime_committed', 'like', "%{$search}%")
-                    ->orWhere('case_status', 'like', "%{$search}%")
-                    ->orWhereHas('pdl', function ($q) use ($search) {
-                        $q->where('fname', 'like', "%{$search}%")
-                            ->orWhere('lname', 'like', "%{$search}%");
-                    });
+                $searchTerm = strtolower(trim($search));
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->whereRaw('LOWER(case_number) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereRaw('LOWER(crime_committed) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereRaw('LOWER(case_status) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereRaw('LOWER(case_remarks) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereRaw('LOWER(security_classification) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereHas('pdl', function ($pdlQuery) use ($searchTerm) {
+                            $pdlQuery->whereRaw('LOWER(fname) LIKE ?', ["%{$searchTerm}%"])
+                                ->orWhereRaw('LOWER(lname) LIKE ?', ["%{$searchTerm}%"])
+                                ->orWhereRaw('LOWER(CONCAT(fname, " ", lname)) LIKE ?', ["%{$searchTerm}%"]);
+                        });
+                });
             })
             ->latest()
             ->get();
@@ -36,6 +42,8 @@ class CaseInformationController extends Controller
             'filters' => [
                 'search' => $search,
             ],
+            'searchPerformed' => !empty($search),
+            'totalResults' => $cases->count(),
         ]);
     }
 

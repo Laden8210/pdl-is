@@ -24,6 +24,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SearchResultsController;
+
 Route::get('/', [AuthController::class, 'index'])->name('home');
 
 // Admin Routes - Protected by auth and admin middleware
@@ -31,14 +32,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management.index');
-    Route::post('/profile/update', [ProfileManagementController::class, 'update'])->name('admin.profile.update');
+
 
     Route::get('/user-management', [UserManagementController::class, 'index'])->name('user-management.index');
     Route::get('/user-management/create', [UserManagementController::class, 'create'])->name('user-management.create');
-Route::delete('/user-management/{id}', [UserManagementController::class, 'destroy'])
-    ->name('user-management.destroy');
-Route::put('/user-management/{id}', [UserManagementController::class, 'update'])
-    ->name('user-management.update');
+    Route::delete('/user-management/{id}', [UserManagementController::class, 'destroy'])
+        ->name('user-management.destroy');
+    Route::put('/user-management/{id}', [UserManagementController::class, 'update'])
+        ->name('user-management.update');
     Route::post('/user-management/reset-password/{id}', [UserManagementController::class, 'resetPassword'])->name('user-management.reset-password');
     Route::post('/user-management', [UserManagementController::class, 'store'])->name('user-management.store');
 
@@ -83,21 +84,18 @@ Route::put('/user-management/{id}', [UserManagementController::class, 'update'])
 
     Route::get('/report/pdl/{pdl}/report/{type}', [ReportController::class, 'generatePDLReport'])->name('reports.pdl.report');
 
+    Route::get('/court-hearing-calendar', [CourtHearingCalendarController::class, 'index'])->name('court-hearing.calendar');
+    Route::get('/verification', [VerificationController::class, 'index'])->name('verification.index');
+
+
+    Route::get('/pdl-management/time-allowance', [TimeAllowanceController::class, 'index'])->name('admin.pdl-management.time-allowance');
+
     // PDL Archiving Routes
     Route::get('/pdl/{pdl}/archive', [App\Http\Controllers\PdlArchiveController::class, 'showArchiveForm'])->name('pdl.archive.show');
-    Route::post('/pdl/{pdl}/archive', [App\Http\Controllers\PdlArchiveController::class, 'archive'])->name('pdl.archive');
-    Route::post('/pdl/{pdl}/unarchive', [App\Http\Controllers\PdlArchiveController::class, 'unarchive'])->name('pdl.unarchive');
-    Route::post('/pdl/{pdl}/custody-dates', [App\Http\Controllers\PdlArchiveController::class, 'updateCustodyDates'])->name('pdl.custody-dates');
+
     Route::get('/pdl/archived', [App\Http\Controllers\PdlArchiveController::class, 'archived'])->name('pdl.archived');
     Route::get('/pdl/archive-stats', [App\Http\Controllers\PdlArchiveController::class, 'getArchiveStats'])->name('pdl.archive-stats');
 
-    Route::get('/court-hearing-calendar', [CourtHearingCalendarController::class, 'index'])->name('court-hearing.calendar');
-    Route::get('/verification', [VerificationController::class, 'index'])->name('verification.index');
-    Route::patch('/verification/{verification}/update', [VerificationController::class, 'update'])
-    ->name('admin.verification.update');
-
-    Route::get('/pdl-management/time-allowance', [TimeAllowanceController::class, 'index'])->name('pdl-management.time-allowance');
-    Route::post('/pdl-management/time-allowance/{pdl}', [TimeAllowanceController::class, 'updateTimeAllowance'])->name('time-allowance.update');
 
     Route::get('/user-pdl-archive', [UserPDLArchiveController::class, 'index'])->name('user-pdl-archive.index');
 
@@ -118,8 +116,8 @@ Route::put('/user-management/{id}', [UserManagementController::class, 'update'])
     Route::put('/pdl-management/physical-characteristics/{characteristic}', [PhysicalCharacteristicController::class, 'update'])->name('physical-characteristics.update');
     Route::delete('/pdl-management/physical-characteristics/{characteristic}', [PhysicalCharacteristicController::class, 'destroy'])->name('physical-characteristics.destroy');
 
-    Route::get('/jail-events', [JailEventsController::class, 'index'])->name('jail-events.index');
-    Route::post('/jail-events', [JailEventsController::class, 'store'])->name('jail-events.store');
+    Route::get('/jail-events', [JailEventsController::class, 'index'])->name('admin.jail-events.index');
+    Route::post('/jail-events', [JailEventsController::class, 'store'])->name('admin.jail-events.store');
 
     // PDL Alerts and Reminders
     Route::get('/pdl-management/alerts', [PdlAlertController::class, 'index'])->name('pdl-alerts.index');
@@ -149,18 +147,21 @@ Route::put('/user-management/{id}', [UserManagementController::class, 'update'])
 // Record Officer Routes - Protected by auth and record.officer middleware
 Route::middleware(['auth', 'record.officer'])->prefix('record-officer')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.record-officer');
-    Route::get('/jail-events', [JailEventsController::class, 'index'])->name('jail-events.index');
-    Route::post('/jail-events', [JailEventsController::class, 'store'])->name('jail-events.store');
+    Route::get('/jail-events', [JailEventsController::class, 'index'])->name('record-officer.jail-events.index');
+    Route::post('/jail-events', [JailEventsController::class, 'store'])->name('record-officer.jail-events.store');
+    Route::get('/pdl-management/personal-information/{pdl_id}', [PDLManagementController::class, 'view_update'])->name('pdl-management.personal-information.view');
 
 
     Route::get('/pdl-archives', [UserPDLArchiveController::class, 'index'])->name('user-pdl-archive.index');
     Route::get('/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management.index');
     Route::get('/verification', [VerificationController::class, 'index'])->name('verification.index');
+    Route::patch('/verification/{verification}/update', [VerificationController::class, 'update'])->name('record-officer.verification.update');
     Route::get('/pdl-management/personal-information', [PDLManagementController::class, 'personal_information_admin'])->name('pdl-management.personal-information');
     Route::get('/pdl-management/health-assessment', [PDLManagementController::class, 'health_assessment'])->name('pdl-management.health-assessment');
     Route::get('/pdl-management/medical-records', [PDLManagementController::class, 'medical_records'])->name('pdl-management.medical-records');
     Route::get('/pdl-management/cell-assignment', [CellAssignmentController::class, 'index'])->name('cell-assignments.index');
-    Route::get('/pdl-management/time-allowance', [TimeAllowanceController::class, 'index'])->name('pdl-management.time-allowance');
+    Route::get('/pdl-management/time-allowance', [TimeAllowanceController::class, 'index'])->name('record-officer.pdl-management.time-allowance');
+    Route::post('/pdl-management/time-allowance/{pdl}', [TimeAllowanceController::class, 'updateTimeAllowance'])->name('record-officer.time-allowance.update');
 
     // Additional PDL Management routes for notifications
     Route::get('/pdl-management/case-information', [CaseInformationController::class, 'index'])->name('case-information.index');
@@ -185,7 +186,6 @@ Route::middleware(['auth', 'law.enforcement'])->prefix('law-enforcement')->group
     Route::post('/pdl-management/personal-information/create', [PDLManagementController::class, 'store_create'])->name('pdl-management.personal-information.create');
 
     Route::get('/pdl-management/personal-information/{pdl_id}', [PDLManagementController::class, 'view_update'])->name('pdl-management.personal-information.view');
-    Route::put('/pdl-management/personal-information/{pdl_id}', [PDLManagementController::class, 'update_personal_information'])->name('pdl-management.personal-information.update');
 
     Route::get('/pdl-management/court-order', [PDLManagementController::class, 'court_order'])->name('pdl-management.court-order');
     Route::post('/pdl-management/court-order', [PDLManagementController::class, 'store_court_order'])->name('court-orders.store');
@@ -193,38 +193,38 @@ Route::middleware(['auth', 'law.enforcement'])->prefix('law-enforcement')->group
     Route::post('/pdl-management/case-information', [CaseInformationController::class, 'store'])->name('case-information.store');
 
     Route::get('/pdl-management/medical-records', [MedicalRecordController::class, 'index'])
-    ->name('medical-records.index');
+        ->name('medical-records.index');
 
     Route::post('/medical-records', [MedicalRecordController::class, 'store'])
-    ->name('medical-records.store');
+        ->name('medical-records.store');
 
     Route::put('/medical-records/{medicalRecord}', [MedicalRecordController::class, 'update'])
-    ->name('medical-records.update');
+        ->name('medical-records.update');
 
     Route::delete('/medical-records/{medicalRecord}', [MedicalRecordController::class, 'destroy'])
-    ->name('medical-records.destroy');
+        ->name('medical-records.destroy');
 
     Route::get('/pdl-management/physical-characteristics', [PhysicalCharacteristicController::class, 'index'])
-    ->name('physical-characteristics.index');
+        ->name('physical-characteristics.index');
 
     Route::post('/pdl-management/physical-characteristics', [PhysicalCharacteristicController::class, 'store'])
-    ->name('physical-characteristics.store');
+        ->name('physical-characteristics.store');
 
     Route::put('/pdl-management/physical-characteristics/{characteristic}', [PhysicalCharacteristicController::class, 'update'])
-    ->name('physical-characteristics.update');
+        ->name('physical-characteristics.update');
 
     Route::delete('/pdl-management/physical-characteristics/{characteristic}', [PhysicalCharacteristicController::class, 'destroy'])
-    ->name('physical-characteristics.destroy');
+        ->name('physical-characteristics.destroy');
 
     // Additional PDL Management routes for notifications
     Route::get('/pdl-management/cell-assignment', [CellAssignmentController::class, 'index'])->name('cell-assignments.index');
     Route::post('/pdl-management/cell-assignment', [CellAssignmentController::class, 'assign'])->name('cell-assignments.store');
 
-    Route::get('/pdl-management/time-allowance', [TimeAllowanceController::class, 'index'])->name('pdl-management.time-allowance');
-    Route::post('/pdl-management/time-allowance/{pdl}', [TimeAllowanceController::class, 'updateTimeAllowance'])->name('time-allowance.update');
+    Route::get('/pdl-management/time-allowance', [TimeAllowanceController::class, 'index'])->name('law-enforcement.pdl-management.time-allowance');
+    Route::post('/pdl-management/time-allowance/{pdl}', [TimeAllowanceController::class, 'updateTimeAllowance'])->name('law-enforcement.time-allowance.update');
 
-    Route::get('/jail-events', [JailEventsController::class, 'index'])->name('jail-events.index');
-    Route::post('/jail-events', [JailEventsController::class, 'store'])->name('jail-events.store');
+    Route::get('/jail-events', [JailEventsController::class, 'index'])->name('law-enforcement.jail-events.index');
+    Route::post('/jail-events', [JailEventsController::class, 'store'])->name('law-enforcement.jail-events.store');
 
     // Certificate Management
     Route::get('/certificates', [CertificateController::class, 'index'])->name('certificates.index');
@@ -243,8 +243,8 @@ Route::middleware(['auth', 'law.enforcement'])->prefix('law-enforcement')->group
 // Shared routes that require authentication but no specific role
 Route::middleware(['auth'])->group(function () {
 
-Route::get('/notifications', [NotificationController::class, 'index']);
-Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
 });
 
 // Global Search Routes - Available to all authenticated users
@@ -252,9 +252,21 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/search', [SearchController::class, 'globalSearch'])->name('search.global');
     Route::get('/search/quick', [SearchController::class, 'quickSearch'])->name('search.quick');
     Route::get('/search/test', [App\Http\Controllers\SearchTestController::class, 'testSearch'])->name('search.test');
-
+    Route::post('/pdl-management/time-allowance/{pdl}', [TimeAllowanceController::class, 'updateTimeAllowance'])->name('admin.time-allowance.update');
+    Route::put('/pdl-management/time-allowance/record/{record}', [TimeAllowanceController::class, 'updateRecord'])->name('admin.time-allowance.update-record');
+    Route::delete('/pdl-management/time-allowance/record/{record}', [TimeAllowanceController::class, 'revoke'])->name('admin.time-allowance.revoke');
+    Route::post('/pdl-management/custody/{pdl}', [App\Http\Controllers\CustodyController::class, 'update'])->name('admin.custody.update');
     // Search Results Pages
     Route::get('/search/results', [SearchResultsController::class, 'show'])->name('search.results');
+    Route::put('/pdl-management/personal-information/{pdl_id}', [PDLManagementController::class, 'update_personal_information'])->name('pdl-management.personal-information.update');
+    Route::post('/pdl/{pdl}/archive', [App\Http\Controllers\PdlArchiveController::class, 'archive'])->name('pdl.archive');
+    Route::post('/pdl/{pdl}/unarchive', [App\Http\Controllers\PdlArchiveController::class, 'unarchive'])->name('pdl.unarchive');
+    Route::post('/pdl/{pdl}/custody-dates', [App\Http\Controllers\PdlArchiveController::class, 'updateCustodyDates'])->name('pdl.custody-dates');
+    Route::post('/user-pdl-archive/{pdl}/unarchive', [UserPDLArchiveController::class, 'unarchivePdl'])->name('user-pdl-archive.unarchive');
+    Route::post('/user-personnel-archive/{personnel}/restore', [UserPDLArchiveController::class, 'restorePersonnel'])->name('user-personnel-archive.restore');
+    Route::patch('/admin/verification/{verification}/update', [VerificationController::class, 'update'])
+        ->name('admin.verification.update');
+    Route::post('/profile/update', [ProfileManagementController::class, 'update'])->name('admin.profile.update');
 });
 
 require __DIR__ . '/auth.php';

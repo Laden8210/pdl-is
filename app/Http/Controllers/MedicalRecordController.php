@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Services\NotificationService;
 use App\Models\MedicalRecord;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Pdl;
 
 class MedicalRecordController extends Controller
 {
@@ -16,14 +17,19 @@ class MedicalRecordController extends Controller
 
         $records = MedicalRecord::with('pdl:id,fname,lname')
             ->when($search, function ($query, $search) {
-                $query->where('complaint', 'like', "%{$search}%")
-                    ->orWhere('prognosis', 'like', "%{$search}%")
-                    ->orWhere('laboratory', 'like', "%{$search}%")
-                    ->orWhere('findings', 'like', "%{$search}%")
-                    ->orWhereHas('pdl', function ($q) use ($search) {
-                        $q->where('fname', 'like', "%{$search}%")
-                          ->orWhere('lname', 'like', "%{$search}%");
-                    });
+                $searchTerm = strtolower(trim($search));
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->whereRaw('LOWER(complaint) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereRaw('LOWER(prognosis) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereRaw('LOWER(laboratory) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereRaw('LOWER(findings) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereRaw('LOWER(prescription) LIKE ?', ["%{$searchTerm}%"])
+                        ->orWhereHas('pdl', function ($pdlQuery) use ($searchTerm) {
+                            $pdlQuery->whereRaw('LOWER(fname) LIKE ?', ["%{$searchTerm}%"])
+                                ->orWhereRaw('LOWER(lname) LIKE ?', ["%{$searchTerm}%"])
+                                ->orWhereRaw('LOWER(CONCAT(fname, " ", lname)) LIKE ?', ["%{$searchTerm}%"]);
+                        });
+                });
             })
             ->latest()
             ->get();
@@ -37,6 +43,8 @@ class MedicalRecordController extends Controller
             'filters' => [
                 'search' => $search,
             ],
+            'searchPerformed' => !empty($search),
+            'totalResults' => $records->count(),
         ]);
     }
 
@@ -54,7 +62,7 @@ class MedicalRecordController extends Controller
 
         $medicalRecord = MedicalRecord::create($validated);
         $pdl = Pdl::findOrFail($validated['pdl_id']);
-        
+
         NotificationService::medicalRecordCreated($medicalRecord, $pdl, auth()->user());
 
         return redirect()->route('medical-records.index')

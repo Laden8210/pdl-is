@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
+import { PageProps, type BreadcrumbItem } from '@/types';
 
 import { Head } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
@@ -28,13 +29,13 @@ const breadcrumbs = [
   },
 ];
 
-interface DashboardProps {
+interface DashboardProps extends PageProps {
   dashboardData: {
     pdlByGender: { name: string; value: number; color: string }[];
     caseStatusData: { name: string; value: number }[];
     monthlyAdmissions: { month: string; admissions: number; releases: number }[];
     cellOccupancy: { cell: string; capacity: number; occupied: number }[];
-    timeAllowanceData: { type: string; count: number; color: string }[];
+    timeAllowanceData: { type: string; count: number; color: string; description: string }[];
     securityClassificationData: { classification: string; count: number; color: string }[];
     courtOrderTypes: { type: string; count: number; color: string }[];
     verificationStatusData: { status: string; count: number; color: string }[];
@@ -54,6 +55,7 @@ interface DashboardProps {
       activePersonnel: number;
     };
   };
+  [key: string]: unknown;
 }
 
 export default function PDLDashboard() {
@@ -88,8 +90,8 @@ export default function PDLDashboard() {
     } = metrics;
 
 
-  const getActivityBadgeStyle = (color) => {
-    const styles = {
+  const getActivityBadgeStyle = (color: string) => {
+    const styles: Record<string, string> = {
       blue: 'bg-blue-50 text-blue-700',
       green: 'bg-green-50 text-green-700',
       orange: 'bg-orange-50 text-orange-700',
@@ -99,8 +101,8 @@ export default function PDLDashboard() {
     return styles[color] || 'bg-gray-50 text-gray-700';
   };
 
-  const getActivityDotColor = (color) => {
-    const colors = {
+  const getActivityDotColor = (color: string) => {
+    const colors: Record<string, string> = {
       blue: 'bg-blue-500',
       green: 'bg-green-500',
       orange: 'bg-orange-500',
@@ -172,15 +174,30 @@ export default function PDLDashboard() {
             </div>
 
             {/* Second Row Metrics */}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Time Allowances</CardTitle>
-                  <Clock className="h-5 w-5 text-purple-500" />
+                  <CardTitle className="text-sm font-medium text-gray-600">GCTA Awards</CardTitle>
+                  <Clock className="h-5 w-5 text-green-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-gray-900">{totalTimeAllowances}</div>
-                  <p className="text-sm text-gray-500">GCTA & TASTM awarded</p>
+                  <div className="text-2xl font-bold text-gray-900">
+                    {timeAllowanceData.find(item => item.type === 'GCTA')?.count || 0}
+                  </div>
+                  <p className="text-sm text-gray-500">Good Conduct Time Allowance</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">TASTM Awards</CardTitle>
+                  <Clock className="h-5 w-5 text-orange-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900">
+                    {timeAllowanceData.find(item => item.type === 'TASTM')?.count || 0}
+                  </div>
+                  <p className="text-sm text-gray-500">Study, Teaching & Mentoring</p>
                 </CardContent>
               </Card>
 
@@ -231,37 +248,42 @@ export default function PDLDashboard() {
                 </CardHeader>
                 <CardContent>
                   {pdlByGender.length > 0 ? (
-                    <div className="flex items-center justify-between">
+                    <div className="space-y-4">
+                      {/* Legend */}
                       <div className="space-y-2">
                         {pdlByGender.map((item, index) => (
                           <div key={index} className="flex items-center gap-3">
-                            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
+                            <div className="h-3 w-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
                             <span className="text-sm text-gray-600">
-                              {item.name}: {item.value} ({totalPDL > 0 ? (item.value / totalPDL * 100).toFixed(1) : 0}%)
+                              <strong>{item.name}:</strong> {item.value} ({totalPDL > 0 ? (item.value / totalPDL * 100).toFixed(1) : 0}%)
                             </span>
                           </div>
                         ))}
                       </div>
-                      <div className="h-40 w-40">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Pie
-                              data={pdlByGender}
-                              dataKey="value"
-                              cx="50%"
-                              cy="50%"
-                              outerRadius={60}
-                              innerRadius={30}
-                              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                              labelLine={false}
-                            >
-                              {pdlByGender.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.color} />
-                              ))}
-                            </Pie>
-                            <Tooltip formatter={(value) => [`${value} PDL`, 'Count']} />
-                          </PieChart>
-                        </ResponsiveContainer>
+
+                      {/* Chart */}
+                      <div className="flex justify-center">
+                        <div className="h-48 w-48">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie
+                                data={pdlByGender}
+                                dataKey="value"
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={70}
+                                innerRadius={40}
+                                label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+                                labelLine={false}
+                              >
+                                {pdlByGender.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                              </Pie>
+                              <Tooltip formatter={(value) => [`${value} PDL`, 'Count']} />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        </div>
                       </div>
                     </div>
                   ) : (
@@ -517,49 +539,87 @@ export default function PDLDashboard() {
                 </CardContent>
               </Card>
 
-              {/* Time Allowances */}
+              {/* GCTA Time Allowances */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Clock className="h-5 w-5" />
-                    Time Allowances
+                    GCTA Time Allowances
                   </CardTitle>
-                  <CardDescription>Distribution of time allowances awarded</CardDescription>
+                  <CardDescription>Good Conduct Time Allowance distribution</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {timeAllowanceData.length > 0 ? (
-                    <div>
-                      <div className="space-y-3">
-                        {timeAllowanceData.map((item, index) => (
-                          <div key={index} className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
-                              <span className="text-sm font-medium">{item.type}</span>
-                            </div>
-                            <Badge variant="secondary">{item.count}</Badge>
+                  {(() => {
+                    const gctaData = timeAllowanceData.find(item => item.type === 'GCTA');
+                    return gctaData ? (
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <div className="h-4 w-4 rounded-full" style={{ backgroundColor: gctaData.color }} />
+                            <span className="text-lg font-semibold">{gctaData.type}</span>
                           </div>
-                        ))}
-                      </div>
-                      {timeAllowanceData.length >= 2 && (
-                        <div>
-                          <div className="mt-4 h-4 w-full rounded-full bg-gray-200">
-                            <div
-                              className="h-4 rounded-full bg-blue-500"
-                              style={{
-                                width: `${totalTimeAllowances > 0 ? (timeAllowanceData[0].count / totalTimeAllowances * 100) : 0}%`
-                              }}
-                            />
-                          </div>
-                          <div className="mt-2 flex justify-between text-xs text-gray-500">
-                            <span>{timeAllowanceData[0].type}: {totalTimeAllowances > 0 ? (timeAllowanceData[0].count / totalTimeAllowances * 100).toFixed(1) : 0}%</span>
-                            <span>{timeAllowanceData[1].type}: {totalTimeAllowances > 0 ? (timeAllowanceData[1].count / totalTimeAllowances * 100).toFixed(1) : 0}%</span>
-                          </div>
+                          <Badge variant="secondary" className="text-lg px-3 py-1">{gctaData.count}</Badge>
                         </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">No time allowance data available</div>
-                  )}
+                        <div className="text-sm text-muted-foreground mb-2">{gctaData.description}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div
+                            className="h-3 rounded-full transition-all duration-300"
+                            style={{
+                              width: `${totalTimeAllowances > 0 ? (gctaData.count / totalTimeAllowances * 100) : 0}%`,
+                              backgroundColor: gctaData.color
+                            }}
+                          />
+                        </div>
+                        <div className="mt-2 text-xs text-gray-500">
+                          {totalTimeAllowances > 0 ? (gctaData.count / totalTimeAllowances * 100).toFixed(1) : 0}% of total allowances
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">No GCTA data available</div>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+
+              {/* TASTM Time Allowances */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    TASTM Time Allowances
+                  </CardTitle>
+                  <CardDescription>Time Allowance for Study, Teaching, and Mentoring distribution</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {(() => {
+                    const tastmData = timeAllowanceData.find(item => item.type === 'TASTM');
+                    return tastmData ? (
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <div className="h-4 w-4 rounded-full" style={{ backgroundColor: tastmData.color }} />
+                            <span className="text-lg font-semibold">{tastmData.type}</span>
+                          </div>
+                          <Badge variant="secondary" className="text-lg px-3 py-1">{tastmData.count}</Badge>
+                        </div>
+                        <div className="text-sm text-muted-foreground mb-2">{tastmData.description}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div
+                            className="h-3 rounded-full transition-all duration-300"
+                            style={{
+                              width: `${totalTimeAllowances > 0 ? (tastmData.count / totalTimeAllowances * 100) : 0}%`,
+                              backgroundColor: tastmData.color
+                            }}
+                          />
+                        </div>
+                        <div className="mt-2 text-xs text-gray-500">
+                          {totalTimeAllowances > 0 ? (tastmData.count / totalTimeAllowances * 100).toFixed(1) : 0}% of total allowances
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">No TASTM data available</div>
+                    );
+                  })()}
                 </CardContent>
               </Card>
 

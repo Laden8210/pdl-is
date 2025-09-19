@@ -1,19 +1,19 @@
+import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ViewPdlInformation } from '@/features/pdl-management/view-pdl-information';
 import AppLayout from '@/layouts/app-layout';
 import { getAge } from '@/lib/dateUtils';
 import { PageProps, type BreadcrumbItem } from '@/types';
-import { Head, usePage, Link, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Archive, Calendar, FileText, Edit, Upload, AlertCircle, CheckCircle } from 'lucide-react';
+import { AlertCircle, Archive, Edit } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -45,12 +45,22 @@ export default function PersonalInformation() {
     const [courtOrderDialogOpen, setCourtOrderDialogOpen] = useState(false);
     const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
 
-    const { data: custodyData, setData: setCustodyData, post: postCustody, processing: custodyProcessing } = useForm({
+    const {
+        data: custodyData,
+        setData: setCustodyData,
+        post: postCustody,
+        processing: custodyProcessing,
+    } = useForm({
         admission_date: '',
         release_date: '',
     });
 
-    const { data: courtOrderData, setData: setCourtOrderData, post: postCourtOrder, processing: courtOrderProcessing } = useForm({
+    const {
+        data: courtOrderData,
+        setData: setCourtOrderData,
+        post: postCourtOrder,
+        processing: courtOrderProcessing,
+    } = useForm({
         court_order_number: '',
         order_type: '',
         order_date: '',
@@ -60,12 +70,17 @@ export default function PersonalInformation() {
         court_branch: '',
     });
 
-    const { data: archiveData, setData: setArchiveData, post: postArchive, processing: archiveProcessing } = useForm({
+    const {
+        data: archiveData,
+        setData: setArchiveData,
+        post: postArchive,
+        processing: archiveProcessing,
+    } = useForm({
         archive_status: '',
         archive_reason: '',
+        archive_court_order_type: '',
+        archive_court_order_file: null as File | null,
         archive_case_number: '',
-        archive_court_order: null as File | null,
-        archive_notes: '',
     });
 
     const handleCustodyDates = (pdl: any) => {
@@ -98,9 +113,9 @@ export default function PersonalInformation() {
         setArchiveData({
             archive_status: '',
             archive_reason: '',
+            archive_court_order_type: '',
+            archive_court_order_file: null,
             archive_case_number: '',
-            archive_court_order: null,
-            archive_notes: '',
         });
         setArchiveDialogOpen(true);
     };
@@ -117,7 +132,7 @@ export default function PersonalInformation() {
                 },
                 onError: (errors) => {
                     console.error('Custody dates update errors:', errors);
-                }
+                },
             });
         }
     };
@@ -139,32 +154,42 @@ export default function PersonalInformation() {
                 },
                 onError: (errors) => {
                     console.error('Court order update errors:', errors);
-                }
+                },
             });
         }
     };
 
     const handleArchiveSubmit = () => {
         if (selectedPdl) {
+            console.log('Submitting archive data:', archiveData);
+            console.log('Selected PDL:', selectedPdl);
+            console.log('Route URL:', route('pdl.archive', selectedPdl.id));
+
             postArchive(route('pdl.archive', selectedPdl.id), {
-                onSuccess: () => {
-                    setArchiveDialogOpen(false);
+                onSuccess: (page) => {
+                    console.log('Archive successful', page);
+                    // Keep dialog open to show success message
+                    // setArchiveDialogOpen(false);
                     setArchiveData({
                         archive_status: '',
                         archive_reason: '',
+                        archive_court_order_type: '',
+                        archive_court_order_file: null,
                         archive_case_number: '',
-                        archive_court_order: null,
-                        archive_notes: '',
                     });
                 },
                 onError: (errors) => {
                     console.error('Archive errors:', errors);
-                }
+                    // Keep dialog open to show error messages
+                },
+                onFinish: () => {
+                    console.log('Archive request finished');
+                },
             });
         }
     };
+    const successMessage = props.success;
 
-    console.log('Is Admin:', isAdmin);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Personal Information" />
@@ -220,32 +245,10 @@ export default function PersonalInformation() {
                                                 <TableCell className="space-x-1">
                                                     <ViewPdlInformation pdl={verification.pdl} />
 
-                                                    {/* <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => handleArchive(verification.pdl)}
-                                                    >
-                                                        <Archive className="h-4 w-4 mr-1" />
+                                                    <Button variant="outline" size="sm" onClick={() => handleArchive(verification.pdl)}>
+                                                        <Archive className="mr-1 h-4 w-4" />
                                                         Archive
                                                     </Button>
-
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => handleCustodyDates(verification.pdl)}
-                                                    >
-                                                        <Calendar className="h-4 w-4 mr-1" />
-                                                        Manage Custody Dates
-                                                    </Button>
-
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => handleUpdateCourtOrder(verification.pdl)}
-                                                    >
-                                                        <FileText className="h-4 w-4 mr-1" />
-                                                        Update Court Order
-                                                    </Button> */}
 
                                                     {!isAdmin && (
                                                         <Button
@@ -255,7 +258,7 @@ export default function PersonalInformation() {
                                                                 window.location.href = `/record-officer/pdl-management/personal-information/${verification.pdl.id}`;
                                                             }}
                                                         >
-                                                            <Edit className="h-4 w-4 mr-1" />
+                                                            <Edit className="mr-1 h-4 w-4" />
                                                             Edit
                                                         </Button>
                                                     )}
@@ -278,30 +281,23 @@ export default function PersonalInformation() {
                             </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4">
-                            {flash?.success && (
-                                <Alert className="border-green-200 bg-green-50">
-                                    <CheckCircle className="h-4 w-4 text-green-600" />
-                                    <AlertDescription className="text-green-800">
-                                        {flash.success}
+                            {Object.keys(errors).length > 0 && (
+                                <Alert variant="destructive" className="mt-4 mb-4">
+                                    <AlertTitle>Unable to process request</AlertTitle>
+                                    <AlertDescription>
+                                        {Object.values(errors).map((error, index) => (
+                                            <ul className="list-inside list-disc text-sm" key={index}>
+                                                <li>{error}</li>
+                                            </ul>
+                                        ))}
                                     </AlertDescription>
                                 </Alert>
                             )}
 
-                            {errors?.admission_date && (
-                                <Alert className="border-red-200 bg-red-50">
-                                    <AlertCircle className="h-4 w-4 text-red-600" />
-                                    <AlertDescription className="text-red-800">
-                                        {errors.admission_date}
-                                    </AlertDescription>
-                                </Alert>
-                            )}
-
-                            {errors?.release_date && (
-                                <Alert className="border-red-200 bg-red-50">
-                                    <AlertCircle className="h-4 w-4 text-red-600" />
-                                    <AlertDescription className="text-red-800">
-                                        {errors.release_date}
-                                    </AlertDescription>
+                            {successMessage && (
+                                <Alert variant="default" className="mb-4">
+                                    <AlertTitle>Success</AlertTitle>
+                                    <AlertDescription>{successMessage}</AlertDescription>
                                 </Alert>
                             )}
 
@@ -347,21 +343,23 @@ export default function PersonalInformation() {
                             </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4">
-                            {flash?.success && (
-                                <Alert className="border-green-200 bg-green-50">
-                                    <CheckCircle className="h-4 w-4 text-green-600" />
-                                    <AlertDescription className="text-green-800">
-                                        {flash.success}
+                            {Object.keys(errors).length > 0 && (
+                                <Alert variant="destructive" className="mt-4 mb-4">
+                                    <AlertTitle>Unable to process request</AlertTitle>
+                                    <AlertDescription>
+                                        {Object.values(errors).map((error, index) => (
+                                            <ul className="list-inside list-disc text-sm" key={index}>
+                                                <li>{error}</li>
+                                            </ul>
+                                        ))}
                                     </AlertDescription>
                                 </Alert>
                             )}
 
-                            {errors?.court_order_number && (
-                                <Alert className="border-red-200 bg-red-50">
-                                    <AlertCircle className="h-4 w-4 text-red-600" />
-                                    <AlertDescription className="text-red-800">
-                                        {errors.court_order_number}
-                                    </AlertDescription>
+                            {successMessage && (
+                                <Alert variant="default" className="mb-4">
+                                    <AlertTitle>Success</AlertTitle>
+                                    <AlertDescription>{successMessage}</AlertDescription>
                                 </Alert>
                             )}
 
@@ -437,51 +435,40 @@ export default function PersonalInformation() {
                         <DialogHeader>
                             <DialogTitle>Archive PDL</DialogTitle>
                             <DialogDescription>
-                                Archive {selectedPdl?.fname} {selectedPdl?.lname} with court order information
+                                Archive {selectedPdl?.fname} {selectedPdl?.lname}
                             </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4">
-                            {flash?.success && (
-                                <Alert className="border-green-200 bg-green-50">
-                                    <CheckCircle className="h-4 w-4 text-green-600" />
-                                    <AlertDescription className="text-green-800">
-                                        {flash.success}
+                            {Object.keys(errors).length > 0 && (
+                                <Alert variant="destructive" className="mt-4 mb-4">
+                                    <AlertTitle>Unable to process request</AlertTitle>
+                                    <AlertDescription>
+                                        {Object.values(errors).map((error, index) => (
+                                            <ul className="list-inside list-disc text-sm" key={index}>
+                                                <li>{error}</li>
+                                            </ul>
+                                        ))}
                                     </AlertDescription>
                                 </Alert>
                             )}
 
-                            {errors?.archive_status && (
-                                <Alert className="border-red-200 bg-red-50">
-                                    <AlertCircle className="h-4 w-4 text-red-600" />
-                                    <AlertDescription className="text-red-800">
-                                        {errors.archive_status}
-                                    </AlertDescription>
+                            {successMessage && (
+                                <Alert variant="default" className="mb-4">
+                                    <AlertTitle>Success</AlertTitle>
+                                    <AlertDescription>{successMessage}</AlertDescription>
                                 </Alert>
                             )}
 
-                            {errors?.archive_reason && (
+                            {/* General Error Messages */}
+                            {Object.keys(errors).length > 0 && !errors.archive_status && !errors.archive_reason && !errors.error && (
                                 <Alert className="border-red-200 bg-red-50">
                                     <AlertCircle className="h-4 w-4 text-red-600" />
                                     <AlertDescription className="text-red-800">
-                                        {errors.archive_reason}
-                                    </AlertDescription>
-                                </Alert>
-                            )}
-
-                            {errors?.archive_case_number && (
-                                <Alert className="border-red-200 bg-red-50">
-                                    <AlertCircle className="h-4 w-4 text-red-600" />
-                                    <AlertDescription className="text-red-800">
-                                        {errors.archive_case_number}
-                                    </AlertDescription>
-                                </Alert>
-                            )}
-
-                            {errors?.archive_court_order && (
-                                <Alert className="border-red-200 bg-red-50">
-                                    <AlertCircle className="h-4 w-4 text-red-600" />
-                                    <AlertDescription className="text-red-800">
-                                        {errors.archive_court_order}
+                                        <ul className="list-inside list-disc space-y-1">
+                                            {Object.entries(errors).map(([key, value]) => (
+                                                <li key={key}>{value}</li>
+                                            ))}
+                                        </ul>
                                     </AlertDescription>
                                 </Alert>
                             )}
@@ -507,39 +494,6 @@ export default function PersonalInformation() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="archive_case_number">Case Number *</Label>
-                                <Input
-                                    id="archive_case_number"
-                                    value={archiveData.archive_case_number}
-                                    onChange={(e) => setArchiveData('archive_case_number', e.target.value)}
-                                    placeholder="Enter case number"
-                                    className={errors?.archive_case_number ? 'border-red-500' : ''}
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="archive_court_order">Court Order Document *</Label>
-                                <div className="flex items-center space-x-2">
-                                    <Input
-                                        id="archive_court_order"
-                                        type="file"
-                                        accept=".pdf,.jpg,.jpeg,.png"
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0];
-                                            if (file) {
-                                                setArchiveData('archive_court_order', file);
-                                            }
-                                        }}
-                                        className={`flex-1 ${errors?.archive_court_order ? 'border-red-500' : ''}`}
-                                    />
-                                    <Upload className="h-4 w-4 text-muted-foreground" />
-                                </div>
-                                <p className="text-xs text-muted-foreground">
-                                    Upload PDF, JPG, JPEG, or PNG file (max 10MB)
-                                </p>
-                            </div>
-
-                            <div className="space-y-2">
                                 <Label htmlFor="archive_reason">Reason for Archiving *</Label>
                                 <Textarea
                                     id="archive_reason"
@@ -552,13 +506,48 @@ export default function PersonalInformation() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="archive_notes">Additional Notes (Optional)</Label>
-                                <Textarea
-                                    id="archive_notes"
-                                    placeholder="Enter any additional notes..."
-                                    value={archiveData.archive_notes}
-                                    onChange={(e) => setArchiveData('archive_notes', e.target.value)}
-                                    rows={2}
+                                <Label htmlFor="archive_court_order_type">Court Order Type *</Label>
+                                <Select
+                                    value={archiveData.archive_court_order_type}
+                                    onValueChange={(value) => setArchiveData('archive_court_order_type', value)}
+                                >
+                                    <SelectTrigger className={errors?.archive_court_order_type ? 'border-red-500' : ''}>
+                                        <SelectValue placeholder="Select court order type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="RELEASE">Release Order</SelectItem>
+                                        <SelectItem value="BAIL">Bail Order</SelectItem>
+                                        <SelectItem value="SERVED_SENTENCE">Served Sentence</SelectItem>
+                                        <SelectItem value="PROBATION">Probation Order</SelectItem>
+                                        <SelectItem value="PAROLE">Parole Order</SelectItem>
+                                        <SelectItem value="TRANSFER">Transfer Order</SelectItem>
+                                        <SelectItem value="OTHER">Other Court Order</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="archive_court_order_file">Court Order Document *</Label>
+                                <Input
+                                    id="archive_court_order_file"
+                                    type="file"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    onChange={(e) => setArchiveData('archive_court_order_file', e.target.files?.[0] || null)}
+                                    className={errors?.archive_court_order_file ? 'border-red-500' : ''}
+                                />
+                                <p className="text-sm text-gray-500">
+                                    Upload PDF, JPG, JPEG, or PNG file (max 10MB)
+                                </p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="archive_case_number">Case Number *</Label>
+                                <Input
+                                    id="archive_case_number"
+                                    placeholder="Enter case number (must match PDL's case number)"
+                                    value={archiveData.archive_case_number}
+                                    onChange={(e) => setArchiveData('archive_case_number', e.target.value)}
+                                    className={errors?.archive_case_number ? 'border-red-500' : ''}
                                 />
                             </div>
 
@@ -566,12 +555,23 @@ export default function PersonalInformation() {
                                 <Button variant="outline" onClick={() => setArchiveDialogOpen(false)}>
                                     Cancel
                                 </Button>
-                                <Button
-                                    onClick={handleArchiveSubmit}
-                                    disabled={archiveProcessing || !archiveData.archive_status || !archiveData.archive_reason || !archiveData.archive_case_number || !archiveData.archive_court_order}
-                                >
-                                    {archiveProcessing ? 'Archiving...' : 'Archive PDL'}
-                                </Button>
+                                {flash?.success ? (
+                                    <Button onClick={() => setArchiveDialogOpen(false)}>Close</Button>
+                                ) : (
+                                    <Button
+                                        onClick={handleArchiveSubmit}
+                                        disabled={
+                                            archiveProcessing ||
+                                            !archiveData.archive_status ||
+                                            !archiveData.archive_reason ||
+                                            !archiveData.archive_court_order_type ||
+                                            !archiveData.archive_court_order_file ||
+                                            !archiveData.archive_case_number
+                                        }
+                                    >
+                                        {archiveProcessing ? 'Archiving...' : 'Archive PDL'}
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </DialogContent>

@@ -11,9 +11,10 @@ import { FormEventHandler } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Dashboard',
-        href: '/dashboard',
+        title: 'Profile Management',
+        href: '/profile-management',
     },
+
 ];
 
 export default function ProfileManagement() {

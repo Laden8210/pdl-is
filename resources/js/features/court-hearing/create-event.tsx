@@ -37,6 +37,24 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
     const [filteredPdls, setFilteredPdls] = useState<Pdl[]>(pdls || []);
     const [showSuccess, setShowSuccess] = useState(false);
     const [selectedCount, setSelectedCount] = useState(0);
+    const [showActivitySuggestions, setShowActivitySuggestions] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const activitySuggestions = [
+        'Court Hearing',
+        'Medical',
+        'Visitation',
+        'Rehabilitation',
+        'Jail Activity/Transfer',
+        'Other'
+    ];
+
+    const getFilteredActivitySuggestions = () => {
+        if (!data.activity_name || data.activity_name.trim() === '') return [];
+        return activitySuggestions.filter(suggestion =>
+            suggestion.toLowerCase().includes(data.activity_name.toLowerCase())
+        );
+    };
 
     const { data, setData, post, processing } = useForm({
         activity_name: '',
@@ -58,41 +76,60 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
     }, [searchTerm, pdls]);
 
     useEffect(() => {
-        setSelectedCount(data.pdl_ids.length);
+        setSelectedCount(Array.isArray(data.pdl_ids) ? data.pdl_ids.length : 0);
     }, [data.pdl_ids]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('jail-events.store'), {
+
+        // Debug: Log the form data being submitted
+        console.log('Form data being submitted:', {
+            activity_name: data.activity_name,
+            activity_date: data.activity_date,
+            activity_time: data.activity_time,
+            category: data.category,
+            pdl_ids: data.pdl_ids,
+        });
+
+        post(route('record-officer.jail-events.store'), {
             preserveScroll: true,
             onSuccess: () => {
+                console.log('Form submitted successfully');
                 setShowSuccess(true);
-                // Reset form fields except for PDL selection
+                setIsDialogOpen(false);
+                // Reset form fields
                 setData({
-                    ...data,
                     activity_name: '',
                     activity_date: '',
                     activity_time: '',
                     category: '',
+                    pdl_ids: [],
                 });
+                setSearchTerm('');
+                setShowActivitySuggestions(false);
+            },
+            onError: (errors) => {
+                console.error('Form submission errors:', errors);
             },
         });
     };
 
     const togglePdlSelection = (pdlId: number) => {
-        setData('pdl_ids', data.pdl_ids.includes(pdlId) ? data.pdl_ids.filter((id) => id !== pdlId) : [...data.pdl_ids, pdlId]);
+        const currentIds = Array.isArray(data.pdl_ids) ? data.pdl_ids : [];
+        setData('pdl_ids', currentIds.includes(pdlId) ? currentIds.filter((id) => id !== pdlId) : [...currentIds, pdlId]);
     };
 
     const selectAllFiltered = () => {
         const filteredIds = filteredPdls.map((pdl) => pdl.id);
-        setData('pdl_ids', (prev) => {
-            // If all filtered are already selected, deselect all
-            if (filteredIds.every((id) => prev.includes(id))) {
-                return prev.filter((id) => !filteredIds.includes(id));
-            }
+        const currentIds = Array.isArray(data.pdl_ids) ? data.pdl_ids : [];
+
+        // If all filtered are already selected, deselect all
+        if (filteredIds.every((id) => currentIds.includes(id))) {
+            setData('pdl_ids', currentIds.filter((id) => !filteredIds.includes(id)));
+        } else {
             // Otherwise, add all filtered that aren't already selected
-            return [...new Set([...prev, ...filteredIds])];
-        });
+            setData('pdl_ids', [...new Set([...currentIds, ...filteredIds])]);
+        }
     };
 
     const { props } = usePage<any>();
@@ -108,8 +145,23 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
         }
     }, [showSuccess]);
 
+    // Reset form when dialog opens
+    useEffect(() => {
+        if (isDialogOpen) {
+            setData({
+                activity_name: '',
+                activity_date: '',
+                activity_time: '',
+                category: '',
+                pdl_ids: [],
+            });
+            setSearchTerm('');
+            setShowActivitySuggestions(false);
+        }
+    }, [isDialogOpen]);
+
     return (
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline" className="mt-4">
                     Add Event
@@ -141,7 +193,7 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                                     <ul className="list-inside list-disc space-y-1">
                                         {Object.values(errors).map((error, index) => (
                                             <li key={index} className="text-sm">
-                                                {error}
+                                                {String(error)}
                                             </li>
                                         ))}
                                     </ul>
@@ -163,12 +215,44 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                     <div className="grid gap-4 py-4">
                         <div className="space-y-2">
                             <Label htmlFor="activity_name">Activity Name</Label>
-                            <Input
-                                id="activity_name"
-                                placeholder="Enter activity name"
-                                value={data.activity_name}
-                                onChange={(e) => setData('activity_name', e.target.value)}
-                            />
+                            <div className="relative">
+                                <Input
+                                    id="activity_name"
+                                    placeholder="Type to search activities..."
+                                    value={data.activity_name}
+                                    onChange={(e) => {
+                                        setData('activity_name', e.target.value);
+                                        setShowActivitySuggestions(e.target.value.trim() !== '');
+                                    }}
+                                    onFocus={() => setShowActivitySuggestions(data.activity_name.trim() !== '')}
+                                    onBlur={() => {
+                                        // Delay hiding suggestions to allow clicking on them
+                                        setTimeout(() => setShowActivitySuggestions(false), 200);
+                                    }}
+                                    required
+                                />
+                                {showActivitySuggestions && (
+                                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                                        {getFilteredActivitySuggestions().map((suggestion, index) => (
+                                            <div
+                                                key={index}
+                                                className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                                onClick={() => {
+                                                    setData('activity_name', suggestion);
+                                                    setShowActivitySuggestions(false);
+                                                }}
+                                            >
+                                                {suggestion}
+                                            </div>
+                                        ))}
+                                        {getFilteredActivitySuggestions().length === 0 && data.activity_name && (
+                                            <div className="px-3 py-2 text-sm text-gray-500">
+                                                No suggestions found
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -179,6 +263,7 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                                     id="activity_date"
                                     value={data.activity_date}
                                     onChange={(e) => setData('activity_date', e.target.value)}
+                                    required
                                 />
                             </div>
                             <div className="space-y-2">
@@ -188,6 +273,7 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                                     id="activity_time"
                                     value={data.activity_time}
                                     onChange={(e) => setData('activity_time', e.target.value)}
+                                    required
                                 />
                             </div>
                         </div>
@@ -202,15 +288,27 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                                 required
                             >
                                 <option value="">Select a category</option>
+
                                 <option value="court_hearing">Court Hearing</option>
                                 <option value="jail_activity">Jail Activity</option>
+                                <option value="medical">Medical</option>
+                                <option value="visitation">Visitation</option>
+                                <option value="rehabilitation">Rehabilitation</option>
+                                <option value="transfer">Transfer</option>
+                                <option value="other">Other</option>
                             </select>
                         </div>
 
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <Label>Persons Involved (PDLs)</Label>
-
+                                <button
+                                    type="button"
+                                    onClick={selectAllFiltered}
+                                    className="text-sm text-blue-600 hover:text-blue-800 underline"
+                                >
+                                    {filteredPdls.every((pdl) => Array.isArray(data.pdl_ids) && data.pdl_ids.includes(pdl.id)) ? 'Deselect All' : 'Select All'}
+                                </button>
                             </div>
 
                             <div className="relative">
@@ -231,7 +329,7 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                                         {filteredPdls.map((pdl) => (
                                             <label key={pdl.id} className="flex cursor-pointer items-center gap-3 p-3 hover:bg-muted/50">
                                                 <Checkbox
-                                                    checked={data.pdl_ids.includes(pdl.id)}
+                                                    checked={Array.isArray(data.pdl_ids) && data.pdl_ids.includes(pdl.id)}
                                                     onCheckedChange={() => togglePdlSelection(pdl.id)}
                                                 />
                                                 <div>

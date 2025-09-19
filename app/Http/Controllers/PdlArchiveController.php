@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Pdl;
 use App\Models\CaseInformation;
+use App\Models\CourtOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class PdlArchiveController extends Controller
@@ -20,7 +22,6 @@ class PdlArchiveController extends Controller
         return Inertia::render('admin/pdl/archive', [
             'pdl' => $pdl->load(['personnel', 'cases', 'physicalCharacteristics', 'medicalRecords', 'courtOrders']),
             'archiveStatusOptions' => Pdl::getArchiveStatusOptions(),
-            'existingCaseNumbers' => $pdl->cases->pluck('case_number')->filter()->toArray()
         ]);
     }
 
@@ -29,48 +30,37 @@ class PdlArchiveController extends Controller
      */
     public function archive(Request $request, Pdl $pdl)
     {
-
-
-        $request->validate([
-            'archive_status' => 'required|in:' . implode(',', array_keys(Pdl::getArchiveStatusOptions())),
-            'archive_reason' => 'required|string|max:1000',
-            'archive_case_number' => 'required|string|max:255',
-            'archive_court_order' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
-            'archive_notes' => 'nullable|string|max:1000',
-            'admission_date' => 'nullable|date',
-            'release_date' => 'nullable|date|after_or_equal:admission_date',
-        ]);
-
-        // Validate case number exists in PDL's cases
-        $pdl = Pdl::with('cases')->findOrFail($pdl->id);
-        $existingCaseNumbers = $pdl->cases->pluck('case_number')->filter()->toArray();
-
-        if (!in_array($request->archive_case_number, $existingCaseNumbers)) {
-            return redirect()->back()->withErrors([
-                'archive_case_number' => 'The case number must match one of the existing case numbers for this PDL.'
+        try {
+            $request->validate([
+                'archive_status' => 'required|in:' . implode(',', array_keys(Pdl::getArchiveStatusOptions())),
+                'archive_reason' => 'required|string|max:1000',
+                'archive_court_order_type' => 'required|in:' . implode(',', array_keys(Pdl::getCourtOrderTypeOptions())),
+                'archive_court_order_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
+                'archive_case_number' => 'required|string|max:255',
             ]);
+
+            // Handle file upload
+            $file = $request->file('archive_court_order_file');
+            $fileName = time() . '_' . $pdl->id . '_court_order.' . $file->getClientOriginalExtension();
+            $filePath = $file->storeAs('archive/court_orders', $fileName, 'public');
+
+            $pdl->update([
+                'archive_status' => $request->archive_status,
+                'archive_reason' => $request->archive_reason,
+                'archive_court_order_type' => $request->archive_court_order_type,
+                'archive_court_order_file' => $filePath,
+                'archive_case_number' => $request->archive_case_number,
+                'archive_court_order_date' => now(),
+                'archived_at' => now(),
+            ]);
+
+            return redirect()->back()->with('success', 'PDL record has been successfully archived with court order documentation.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors());
+        } catch (\Exception $e) {
+            Log::error('Archive error: ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Failed to archive PDL: ' . $e->getMessage()]);
         }
-
-        // Handle court order file upload
-        $courtOrderPath = null;
-        if ($request->hasFile('archive_court_order')) {
-            $file = $request->file('archive_court_order');
-            $fileName = 'court_order_' . $pdl->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $courtOrderPath = $file->storeAs('court_orders', $fileName, 'public');
-        }
-
-        $pdl->update([
-            'archive_status' => $request->archive_status,
-            'archive_reason' => $request->archive_reason,
-            'archive_case_number' => $request->archive_case_number,
-            'archive_court_order_path' => $courtOrderPath,
-            'archive_notes' => $request->archive_notes,
-            'archived_at' => now(),
-            'admission_date' => $request->admission_date,
-            'release_date' => $request->release_date,
-        ]);
-
-        return redirect()->back()->with('success', 'PDL record has been successfully archived.');
     }
 
     /**
@@ -78,12 +68,13 @@ class PdlArchiveController extends Controller
      */
     public function unarchive(Pdl $pdl)
     {
-
-
         $pdl->update([
             'archive_status' => null,
             'archive_reason' => null,
-            'archive_notes' => null,
+            'archive_court_order_type' => null,
+            'archive_court_order_file' => null,
+            'archive_case_number' => null,
+            'archive_court_order_date' => null,
             'archived_at' => null,
         ]);
 
