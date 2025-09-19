@@ -498,7 +498,9 @@ export default function CreatePDLInformation() {
                                     <Input id="lname" name="lname" value={data.lname} onChange={handleChange} placeholder="Enter last name" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="alias">Alias</Label>
+                                    <Label htmlFor="alias">Alias
+                                        <span className="text-red-500">*</span>
+                                    </Label>
                                     <Input id="alias" name="alias" value={data.alias} onChange={handleChange} placeholder="Enter alias (if any)" />
                                 </div>
                                 <div className="space-y-2">
@@ -558,15 +560,21 @@ export default function CreatePDLInformation() {
                                 <h3 className="mb-4 text-lg font-medium">Address Information</h3>
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                     <div className="space-y-2">
-                                        <Label htmlFor="brgy">Barangay</Label>
+                                        <Label htmlFor="brgy">Barangay
+                                            <span className="text-red-500">*</span>
+                                        </Label>
                                         <Input id="brgy" name="brgy" value={data.brgy} onChange={handleChange} placeholder="Enter barangay" />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="city">City</Label>
+                                        <Label htmlFor="city">City
+                                            <span className="text-red-500">*</span>
+                                        </Label>
                                         <Input id="city" name="city" value={data.city} onChange={handleChange} placeholder="Enter city" />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="province">Province</Label>
+                                        <Label htmlFor="province">Province
+                                            <span className="text-red-500">*</span>
+                                        </Label>
                                         <Input
                                             id="province"
                                             name="province"
