@@ -14,6 +14,8 @@ class SystemNotification extends Model
     protected $fillable = [
         'title',
         'message',
+        'notification_type',
+        'action_url',
         'personnel_id',
         'pdl_id',
     ];

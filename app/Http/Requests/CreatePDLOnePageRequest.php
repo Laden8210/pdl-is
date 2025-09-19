@@ -14,24 +14,25 @@ class CreatePDLOnePageRequest extends FormRequest
     public function rules()
     {
         return [
-            'fname' => 'required|string|max:255',
-            'lname' => 'required|string|max:255',
-            'alias' => 'nullable|string|max:255',
+            'fname' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
+            'lname' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
+            'alias' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'birthdate' => 'required|date',
             'age' => 'required|integer',
             'gender' => 'required|string|in:Male,Female',
-            'ethnic_group' => 'nullable|string|max:255',
+            'ethnic_group' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'civil_status' => 'required|string|in:Single,Married,Widowed,Divorced',
             'brgy' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',
             'province' => 'nullable|string|max:255',
+
 
             // Court Order
             'court_order_number' => 'required|string|max:255',
             'order_type' => 'required|string|max:255',
             'order_date' => 'required|date',
             'received_date' => 'required|date',
-            'document_type' => 'required|string|max:255',
+            'document_type' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png,txt|max:10240',
             'court_branch' => 'required|string|max:255',
             'cod_remarks' => 'nullable|string',
 
@@ -72,9 +73,13 @@ class CreatePDLOnePageRequest extends FormRequest
             // Personal Information
             'fname.required' => 'First name is required',
             'fname.max' => 'First name must not exceed 255 characters',
+            'fname.regex' => 'First name must be a valid string',
             'lname.required' => 'Last name is required',
             'lname.max' => 'Last name must not exceed 255 characters',
+            'lname.regex' => 'Last name must be a valid string',
             'alias.max' => 'Alias must not exceed 255 characters',
+            'alias.regex' => 'Alias must be a valid string',
+
             'birthdate.required' => 'Birthdate is required',
             'birthdate.date' => 'Birthdate must be a valid date',
             'age.required' => 'Age is required',
@@ -83,6 +88,11 @@ class CreatePDLOnePageRequest extends FormRequest
             'gender.in' => 'Gender must be either Male or Female',
             'civil_status.required' => 'Civil status is required',
             'civil_status.in' => 'Civil status must be Single, Married, Widowed, or Divorced',
+            'ethnic_group.regex' => 'Ethnic group must be a valid string',
+            'brgy.regex' => 'Barangay must be a valid string',
+            'city.regex' => 'City must be a valid string',
+            'province.regex' => 'Province must be a valid string',
+
 
             // Address Information
             'brgy.max' => 'Barangay must not exceed 255 characters',
@@ -98,8 +108,10 @@ class CreatePDLOnePageRequest extends FormRequest
             'order_date.date' => 'Order date must be a valid date',
             'received_date.required' => 'Received date is required',
             'received_date.date' => 'Received date must be a valid date',
-            'document_type.required' => 'Document type is required',
-            'document_type.max' => 'Document type must not exceed 255 characters',
+            'document_type.required' => 'Document file is required',
+            'document_type.file' => 'Document must be a valid file',
+            'document_type.mimes' => 'Document must be a PDF, DOC, DOCX, JPG, JPEG, PNG, or TXT file',
+            'document_type.max' => 'Document file size must not exceed 10MB',
             'court_branch.required' => 'Court branch is required',
             'court_branch.max' => 'Court branch must not exceed 255 characters',
 

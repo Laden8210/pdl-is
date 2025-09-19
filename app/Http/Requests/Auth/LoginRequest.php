@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\LoginAttempt;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -41,13 +42,22 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        // Check if email/IP is locked due to failed attempts
+        $this->ensureAccountNotLocked();
+
         if (! Auth::attempt($this->only('username', 'password'), $this->boolean('remember'))) {
+            // Record failed attempt
+            LoginAttempt::recordAttempt($this->input('username'), $this->ip(), false);
+
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
                 'username' => __('auth.failed'),
             ]);
         }
+
+        // Record successful attempt
+        LoginAttempt::recordAttempt($this->input('username'), $this->ip(), true);
 
         RateLimiter::clear($this->throttleKey());
     }
@@ -76,10 +86,38 @@ class LoginRequest extends FormRequest
     }
 
     /**
+     * Ensure the account is not locked due to failed login attempts.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function ensureAccountNotLocked(): void
+    {
+        $username = $this->input('username');
+        $ipAddress = $this->ip();
+
+        // Check if email is locked (3 failed attempts in 10 minutes)
+        if (LoginAttempt::isEmailLocked($username, 3, 10)) {
+            $remainingSeconds = LoginAttempt::getLockoutTimeRemaining($username, 3, 10);
+            $remainingMinutes = ceil($remainingSeconds / 60);
+
+            throw ValidationException::withMessages([
+                'username' => "Too many failed login attempts. Account locked for {$remainingMinutes} minutes.",
+            ]);
+        }
+
+        // Check if IP is locked (5 failed attempts in 10 minutes)
+        if (LoginAttempt::isIpLocked($ipAddress, 5, 10)) {
+            throw ValidationException::withMessages([
+                'username' => 'Too many failed login attempts from this IP address. Please try again later.',
+            ]);
+        }
+    }
+
+    /**
      * Get the rate limiting throttle key for the request.
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('username')).'|'.$this->ip());
     }
 }

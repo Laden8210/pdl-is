@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Services\NotificationService;
 use App\Models\MedicalRecord;
-use App\Models\Pdl;
 use Illuminate\Support\Facades\Validator;
 
 class MedicalRecordController extends Controller
@@ -52,7 +52,10 @@ class MedicalRecordController extends Controller
             'findings' => 'required|string|max:1000',
         ]);
 
-        MedicalRecord::create($validated);
+        $medicalRecord = MedicalRecord::create($validated);
+        $pdl = Pdl::findOrFail($validated['pdl_id']);
+        
+        NotificationService::medicalRecordCreated($medicalRecord, $pdl, auth()->user());
 
         return redirect()->route('medical-records.index')
             ->with('success', 'Medical record created successfully');

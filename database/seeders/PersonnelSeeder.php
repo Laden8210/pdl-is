@@ -57,7 +57,6 @@ class PersonnelSeeder extends Seeder
             ],
 
 
-
         ]);
     }
 }

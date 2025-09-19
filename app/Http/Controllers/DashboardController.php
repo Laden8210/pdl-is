@@ -298,4 +298,447 @@ class DashboardController extends Controller
             ]
         ]);
     }
+
+    public function lawEnforcementDashboard()
+    {
+        // Get PDL demographics by gender for law enforcement view
+        $pdlByGender = Pdl::select('gender', DB::raw('count(*) as value'))
+            ->whereNull('deleted_at')
+            ->groupBy('gender')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => $item->gender,
+                    'value' => $item->value,
+                    'color' => $item->gender === 'Male' ? '#3b82f6' : '#ec4899'
+                ];
+            });
+
+        // Get case status distribution for law enforcement
+        $caseStatusData = CaseInformation::select('case_status', DB::raw('count(*) as value'))
+            ->groupBy('case_status')
+            ->get()
+            ->map(function ($item) {
+                $colors = [
+                    'Active' => '#3b82f6',
+                    'Closed' => '#10b981',
+                    'Pending' => '#f59e0b',
+                    'On Trial' => '#8b5cf6',
+                    'Appealed' => '#ef4444'
+                ];
+                return [
+                    'name' => $item->case_status,
+                    'value' => $item->value,
+                    'color' => $colors[$item->case_status] ?? '#6b7280'
+                ];
+            });
+
+        // Get monthly admissions (last 6 months) - law enforcement focus
+        $monthlyData = collect();
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $monthName = $date->format('M');
+
+            $admissions = Pdl::whereMonth('created_at', $date->month)
+                ->whereYear('created_at', $date->year)
+                ->whereNull('deleted_at')
+                ->count();
+
+            $monthlyData->push([
+                'month' => $monthName,
+                'admissions' => $admissions
+            ]);
+        }
+
+        // Get court order types - important for law enforcement
+        $courtOrderTypes = CourtOrder::select('order_type', DB::raw('count(*) as count'))
+            ->groupBy('order_type')
+            ->get()
+            ->map(function ($item) {
+                $colors = [
+                    'Commitment' => '#3b82f6',
+                    'Release' => '#10b981',
+                    'Hearing' => '#f59e0b',
+                    'Transfer' => '#8b5cf6',
+                    'Other' => '#6b7280'
+                ];
+                return [
+                    'type' => $item->order_type,
+                    'count' => $item->count,
+                    'color' => $colors[$item->order_type] ?? '#6b7280'
+                ];
+            });
+
+        // Get security classification distribution - critical for law enforcement
+        $securityClassificationData = CaseInformation::select('security_classification', DB::raw('count(*) as count'))
+            ->whereNotNull('security_classification')
+            ->groupBy('security_classification')
+            ->get()
+            ->map(function ($item) {
+                $colors = [
+                    'Maximum' => '#ef4444',
+                    'Medium' => '#f59e0b',
+                    'Minimum' => '#10b981'
+                ];
+                return [
+                    'classification' => $item->security_classification,
+                    'count' => $item->count,
+                    'color' => $colors[$item->security_classification] ?? '#6b7280'
+                ];
+            });
+
+        // Get recent PDL admissions - law enforcement perspective
+        $recentAdmissions = Pdl::whereNull('deleted_at')
+            ->latest()
+            ->limit(5)
+            ->get()
+            ->map(function ($pdl) {
+                return [
+                    'id' => $pdl->id,
+                    'name' => "{$pdl->fname} {$pdl->lname}",
+                    'admission_date' => $pdl->created_at->format('M d, Y'),
+                    'age' => $pdl->age ?? 'N/A',
+                    'gender' => $pdl->gender ?? 'N/A',
+                    'status' => 'Active'
+                ];
+            });
+
+        // Get pending court orders - important for law enforcement workflow
+        $pendingCourtOrders = CourtOrder::with('pdl')
+            ->where('order_date', '>=', now()->subDays(30))
+            ->latest('order_date')
+            ->limit(5)
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'pdl_name' => "{$order->pdl->fname} {$order->pdl->lname}",
+                    'order_type' => $order->order_type,
+                    'order_date' => $order->order_date ? \Carbon\Carbon::parse($order->order_date)->format('M d, Y') : 'N/A',
+                    'court' => $order->court_name ?? 'N/A',
+                    'status' => 'Pending'
+                ];
+            });
+
+        // Get recent case information updates
+        $recentCaseUpdates = CaseInformation::with('pdl')
+            ->latest()
+            ->limit(5)
+            ->get()
+            ->map(function ($case) {
+                return [
+                    'id' => $case->id,
+                    'pdl_name' => "{$case->pdl->fname} {$case->pdl->lname}",
+                    'case_number' => $case->case_number ?? 'N/A',
+                    'case_status' => $case->case_status ?? 'N/A',
+                    'security_classification' => $case->security_classification ?? 'N/A',
+                    'updated_at' => $case->updated_at->format('M d, Y')
+                ];
+            });
+
+        // Calculate key metrics for law enforcement
+        $totalPDL = Pdl::whereNull('deleted_at')->count();
+        $activeCases = CaseInformation::where('case_status', 'Active')->count();
+        $totalCases = CaseInformation::count();
+        $pendingCourtOrdersCount = CourtOrder::where('order_date', '>=', now()->subDays(30))->count();
+        $totalCourtOrders = CourtOrder::count();
+        $highSecurityPDL = CaseInformation::where('security_classification', 'Maximum')->count();
+        $mediumSecurityPDL = CaseInformation::where('security_classification', 'Medium')->count();
+        $lowSecurityPDL = CaseInformation::where('security_classification', 'Minimum')->count();
+
+        // Get recent activities specific to law enforcement
+        $recentActivities = collect([
+            // Recent PDL admissions
+            ...Pdl::whereNull('deleted_at')
+                ->latest()
+                ->limit(3)
+                ->get()
+                ->map(function ($pdl) {
+                    return [
+                        'type' => 'admission',
+                        'title' => "New PDL admission - {$pdl->fname} {$pdl->lname}",
+                        'description' => $pdl->created_at->diffForHumans() . " • Processing required",
+                        'badge' => 'New Admission',
+                        'color' => 'blue'
+                    ];
+                }),
+
+            // Recent court orders
+            ...CourtOrder::with('pdl')
+                ->latest('order_date')
+                ->limit(2)
+                ->get()
+                ->map(function ($order) {
+                    return [
+                        'type' => 'court_order',
+                        'title' => "Court order processed for {$order->pdl->fname} {$order->pdl->lname}",
+                        'description' => $order->created_at->diffForHumans() . " • {$order->order_type}",
+                        'badge' => 'Court Order',
+                        'color' => 'purple'
+                    ];
+                }),
+
+            // Recent case updates
+            ...CaseInformation::with('pdl')
+                ->latest()
+                ->limit(2)
+                ->get()
+                ->map(function ($case) {
+                    return [
+                        'type' => 'case_update',
+                        'title' => "Case update for {$case->pdl->fname} {$case->pdl->lname}",
+                        'description' => $case->updated_at->diffForHumans() . " • {$case->case_status}",
+                        'badge' => 'Case Update',
+                        'color' => 'orange'
+                    ];
+                })
+        ])->sortByDesc('created_at')->take(5)->values();
+
+        return Inertia::render('law-enforcement/dashboard/dashboard', [
+            'dashboardData' => [
+                'pdlByGender' => $pdlByGender,
+                'caseStatusData' => $caseStatusData,
+                'monthlyAdmissions' => $monthlyData,
+                'courtOrderTypes' => $courtOrderTypes,
+                'securityClassificationData' => $securityClassificationData,
+                'recentAdmissions' => $recentAdmissions,
+                'pendingCourtOrders' => $pendingCourtOrders,
+                'recentCaseUpdates' => $recentCaseUpdates,
+                'recentActivities' => $recentActivities,
+                'metrics' => [
+                    'totalPDL' => $totalPDL,
+                    'activeCases' => $activeCases,
+                    'totalCases' => $totalCases,
+                    'pendingCourtOrders' => $pendingCourtOrdersCount,
+                    'totalCourtOrders' => $totalCourtOrders,
+                    'highSecurityPDL' => $highSecurityPDL,
+                    'mediumSecurityPDL' => $mediumSecurityPDL,
+                    'lowSecurityPDL' => $lowSecurityPDL
+                ]
+            ]
+        ]);
+    }
+
+    public function dashboard()
+    {
+        // Records Officer Dashboard - Focus on verification and record management
+
+        // Get pending verifications count and details
+        $pendingVerifications = Verifications::where('status', 'pending')
+            ->with('pdl')
+            ->latest()
+            ->get()
+            ->map(function ($verification) {
+                return [
+                    'id' => $verification->id,
+                    'pdl_id' => $verification->pdl_id,
+                    'pdl_name' => "{$verification->pdl->fname} {$verification->pdl->lname}",
+                    'verification_type' => $verification->verification_type ?? 'General',
+                    'submitted_at' => $verification->created_at->format('M d, Y'),
+                    'days_pending' => $verification->created_at->diffInDays(now()),
+                    'priority' => $verification->created_at->diffInDays(now()) > 7 ? 'High' : 'Normal'
+                ];
+            });
+
+        // Get verification status distribution
+        $verificationStatusData = Verifications::select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->get()
+            ->map(function ($item) {
+                $colors = [
+                    'pending' => '#f59e0b',
+                    'approved' => '#10b981',
+                    'rejected' => '#ef4444'
+                ];
+                return [
+                    'status' => ucfirst($item->status),
+                    'count' => $item->count,
+                    'color' => $colors[$item->status] ?? '#6b7280'
+                ];
+            });
+
+        // Get recent PDL records created (last 30 days)
+        $recentPDLRecords = Pdl::whereNull('deleted_at')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(function ($pdl) {
+                return [
+                    'id' => $pdl->id,
+                    'name' => "{$pdl->fname} {$pdl->lname}",
+                    'created_at' => $pdl->created_at->format('M d, Y'),
+                    'age' => $pdl->age ?? 'N/A',
+                    'gender' => $pdl->gender ?? 'N/A',
+                    'status' => 'Active'
+                ];
+            });
+
+        // Get incomplete PDL records (missing required information)
+        $incompleteRecords = Pdl::whereNull('deleted_at')
+            ->where(function ($query) {
+                $query->whereNull('fname')
+                      ->orWhereNull('lname')
+                      ->orWhereNull('birthdate')
+                      ->orWhereNull('gender')
+                      ->orWhereNull('ethnic_group')
+                      ->orWhereNull('civil_status');
+            })
+            ->limit(10)
+            ->get()
+            ->map(function ($pdl) {
+                $missingFields = [];
+                if (!$pdl->fname) $missingFields[] = 'First Name';
+                if (!$pdl->lname) $missingFields[] = 'Last Name';
+                if (!$pdl->birthdate) $missingFields[] = 'Birth Date';
+                if (!$pdl->gender) $missingFields[] = 'Gender';
+                if (!$pdl->ethnic_group) $missingFields[] = 'Ethnic Group';
+                if (!$pdl->civil_status) $missingFields[] = 'Civil Status';
+
+                return [
+                    'id' => $pdl->id,
+                    'name' => "{$pdl->fname} {$pdl->lname}",
+                    'missing_fields' => implode(', ', $missingFields),
+                    'created_at' => $pdl->created_at->format('M d, Y')
+                ];
+            });
+
+        // Get case information status
+        $caseStatusData = CaseInformation::select('case_status', DB::raw('count(*) as count'))
+            ->groupBy('case_status')
+            ->get()
+            ->map(function ($item) {
+                $colors = [
+                    'Active' => '#3b82f6',
+                    'Closed' => '#10b981',
+                    'Pending' => '#f59e0b',
+                    'On Trial' => '#8b5cf6',
+                    'Appealed' => '#ef4444'
+                ];
+                return [
+                    'status' => $item->case_status,
+                    'count' => $item->count,
+                    'color' => $colors[$item->case_status] ?? '#6b7280'
+                ];
+            });
+
+        // Get monthly record processing (last 6 months)
+        $monthlyProcessing = collect();
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $monthName = $date->format('M');
+
+            $recordsCreated = Pdl::whereMonth('created_at', $date->month)
+                ->whereYear('created_at', $date->year)
+                ->whereNull('deleted_at')
+                ->count();
+
+            $verificationsProcessed = Verifications::whereMonth('updated_at', $date->month)
+                ->whereYear('updated_at', $date->year)
+                ->whereIn('status', ['approved', 'rejected'])
+                ->count();
+
+            $monthlyProcessing->push([
+                'month' => $monthName,
+                'records_created' => $recordsCreated,
+                'verifications_processed' => $verificationsProcessed
+            ]);
+        }
+
+        // Get recent activities for records officer
+        $recentActivities = collect([
+            // Recent verifications
+            ...Verifications::with('pdl')
+                ->where('status', 'pending')
+                ->latest()
+                ->limit(3)
+                ->get()
+                ->map(function ($verification) {
+                    return [
+                        'type' => 'verification',
+                        'title' => "Verification request for {$verification->pdl->fname} {$verification->pdl->lname}",
+                        'description' => $verification->created_at->diffForHumans() . " • Awaiting review",
+                        'badge' => 'Verification',
+                        'color' => 'orange',
+                        'priority' => $verification->created_at->diffInDays(now()) > 7 ? 'High' : 'Normal'
+                    ];
+                }),
+
+            // Recent PDL records
+            ...Pdl::whereNull('deleted_at')
+                ->latest()
+                ->limit(2)
+                ->get()
+                ->map(function ($pdl) {
+                    return [
+                        'type' => 'pdl_record',
+                        'title' => "New PDL record created - {$pdl->fname} {$pdl->lname}",
+                        'description' => $pdl->created_at->diffForHumans() . " • Record ID: {$pdl->id}",
+                        'badge' => 'New Record',
+                        'color' => 'blue'
+                    ];
+                }),
+
+            // Recent case information updates
+            ...CaseInformation::with('pdl')
+                ->latest()
+                ->limit(2)
+                ->get()
+                ->map(function ($case) {
+                    return [
+                        'type' => 'case_update',
+                        'title' => "Case information updated for {$case->pdl->fname} {$case->pdl->lname}",
+                        'description' => $case->updated_at->diffForHumans() . " • {$case->case_status}",
+                        'badge' => 'Case Update',
+                        'color' => 'green'
+                    ];
+                })
+        ])->sortByDesc('created_at')->take(5)->values();
+
+        // Calculate key metrics for records officer
+        $totalPDL = Pdl::whereNull('deleted_at')->count();
+        $pendingVerificationsCount = Verifications::where('status', 'pending')->count();
+        $approvedVerificationsCount = Verifications::where('status', 'approved')->count();
+        $rejectedVerificationsCount = Verifications::where('status', 'rejected')->count();
+        $totalVerifications = Verifications::count();
+        $incompleteRecordsCount = Pdl::whereNull('deleted_at')
+            ->where(function ($query) {
+                $query->whereNull('fname')
+                      ->orWhereNull('lname')
+                      ->orWhereNull('birthdate')
+                      ->orWhereNull('gender')
+                      ->orWhereNull('ethnic_group')
+                      ->orWhereNull('civil_status');
+            })
+            ->count();
+        $totalCases = CaseInformation::count();
+        $activeCases = CaseInformation::where('case_status', 'Active')->count();
+        $recordsCreatedThisMonth = Pdl::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->whereNull('deleted_at')
+            ->count();
+
+        return Inertia::render('records-officer/dashboard/dashboard', [
+            'dashboardData' => [
+                'pendingVerifications' => $pendingVerifications,
+                'verificationStatusData' => $verificationStatusData,
+                'recentPDLRecords' => $recentPDLRecords,
+                'incompleteRecords' => $incompleteRecords,
+                'caseStatusData' => $caseStatusData,
+                'monthlyProcessing' => $monthlyProcessing,
+                'recentActivities' => $recentActivities,
+                'metrics' => [
+                    'totalPDL' => $totalPDL,
+                    'pendingVerifications' => $pendingVerificationsCount,
+                    'approvedVerifications' => $approvedVerificationsCount,
+                    'rejectedVerifications' => $rejectedVerificationsCount,
+                    'totalVerifications' => $totalVerifications,
+                    'incompleteRecords' => $incompleteRecordsCount,
+                    'totalCases' => $totalCases,
+                    'activeCases' => $activeCases,
+                    'recordsCreatedThisMonth' => $recordsCreatedThisMonth
+                ]
+            ]
+        ]);
+    }
 }

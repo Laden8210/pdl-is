@@ -17,12 +17,86 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Check, ChevronsUpDown } from 'lucide-react';
 import { Pdl } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
+import { useState } from 'react';
+
+// Criminal case types for dropdown
+const criminalCaseTypes = [
+    // Violent Crimes
+    { category: 'Violent Crimes', cases: [
+        'Murder', 'Homicide', 'Manslaughter', 'Assault', 'Battery', 'Robbery', 'Armed Robbery',
+        'Kidnapping', 'Abduction', 'Rape', 'Sexual Assault', 'Domestic Violence', 'Child Abuse',
+        'Elder Abuse', 'Hate Crime', 'Terrorism', 'Mass Shooting', 'Gang Violence'
+    ]},
+    // Property Crimes
+    { category: 'Property Crimes', cases: [
+        'Theft', 'Burglary', 'Larceny', 'Embezzlement', 'Fraud', 'Identity Theft', 'Credit Card Fraud',
+        'Insurance Fraud', 'Tax Evasion', 'Money Laundering', 'Arson', 'Vandalism', 'Trespassing',
+        'Shoplifting', 'Auto Theft', 'Grand Theft', 'Petty Theft'
+    ]},
+    // Drug Crimes
+    { category: 'Drug Crimes', cases: [
+        'Drug Possession', 'Drug Trafficking', 'Drug Manufacturing', 'Drug Distribution', 'Drug Importation',
+        'Prescription Drug Fraud', 'Drug Paraphernalia', 'Marijuana Possession', 'Cocaine Possession',
+        'Heroin Possession', 'Methamphetamine', 'Ecstasy', 'LSD', 'Synthetic Drugs'
+    ]},
+    // White Collar Crimes
+    { category: 'White Collar Crimes', cases: [
+        'Corporate Fraud', 'Securities Fraud', 'Bank Fraud', 'Wire Fraud', 'Mail Fraud', 'Internet Fraud',
+        'Ponzi Scheme', 'Insider Trading', 'Bribery', 'Corruption', 'Extortion', 'Racketeering',
+        'Organized Crime', 'Cybercrime', 'Identity Theft', 'Forgery', 'Counterfeiting'
+    ]},
+    // Traffic Violations
+    { category: 'Traffic Violations', cases: [
+        'DUI/DWI', 'Reckless Driving', 'Hit and Run', 'Driving Without License', 'Driving Under Suspension',
+        'Speeding', 'Running Red Light', 'Illegal Parking', 'Vehicle Registration Violation',
+        'Driving Without Insurance', 'Vehicular Manslaughter', 'Street Racing'
+    ]},
+    // Public Order Crimes
+    { category: 'Public Order Crimes', cases: [
+        'Disorderly Conduct', 'Public Intoxication', 'Disturbing the Peace', 'Loitering', 'Prostitution',
+        'Solicitation', 'Public Indecency', 'Trespassing', 'Vagrancy', 'Panhandling', 'Noise Violation',
+        'Public Nuisance', 'Obstruction of Justice', 'Resisting Arrest', 'Escape from Custody'
+    ]},
+    // Juvenile Crimes
+    { category: 'Juvenile Crimes', cases: [
+        'Truancy', 'Curfew Violation', 'Underage Drinking', 'Underage Smoking', 'Graffiti', 'Vandalism',
+        'Shoplifting', 'Fighting', 'Bullying', 'Cyberbullying', 'Sexting', 'Gang Activity'
+    ]},
+    // Federal Crimes
+    { category: 'Federal Crimes', cases: [
+        'Tax Evasion', 'Immigration Violation', 'Customs Violation', 'Border Crossing', 'Human Trafficking',
+        'Drug Trafficking', 'Weapons Trafficking', 'Terrorism', 'Espionage', 'Treason', 'Sedition',
+        'Federal Fraud', 'Bank Robbery', 'Postal Crime', 'Interstate Crime'
+    ]},
+    // Other Crimes
+    { category: 'Other Crimes', cases: [
+        'Contempt of Court', 'Perjury', 'Obstruction of Justice', 'Escape', 'Parole Violation',
+        'Probation Violation', 'Failure to Appear', 'Bail Jumping', 'Witness Tampering', 'Jury Tampering',
+        'Election Fraud', 'Environmental Crime', 'Animal Cruelty', 'Stalking', 'Harassment'
+    ]}
+];
 
 export function CreateCaseInformation({ pdls }: { pdls: Pdl[] }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const [crimeCommittedOpen, setCrimeCommittedOpen] = useState(false);
+
+    const { data, setData, post, processing, errors, reset } = useForm<{
+        case_number: string;
+        crime_committed: string;
+        date_committed: string;
+        time_committed: string;
+        case_status: string;
+        case_remarks: string;
+        security_classification: string;
+        drug_related: boolean;
+        pdl_id: string;
+    }>({
         case_number: '',
         crime_committed: '',
         date_committed: '',
@@ -30,6 +104,7 @@ export function CreateCaseInformation({ pdls }: { pdls: Pdl[] }) {
         case_status: 'open',
         case_remarks: '',
         security_classification: 'medium',
+        drug_related: false,
         pdl_id: '',
     });
 
@@ -100,12 +175,59 @@ export function CreateCaseInformation({ pdls }: { pdls: Pdl[] }) {
                         {/* Crime Committed */}
                         <div className="space-y-2">
                             <Label htmlFor="crime_committed">Crime Committed</Label>
-                            <Input
-                                id="crime_committed"
-                                value={data.crime_committed}
-                                onChange={(e) => setData('crime_committed', e.target.value)}
-                                required
-                            />
+                            <Popover open={crimeCommittedOpen} onOpenChange={setCrimeCommittedOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        aria-expanded={crimeCommittedOpen}
+                                        className="w-full justify-between"
+                                    >
+                                        {data.crime_committed || "Select or type crime committed..."}
+                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-full p-0" align="start">
+                                    <Command>
+                                        <CommandInput
+                                            placeholder="Search crimes or type custom..."
+                                            value={data.crime_committed}
+                                            onValueChange={(value) => setData('crime_committed', value)}
+                                        />
+                                        <CommandList>
+                                            <CommandEmpty>
+                                                <div className="p-2 text-sm text-muted-foreground">
+                                                    No crime found. Press Enter to add "{data.crime_committed}" as custom crime.
+                                                </div>
+                                            </CommandEmpty>
+                                            {criminalCaseTypes.map((category) => (
+                                                <CommandGroup key={category.category} heading={category.category}>
+                                                    {category.cases.map((crime) => (
+                                                        <CommandItem
+                                                            key={crime}
+                                                            value={crime}
+                                                            onSelect={(currentValue) => {
+                                                                setData('crime_committed', currentValue);
+                                                                setCrimeCommittedOpen(false);
+                                                            }}
+                                                        >
+                                                            <Check
+                                                                className={`mr-2 h-4 w-4 ${
+                                                                    data.crime_committed === crime ? "opacity-100" : "opacity-0"
+                                                                }`}
+                                                            />
+                                                            {crime}
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            ))}
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                            <div className="text-xs text-muted-foreground">
+                                Select from common crimes or type a custom crime description
+                            </div>
                         </div>
 
                         {/* Date Committed */}
@@ -153,6 +275,32 @@ export function CreateCaseInformation({ pdls }: { pdls: Pdl[] }) {
                                     <SelectItem value="maximum">Maximum</SelectItem>
                                 </SelectContent>
                             </Select>
+                        </div>
+
+                        {/* Drug Related */}
+                        <div className="space-y-2">
+                            <Label>Drug Related Case</Label>
+                            <RadioGroup
+                                value={data.drug_related.toString()}
+                                onValueChange={(value) => setData('drug_related', Boolean(value === 'true'))}
+                                className="flex flex-row space-x-6"
+                            >
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="true" id="drug_related_yes" />
+                                    <Label htmlFor="drug_related_yes" className="text-sm font-normal">
+                                        Yes
+                                    </Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="false" id="drug_related_no" />
+                                    <Label htmlFor="drug_related_no" className="text-sm font-normal">
+                                        No
+                                    </Label>
+                                </div>
+                            </RadioGroup>
+                            <div className="text-xs text-muted-foreground">
+                                Indicate if this case is related to drug offenses
+                            </div>
                         </div>
 
                         {/* PDL */}

@@ -68,6 +68,7 @@ export interface Cells {
     cell_id: number;
     cell_name: string;
     capacity: number;
+    gender: 'male' | 'female';
     description?: string | null;
     status: string;
     created_at?: string;

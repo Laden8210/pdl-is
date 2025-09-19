@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Verifications;
 use App\Models\TimeAllowance;
+use App\Models\Pdl;
+use App\Services\NotificationService;
+use App\Models\Verifications;
 
 class TimeAllowanceController extends Controller
 {
@@ -20,7 +22,7 @@ class TimeAllowanceController extends Controller
                     'medicalRecords',
                     'cases',
                     'personnel:id,fname,lname',
-                    'timeAllowances' 
+                    'timeAllowances'
                 ]);
             },
             'reviewer:id,fname,lname'
@@ -98,6 +100,9 @@ class TimeAllowanceController extends Controller
             'awarded_by' => auth()->id(),
             'awarded_at' => now()
         ]);
+
+        $pdl = Pdl::findOrFail($pdlId);
+        NotificationService::timeAllowanceUpdated($pdl, $request->type, auth()->user());
 
         return redirect()->back()->with('success', 'Time allowance updated successfully.');
     }

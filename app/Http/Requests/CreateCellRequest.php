@@ -16,6 +16,7 @@ class CreateCellRequest extends FormRequest
         return [
             'cell_name'   => 'required|string|max:255',
             'capacity'    => 'required|integer|min:1',
+            'gender'      => 'required|in:male,female',
             'description' => 'nullable|string|max:500',
             'status'      => 'required|in:active,inactive',
         ];
@@ -31,6 +32,9 @@ class CreateCellRequest extends FormRequest
             'capacity.required' => 'The capacity is required.',
             'capacity.integer'  => 'The capacity must be a valid number.',
             'capacity.min'      => 'The capacity must be at least 1.',
+
+            'gender.required' => 'The gender is required.',
+            'gender.in'       => 'The gender must be either male or female.',
 
             'description.string' => 'The description must be a valid string.',
             'description.max'    => 'The description may not be greater than 500 characters.',

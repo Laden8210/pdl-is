@@ -7,7 +7,6 @@ import AppLayout from '@/layouts/app-layout';
 import { PageProps, type BreadcrumbItem } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -46,11 +45,8 @@ export default function ListOfPdlReports() {
         window.location.href = route('reports.pdl-list.export') + '?' + params.toString();
     };
     const handleGenerateReport = (pdlId: number, reportType: string) => {
-        window.open(
-            route('reports.pdl.report', { pdl: pdlId, type: reportType }),
-            '_blank'
-        );
-    }
+        window.open(route('reports.pdl.report', { pdl: pdlId, type: reportType }), '_blank');
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -76,7 +72,7 @@ export default function ListOfPdlReports() {
                                 <Input id="end_date" type="date" value={data.end_date} onChange={(e) => setData('end_date', e.target.value)} />
                             </div>
                             <div className="flex items-end gap-2">
-                                <Button onClick={handleFilter} className="bg-blue-500 hover:bg-blue-600">
+                                <Button onClick={handleFilter} variant="default">
                                     Apply Filter
                                 </Button>
                                 <Button
@@ -88,6 +84,9 @@ export default function ListOfPdlReports() {
                                 >
                                     Clear
                                 </Button>
+                                <Button onClick={handleExport} variant="secondary" >
+                                    Export to List of PDL Report
+                                </Button>
                             </div>
                         </div>
 
@@ -98,9 +97,6 @@ export default function ListOfPdlReports() {
                                     data.end_date &&
                                     ` from ${format(new Date(data.start_date), 'MMM dd, yyyy')} to ${format(new Date(data.end_date), 'MMM dd, yyyy')}`}
                             </p>
-                            <Button onClick={handleExport} variant="outline" className="bg-green-500 text-white hover:bg-green-600">
-                                Export to List of PDL Report
-                            </Button>
                         </div>
                     </CardContent>
                 </Card>
@@ -123,7 +119,6 @@ export default function ListOfPdlReports() {
                                     <TableHead>Years</TableHead>
                                     <TableHead>Case Status</TableHead>
                                     <TableHead>RTC</TableHead>
-                                    <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -140,25 +135,6 @@ export default function ListOfPdlReports() {
                                             <TableCell>{pdl.years}</TableCell>
                                             <TableCell>{pdl.case_status}</TableCell>
                                             <TableCell>{pdl.rtc}</TableCell>
-                                            <TableCell>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="outline">Reports</Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent>
-                                                        <DropdownMenuItem
-                                                            onClick={() => handleGenerateReport(pdl.id, 'inmate-status')}
-                                                        >
-                                                            Inmates Status Report
-                                                        </DropdownMenuItem>
-
-                                                        <DropdownMenuItem
-                                                            onClick={() => handleGenerateReport(pdl.id, 'inmate-daily-status')}>
-                                                            Inmates Status Daily Report
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </TableCell>
                                         </TableRow>
                                     ))
                                 ) : (

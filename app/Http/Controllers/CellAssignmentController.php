@@ -64,6 +64,7 @@ class CellAssignmentController extends Controller
         $currentOccupancy = CellAssignment::where('cell_id', $validated['cell_id'])->count();
         $selectedPdlsCount = count($validated['pdl_ids']);
 
+        // Check capacity
         if ($currentOccupancy + $selectedPdlsCount > $cell->capacity) {
             $availableSpots = $cell->capacity - $currentOccupancy;
             return back()->withErrors([
@@ -75,10 +76,18 @@ class CellAssignmentController extends Controller
         $successfulAssignments = 0;
 
         foreach ($validated['pdl_ids'] as $pdlId) {
+            $pdl = Pdl::find($pdlId);
+
+            // Check if PDL is already assigned
             $existingAssignment = CellAssignment::where('pdl_id', $pdlId)->first();
             if ($existingAssignment) {
-                $pdl = Pdl::find($pdlId);
                 $errors[] = "PDL {$pdl->fname} {$pdl->lname} is already assigned to a cell";
+                continue;
+            }
+
+            // Check gender compatibility
+            if ($cell->gender !== $pdl->gender) {
+                $errors[] = "PDL {$pdl->fname} {$pdl->lname} (Gender: {$pdl->gender}) cannot be assigned to {$cell->cell_name} (Gender: {$cell->gender})";
                 continue;
             }
 

@@ -30,11 +30,13 @@ export function CreateCellInformation() {
     const { data, setData, post, processing, errors, reset } = useForm<{
         cell_name: string;
         capacity: string;
+        gender: string;
         description: string;
         status: string;
     }>({
         cell_name: '',
         capacity: '',
+        gender: 'male',
         description: '',
         status: 'active',
     });
@@ -107,12 +109,20 @@ export function CreateCellInformation() {
                             />
                         </div>
 
-                        <div className="md:col-span-2">
-                            <Label htmlFor="description">Description</Label>
-                            <Input id="description" name="description" value={data.description} onChange={handleChange} />
+                        <div>
+                            <Label>Gender</Label>
+                            <Select value={data.gender} onValueChange={(value) => setData('gender', value)}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select gender" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="male">Male</SelectItem>
+                                    <SelectItem value="female">Female</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
 
-                        <div className="md:col-span-2">
+                        <div>
                             <Label>Status</Label>
                             <Select value={data.status} onValueChange={(value) => setData('status', value)}>
                                 <SelectTrigger>
@@ -123,6 +133,11 @@ export function CreateCellInformation() {
                                     <SelectItem value="inactive">Inactive</SelectItem>
                                 </SelectContent>
                             </Select>
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <Label htmlFor="description">Description</Label>
+                            <Input id="description" name="description" value={data.description} onChange={handleChange} />
                         </div>
                     </div>
 

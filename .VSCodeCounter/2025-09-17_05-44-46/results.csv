@@ -1,0 +1,370 @@
+"filename", "language", "TypeScript", "JSON", "XML", "PHP", "Markdown", "JavaScript", "MS SQL", "JSON with Comments", "Ignore", "YAML", "TypeScript JSX", "CSS", "comment", "blank", "total"
+"c:\xampp\htdocs\pdl-is\.github\workflows\lint.yml", "YAML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 5, 10, 46
+"c:\xampp\htdocs\pdl-is\.github\workflows\tests.yml", "YAML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 12, 51
+"c:\xampp\htdocs\pdl-is\.prettierignore", "Ignore", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1, 4
+"c:\xampp\htdocs\pdl-is\.prettierrc", "JSON", 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 20
+"c:\xampp\htdocs\pdl-is\app\Console\Commands\CleanupLoginAttempts.php", "PHP", 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 13, 10, 40
+"c:\xampp\htdocs\pdl-is\app\Console\Commands\SendPdlReminders.php", "PHP", 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 14, 11, 49
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\Admin\CourtHearingCalendarController.php", "PHP", 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 45
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\Admin\ProfileManagementController.php", "PHP", 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 52
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\Admin\UserManagementController.php", "PHP", 0, 0, 0, 113, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 144
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\Admin\VerificationController.php", "PHP", 0, 0, 0, 82, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 93
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\Auth\AuthController.php", "PHP", 0, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 85
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\CaseInformationController.php", "PHP", 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 0, 0, 1, 13, 68
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\CellAssignmentController.php", "PHP", 0, 0, 0, 123, 0, 0, 0, 0, 0, 0, 0, 0, 3, 30, 156
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\CertificateController.php", "PHP", 0, 0, 0, 176, 0, 0, 0, 0, 0, 0, 0, 0, 37, 39, 252
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\Controller.php", "PHP", 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 9
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\DashboardController.php", "PHP", 0, 0, 0, 648, 0, 0, 0, 0, 0, 0, 0, 0, 42, 55, 745
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\LawEnforcement\ProfileManagementController.php", "PHP", 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 17
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\MedicalDocumentController.php", "PHP", 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 11
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\MedicalRecordController.php", "PHP", 0, 0, 0, 73, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 89
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\NotificationController.php", "PHP", 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 1, 7, 25
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\PdlAlertController.php", "PHP", 0, 0, 0, 144, 0, 0, 0, 0, 0, 0, 0, 0, 30, 30, 204
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\PhysicalCharacteristicController.php", "PHP", 0, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 94
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\RecordOfficer\JailEventsController.php", "PHP", 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 56
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\RecordOfficer\PDLArchiveController.php", "PHP", 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 17
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\RecordOfficer\PDLManagementController.php", "PHP", 0, 0, 0, 493, 0, 0, 0, 0, 0, 0, 0, 0, 18, 63, 574
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\RecordOfficer\ProfileManagementController.php", "PHP", 0, 0, 0, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 53
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\ReportController.php", "PHP", 0, 0, 0, 1121, 0, 0, 0, 0, 0, 0, 0, 0, 52, 192, 1365
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\SearchController.php", "PHP", 0, 0, 0, 262, 0, 0, 0, 0, 0, 0, 0, 0, 12, 23, 297
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\SearchResultsController.php", "PHP", 0, 0, 0, 307, 0, 0, 0, 0, 0, 0, 0, 0, 9, 35, 351
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\SearchTestController.php", "PHP", 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 32
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\TimeAllowanceController.php", "PHP", 0, 0, 0, 97, 0, 0, 0, 0, 0, 0, 0, 0, 1, 12, 110
+"c:\xampp\htdocs\pdl-is\app\Http\Controllers\UserPDLArchiveController.php", "PHP", 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 55
+"c:\xampp\htdocs\pdl-is\app\Http\Middleware\Authenticate.php", "PHP", 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 35
+"c:\xampp\htdocs\pdl-is\app\Http\Middleware\EnsureUserIsAdmin.php", "PHP", 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 10, 9, 54
+"c:\xampp\htdocs\pdl-is\app\Http\Middleware\EnsureUserIsLawEnforcement.php", "PHP", 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 10, 9, 54
+"c:\xampp\htdocs\pdl-is\app\Http\Middleware\EnsureUserIsRecordOfficer.php", "PHP", 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 10, 9, 54
+"c:\xampp\htdocs\pdl-is\app\Http\Middleware\HandleAppearance.php", "PHP", 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 24
+"c:\xampp\htdocs\pdl-is\app\Http\Middleware\HandleInertiaRequests.php", "PHP", 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 19, 7, 59
+"c:\xampp\htdocs\pdl-is\app\Http\Middleware\ShareNotifications.php", "PHP", 0, 0, 0, 87, 0, 0, 0, 0, 0, 0, 0, 0, 7, 11, 105
+"c:\xampp\htdocs\pdl-is\app\Http\Requests\Auth\LoginRequest.php", "PHP", 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 0, 0, 31, 21, 124
+"c:\xampp\htdocs\pdl-is\app\Http\Requests\CreateCellRequest.php", "PHP", 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 47
+"c:\xampp\htdocs\pdl-is\app\Http\Requests\CreatePDLOnePageRequest.php", "PHP", 0, 0, 0, 132, 0, 0, 0, 0, 0, 0, 0, 0, 10, 18, 160
+"c:\xampp\htdocs\pdl-is\app\Http\Requests\EditCellRequest.php", "PHP", 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 38
+"c:\xampp\htdocs\pdl-is\app\Http\Requests\PDL\CreatePdlRequest.php", "PHP", 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 68
+"c:\xampp\htdocs\pdl-is\app\Http\Requests\PDL\TransferRequest.php", "PHP", 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 8, 6, 41
+"c:\xampp\htdocs\pdl-is\app\Http\Requests\Profile\CreateUserRequest.php", "PHP", 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 0, 0, 14, 7, 76
+"c:\xampp\htdocs\pdl-is\app\Http\Requests\Profile\UpdateProfileRequest.php", "PHP", 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 0, 8, 11, 62
+"c:\xampp\htdocs\pdl-is\app\Http\Requests\Settings\ProfileUpdateRequest.php", "PHP", 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 33
+"c:\xampp\htdocs\pdl-is\app\Http\Requests\StoreCellAssignmentRequest.php", "PHP", 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 9, 5, 29
+"c:\xampp\htdocs\pdl-is\app\Http\Requests\UpdateUserRequest.php", "PHP", 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 50
+"c:\xampp\htdocs\pdl-is\app\Models\Activity.php", "PHP", 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 26
+"c:\xampp\htdocs\pdl-is\app\Models\CaseInformation.php", "PHP", 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 36
+"c:\xampp\htdocs\pdl-is\app\Models\CellAssignment.php", "PHP", 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 32
+"c:\xampp\htdocs\pdl-is\app\Models\Cells.php", "PHP", 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 30
+"c:\xampp\htdocs\pdl-is\app\Models\Certificate.php", "PHP", 0, 0, 0, 144, 0, 0, 0, 0, 0, 0, 0, 0, 54, 31, 229
+"c:\xampp\htdocs\pdl-is\app\Models\CourtOrder.php", "PHP", 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 37
+"c:\xampp\htdocs\pdl-is\app\Models\LoginAttempt.php", "PHP", 0, 0, 0, 85, 0, 0, 0, 0, 0, 0, 0, 0, 21, 25, 131
+"c:\xampp\htdocs\pdl-is\app\Models\MedicalDocument.php", "PHP", 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 36
+"c:\xampp\htdocs\pdl-is\app\Models\MedicalRecord.php", "PHP", 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 40
+"c:\xampp\htdocs\pdl-is\app\Models\PasswordReset.php", "PHP", 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 24
+"c:\xampp\htdocs\pdl-is\app\Models\Pdl.php", "PHP", 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 69
+"c:\xampp\htdocs\pdl-is\app\Models\PdlAlert.php", "PHP", 0, 0, 0, 74, 0, 0, 0, 0, 0, 0, 0, 0, 4, 14, 92
+"c:\xampp\htdocs\pdl-is\app\Models\Personnel.php", "PHP", 0, 0, 0, 73, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 84
+"c:\xampp\htdocs\pdl-is\app\Models\PhysicalCharacteristic.php", "PHP", 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 32
+"c:\xampp\htdocs\pdl-is\app\Models\SystemNotification.php", "PHP", 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 45
+"c:\xampp\htdocs\pdl-is\app\Models\SystemNotificationReadBy.php", "PHP", 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 31
+"c:\xampp\htdocs\pdl-is\app\Models\TimeAllowance.php", "PHP", 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 33
+"c:\xampp\htdocs\pdl-is\app\Models\Verifications.php", "PHP", 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 35
+"c:\xampp\htdocs\pdl-is\app\Providers\AppServiceProvider.php", "PHP", 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 6, 7, 32
+"c:\xampp\htdocs\pdl-is\app\Services\CertificateService.php", "PHP", 0, 0, 0, 170, 0, 0, 0, 0, 0, 0, 0, 0, 44, 40, 254
+"c:\xampp\htdocs\pdl-is\app\Services\NotificationService.php", "PHP", 0, 0, 0, 382, 0, 0, 0, 0, 0, 0, 0, 0, 69, 50, 501
+"c:\xampp\htdocs\pdl-is\bootstrap\app.php", "PHP", 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 2, 5, 42
+"c:\xampp\htdocs\pdl-is\bootstrap\providers.php", "PHP", 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 7
+"c:\xampp\htdocs\pdl-is\components.json", "JSON", 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 22
+"c:\xampp\htdocs\pdl-is\composer.json", "JSON", 0, 87, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 88
+"c:\xampp\htdocs\pdl-is\composer.lock", "JSON", 0, 9527, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9528
+"c:\xampp\htdocs\pdl-is\config\app.php", "PHP", 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 82, 23, 127
+"c:\xampp\htdocs\pdl-is\config\auth.php", "PHP", 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 74, 14, 116
+"c:\xampp\htdocs\pdl-is\config\cache.php", "PHP", 0, 0, 0, 57, 0, 0, 0, 0, 0, 0, 0, 0, 34, 18, 109
+"c:\xampp\htdocs\pdl-is\config\database.php", "PHP", 0, 0, 0, 109, 0, 0, 0, 0, 0, 0, 0, 0, 43, 23, 175
+"c:\xampp\htdocs\pdl-is\config\filesystems.php", "PHP", 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 32, 13, 81
+"c:\xampp\htdocs\pdl-is\config\inertia.php", "PHP", 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 23, 12, 56
+"c:\xampp\htdocs\pdl-is\config\logging.php", "PHP", 0, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 0, 33, 21, 133
+"c:\xampp\htdocs\pdl-is\config\mail.php", "PHP", 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 0, 0, 43, 19, 117
+"c:\xampp\htdocs\pdl-is\config\queue.php", "PHP", 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 0, 0, 44, 17, 113
+"c:\xampp\htdocs\pdl-is\config\services.php", "PHP", 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 11, 8, 39
+"c:\xampp\htdocs\pdl-is\config\session.php", "PHP", 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 160, 35, 218
+"c:\xampp\htdocs\pdl-is\database\factories\UserFactory.php", "PHP", 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 14, 6, 45
+"c:\xampp\htdocs\pdl-is\database\migrations\0001_01_01_000000_create_users_table.php", "PHP", 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 6, 5, 35
+"c:\xampp\htdocs\pdl-is\database\migrations\0001_01_01_000001_create_cache_table.php", "PHP", 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 6, 5, 36
+"c:\xampp\htdocs\pdl-is\database\migrations\0001_01_01_000002_create_jobs_table.php", "PHP", 0, 0, 0, 46, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 58
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_06_30_024800_personnel.php", "PHP", 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 40
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_07_12_193317_create_personal_information_table.php", "PHP", 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 42
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_07_14_011931_add_user_status.php", "PHP", 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 7, 4, 27
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_07_20_163428_add-cell-assignment.php", "PHP", 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 44
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_07_20_182009_add-court-order.php", "PHP", 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 7, 4, 38
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_07_20_205501_add-case-information.php", "PHP", 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 7, 8, 71
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_08_11_155343_activity.php", "PHP", 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 6, 7, 38
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_08_12_065404_add-verification.php", "PHP", 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5, 40
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_08_15_145929_update-personnel.php", "PHP", 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 6, 4, 28
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_08_15_154308_system-notification.php", "PHP", 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 6, 5, 47
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_08_22_204000_time_allowances.php", "PHP", 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 28
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_09_12_085038_add-forgot-password.php", "PHP", 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 35
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_175912_add_notification_type_to_system_notifications_table.php", "PHP", 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 6, 4, 30
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_183719_add_timestamps_to_system_notifications_read_by_table.php", "PHP", 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 6, 4, 29
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_184015_add_gender_to_cells_table.php", "PHP", 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 6, 4, 29
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_184225_update_cells_gender_enum_to_male_female_only.php", "PHP", 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 8, 5, 34
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_185315_create_pdl_alerts_table.php", "PHP", 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 6, 4, 39
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_191732_add_drug_related_to_case_information_table.php", "PHP", 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 6, 4, 29
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_192900_create_medical_documents_table.php", "PHP", 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 6, 4, 37
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_195725_add_document_path_to_court_orders_table.php", "PHP", 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 6, 4, 30
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_203245_create_login_attempts_table.php", "PHP", 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 7, 5, 36
+"c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_204048_create_certificates_table.php", "PHP", 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 0, 7, 5, 55
+"c:\xampp\htdocs\pdl-is\database\schema\mysql-schema.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 370, 0, 0, 0, 0, 0, 0, 3, 373
+"c:\xampp\htdocs\pdl-is\database\seeders\DatabaseSeeder.php", "PHP", 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 19
+"c:\xampp\htdocs\pdl-is\database\seeders\PersonnelSeeder.php", "PHP", 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 29, 6, 62
+"c:\xampp\htdocs\pdl-is\docs\database\database documentation.md", "Markdown", 0, 0, 0, 0, 384, 0, 0, 0, 0, 0, 0, 0, 0, 60, 444
+"c:\xampp\htdocs\pdl-is\docs\global-search-system.md", "Markdown", 0, 0, 0, 0, 185, 0, 0, 0, 0, 0, 0, 0, 0, 53, 238
+"c:\xampp\htdocs\pdl-is\docs\law-enforcement-dashboard.md", "Markdown", 0, 0, 0, 0, 148, 0, 0, 0, 0, 0, 0, 0, 0, 44, 192
+"c:\xampp\htdocs\pdl-is\docs\middleware-protection.md", "Markdown", 0, 0, 0, 0, 104, 0, 0, 0, 0, 0, 0, 0, 0, 27, 131
+"c:\xampp\htdocs\pdl-is\docs\system-requirement.md", "Markdown", 0, 0, 0, 0, 1020, 0, 0, 0, 0, 0, 0, 0, 0, 190, 1210
+"c:\xampp\htdocs\pdl-is\eslint.config.js", "JavaScript", 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 1, 2, 45
+"c:\xampp\htdocs\pdl-is\package-lock.json", "JSON", 0, 10033, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10034
+"c:\xampp\htdocs\pdl-is\package.json", "JSON", 0, 82, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 83
+"c:\xampp\htdocs\pdl-is\phpunit.xml", "XML", 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 34
+"c:\xampp\htdocs\pdl-is\public\build\assets\PieChart-Rd69OCC8.js", "JavaScript", 0, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 27, 1, 99
+"c:\xampp\htdocs\pdl-is\public\build\assets\accordion-DkYmkr0A.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\alert-CuSR_Jww.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\app-BvoQFbYW.css", "CSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\app-DcCWX9mk.js", "JavaScript", 0, 0, 0, 0, 0, 76, 0, 0, 0, 0, 0, 0, 35, 13, 124
+"c:\xampp\htdocs\pdl-is\public\build\assets\app-layout-CwuzIVoQ.js", "JavaScript", 0, 0, 0, 0, 0, 45, 0, 0, 0, 0, 0, 0, 28, 8, 81
+"c:\xampp\htdocs\pdl-is\public\build\assets\appearance-DCUKUIJQ.js", "JavaScript", 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 12, 1, 17
+"c:\xampp\htdocs\pdl-is\public\build\assets\badge-DDkQ-Sjn.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\calendar-bIn4vfxR.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\card-QNSo3ZOw.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\case-information-nmOFlgB2.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\cell-assignment-C_dND05F.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\cell-management-BzQR_aqz.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\checkbox-CQkbq8Ug.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\circle-alert-nkaXhu1c.js", "JavaScript", 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 1, 7
+"c:\xampp\htdocs\pdl-is\public\build\assets\circle-check-big-BKf4FuBb.js", "JavaScript", 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 1, 7
+"c:\xampp\htdocs\pdl-is\public\build\assets\court-order-Cw2BDQsb.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\create-event-xPFki9ud.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\create-pdl-information-CNDMKpML.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\dashboard-BlE8Amlw.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\dashboard-D41JX840.js", "JavaScript", 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 16, 1, 22
+"c:\xampp\htdocs\pdl-is\public\build\assets\data-table-j-gwovtj.js", "JavaScript", 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 16, 1, 23
+"c:\xampp\htdocs\pdl-is\public\build\assets\dateUtils-Iw3XMDmk.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\dropdown-menu-CMrTdwkl.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\ellipsis-DzfNUrwQ.js", "JavaScript", 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 1, 7
+"c:\xampp\htdocs\pdl-is\public\build\assets\eye-Bac0spqN.js", "JavaScript", 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 1, 7
+"c:\xampp\htdocs\pdl-is\public\build\assets\eye-off-CCxCyiMC.js", "JavaScript", 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 1, 7
+"c:\xampp\htdocs\pdl-is\public\build\assets\forgot-password-BnaBJ1JL.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\format-CpNbv1J2.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\gcta-tastm-report-CdudrF_a.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\health-assessment-DX5A_HmF.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\index-B9NzzXP_.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\index-C1uMEMb0.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\index-Cjjgm7p9.js", "JavaScript", 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 1, 7
+"c:\xampp\htdocs\pdl-is\public\build\assets\index-DlSnFdn1.js", "JavaScript", 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 1, 7
+"c:\xampp\htdocs\pdl-is\public\build\assets\index-st6-WOiA.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\input-error-CZEZpeJ6.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\jail-events-sF5wvPxO.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\label-Cwa1UCo1.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\layout-C2xyXhiN.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\list-CngERBSS.js", "JavaScript", 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 12, 1, 17
+"c:\xampp\htdocs\pdl-is\public\build\assets\list-Dq9EIPkG.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\list-HIOex-Cn.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\list-Kaym5A2z.js", "JavaScript", 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 1, 7
+"c:\xampp\htdocs\pdl-is\public\build\assets\list-of-pdl-reports-CxawSdnt.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\loader-circle-BYvY7VOe.js", "JavaScript", 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 1, 7
+"c:\xampp\htdocs\pdl-is\public\build\assets\medical-records-CyfUC6Kd.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\password-BfJMdPQQ.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\pdl-archives-Cn_iA6V2.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\personal-information-admin-BTFgb7uc.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\personal-information-t_lSXI3O.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\physical-characteristics-CkMKKUss.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\population-report-CTHLGlzi.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\profie-JWp9i__v.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\profile-Di-185Cn.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\profile-management-DRur2o3G.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\progress-vLvXOkxR.js", "JavaScript", 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 2, 7
+"c:\xampp\htdocs\pdl-is\public\build\assets\search-HmaTslWG.js", "JavaScript", 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 1, 7
+"c:\xampp\htdocs\pdl-is\public\build\assets\select-DZJSQo1m.js", "JavaScript", 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 1, 7
+"c:\xampp\htdocs\pdl-is\public\build\assets\separator-DG4iFyOn.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\table-CgMGOAID.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\textarea-KTea9Vqs.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\transition--NpKdbHO.js", "JavaScript", 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 1, 6
+"c:\xampp\htdocs\pdl-is\public\build\assets\update-pdl-information-CUgIyHoo.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\users-C5OIh5tf.js", "JavaScript", 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 8, 1, 12
+"c:\xampp\htdocs\pdl-is\public\build\assets\utils-CRZLC5Gr.js", "JavaScript", 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 16, 1, 22
+"c:\xampp\htdocs\pdl-is\public\build\assets\view-pdl-information-Cajiu2gE.js", "JavaScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\xampp\htdocs\pdl-is\public\build\assets\welcome-BxCpBjqO.js", "JavaScript", 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 1, 7
+"c:\xampp\htdocs\pdl-is\public\build\manifest.json", "JSON", 0, 985, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 985
+"c:\xampp\htdocs\pdl-is\public\favicon.svg", "XML", 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"c:\xampp\htdocs\pdl-is\public\images\README.md", "Markdown", 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 6, 22
+"c:\xampp\htdocs\pdl-is\public\index.php", "PHP", 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 4, 7, 21
+"c:\xampp\htdocs\pdl-is\public\logo.svg", "XML", 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 17
+"c:\xampp\htdocs\pdl-is\resources\css\app.css", "CSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 155, 14, 36, 205
+"c:\xampp\htdocs\pdl-is\resources\js\app.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 6, 24
+"c:\xampp\htdocs\pdl-is\resources\js\components\app-content.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 4, 19
+"c:\xampp\htdocs\pdl-is\resources\js\components\app-header.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 171, 0, 2, 10, 183
+"c:\xampp\htdocs\pdl-is\resources\js\components\app-logo-icon.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 2, 14
+"c:\xampp\htdocs\pdl-is\resources\js\components\app-logo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 2, 22
+"c:\xampp\htdocs\pdl-is\resources\js\components\app-shell.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 5, 19
+"c:\xampp\htdocs\pdl-is\resources\js\components\app-sidebar-header.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 600, 0, 23, 44, 667
+"c:\xampp\htdocs\pdl-is\resources\js\components\app-sidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 245, 0, 0, 26, 271
+"c:\xampp\htdocs\pdl-is\resources\js\components\appearance-dropdown.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 4, 54
+"c:\xampp\htdocs\pdl-is\resources\js\components\appearance-tabs.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 4, 35
+"c:\xampp\htdocs\pdl-is\resources\js\components\breadcrumbs.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 2, 35
+"c:\xampp\htdocs\pdl-is\resources\js\components\data-table.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 0, 0, 7, 80
+"c:\xampp\htdocs\pdl-is\resources\js\components\delete-user.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 76, 0, 0, 14, 90
+"c:\xampp\htdocs\pdl-is\resources\js\components\heading-small.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 1, 9
+"c:\xampp\htdocs\pdl-is\resources\js\components\heading.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 1, 9
+"c:\xampp\htdocs\pdl-is\resources\js\components\icon.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 3, 12
+"c:\xampp\htdocs\pdl-is\resources\js\components\input-error.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 2, 11
+"c:\xampp\htdocs\pdl-is\resources\js\components\nav-footer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 2, 35
+"c:\xampp\htdocs\pdl-is\resources\js\components\nav-main.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 78, 0, 0, 7, 85
+"c:\xampp\htdocs\pdl-is\resources\js\components\nav-user.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 0, 0, 6, 40
+"c:\xampp\htdocs\pdl-is\resources\js\components\pagination-controls.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 6, 49
+"c:\xampp\htdocs\pdl-is\resources\js\components\text-link.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 3, 20
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\accordion.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 7, 65
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\alert.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 62, 0, 0, 7, 69
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\avatar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 46, 0, 0, 6, 52
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\badge.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 6, 47
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\breadcrumb.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99, 0, 0, 11, 110
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\button.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 6, 60
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\calendar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 202, 0, 0, 10, 212
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 9, 69
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\checkbox.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 4, 31
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\collapsible.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 5, 32
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\command.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 171, 0, 0, 12, 183
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\dialog.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 130, 0, 0, 14, 144
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\dropdown-menu.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 238, 0, 0, 18, 256
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\icon.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 4, 15
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\input.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 6, 33
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\label.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 4, 23
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\navigation-menu.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 157, 0, 0, 12, 169
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\placeholder-pattern.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 4, 21
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\popover.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 7, 47
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\progress.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 4, 27
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\radio-group.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 5, 44
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\scroll-area.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 5, 57
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\select.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 167, 0, 0, 13, 180
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\separator.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 4, 27
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\sheet.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 125, 0, 0, 13, 138
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\sidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 656, 0, 12, 54, 722
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\skeleton.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 3, 14
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\switch.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 4, 30
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\table.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 104, 0, 0, 11, 115
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\tabs.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 7, 65
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\textarea.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 4, 19
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\toggle-group.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 65, 0, 0, 7, 72
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\toggle.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 5, 46
+"c:\xampp\htdocs\pdl-is\resources\js\components\ui\tooltip.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 7, 60
+"c:\xampp\htdocs\pdl-is\resources\js\components\user-info.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 3, 23
+"c:\xampp\htdocs\pdl-is\resources\js\components\user-menu-content.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 5, 46
+"c:\xampp\htdocs\pdl-is\resources\js\features\court-hearing\create-event.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 245, 0, 3, 23, 271
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\case-information-columns.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 105, 0, 0, 5, 110
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\cell-assignment-columns.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 68, 0, 1, 3, 72
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\cell-management-columns.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 0, 0, 4, 77
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\court_order_columns.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 1, 6, 108
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\create-case-information.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 301, 0, 20, 22, 343
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\create-cell-assignment.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 246, 0, 14, 26, 286
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\create-cell-information.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 141, 0, 0, 18, 159
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\create-court-order.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 150, 0, 8, 18, 176
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\create-medical-record.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 153, 0, 8, 13, 174
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\create-pdl-personal-information.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 175, 0, 0, 18, 193
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\create-physical-characteristic.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 158, 0, 10, 18, 186
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\edit-cell-assignment.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 123, 0, 0, 16, 139
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\edit-cell-information.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 0, 0, 20, 165
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\edit-medical-record.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 155, 0, 7, 14, 176
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\edit-pdl-personal-information.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 178, 0, 0, 16, 194
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\edit-physical-characteristic.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 185, 0, 10, 17, 212
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\medical-record-columns.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 0, 0, 4, 84
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\physical-characteristic-columns.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 76, 0, 0, 3, 79
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\transfer-pdl.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 88, 0, 0, 11, 99
+"c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\view-pdl-information.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 229, 0, 6, 9, 244
+"c:\xampp\htdocs\pdl-is\resources\js\features\time-allowance\manage-time-allowance.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 141, 0, 0, 14, 155
+"c:\xampp\htdocs\pdl-is\resources\js\features\user-management\create-user.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 208, 0, 0, 26, 234
+"c:\xampp\htdocs\pdl-is\resources\js\features\user-management\delete-user.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 0, 0, 11, 91
+"c:\xampp\htdocs\pdl-is\resources\js\features\user-management\edit-user.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 201, 0, 1, 20, 222
+"c:\xampp\htdocs\pdl-is\resources\js\features\user-management\reset-password-dialog.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 143, 0, 2, 13, 158
+"c:\xampp\htdocs\pdl-is\resources\js\features\user-management\user-columns.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 89, 0, 0, 7, 96
+"c:\xampp\htdocs\pdl-is\resources\js\features\verification\verification-card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 351, 0, 4, 17, 372
+"c:\xampp\htdocs\pdl-is\resources\js\hooks\use-appearance.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 3, 21, 72
+"c:\xampp\htdocs\pdl-is\resources\js\hooks\use-initials.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 5, 16
+"c:\xampp\htdocs\pdl-is\resources\js\hooks\use-mobile-navigation.ts", "TypeScript", 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 9
+"c:\xampp\htdocs\pdl-is\resources\js\hooks\use-mobile.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 8, 23
+"c:\xampp\htdocs\pdl-is\resources\js\layouts\app-layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 3, 15
+"c:\xampp\htdocs\pdl-is\resources\js\layouts\app\app-header-layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 2, 15
+"c:\xampp\htdocs\pdl-is\resources\js\layouts\app\app-sidebar-layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 3, 25
+"c:\xampp\htdocs\pdl-is\resources\js\layouts\auth-layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 2, 10
+"c:\xampp\htdocs\pdl-is\resources\js\layouts\auth\auth-card-layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 0, 0, 3, 37
+"c:\xampp\htdocs\pdl-is\resources\js\layouts\auth\auth-simple-layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 4, 35
+"c:\xampp\htdocs\pdl-is\resources\js\layouts\auth\auth-split-layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 4, 46
+"c:\xampp\htdocs\pdl-is\resources\js\layouts\settings\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 1, 8, 69
+"c:\xampp\htdocs\pdl-is\resources\js\lib\dateUtils.ts", "TypeScript", 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 16
+"c:\xampp\htdocs\pdl-is\resources\js\lib\utils.ts", "TypeScript", 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\archive\list.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 203, 0, 6, 7, 216
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\court-hearing\calendar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 86, 0, 2, 11, 99
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\profile-management\profie.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 155, 0, 3, 15, 173
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\drug-related-cases-monthly.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 344, 0, 8, 21, 373
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\gcta-tastm-report.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 153, 0, 1, 16, 170
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\inmates-status-daily.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 444, 0, 15, 28, 487
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\inmates-status.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 327, 0, 10, 23, 360
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\list-of-pdl-reports.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 143, 0, 0, 12, 155
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\population-report.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 143, 0, 0, 15, 158
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\settings\appearance.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 6, 31
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\settings\password.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 0, 0, 21, 129
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\settings\profile.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 107, 0, 0, 21, 128
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\time-allowance\list.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 87, 0, 0, 7, 94
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\user-management\list.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 77, 0, 0, 14, 91
+"c:\xampp\htdocs\pdl-is\resources\js\pages\admin\verification\list.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 78, 0, 2, 12, 92
+"c:\xampp\htdocs\pdl-is\resources\js\pages\certificates\create.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 278, 0, 6, 20, 304
+"c:\xampp\htdocs\pdl-is\resources\js\pages\certificates\index.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 279, 0, 3, 16, 298
+"c:\xampp\htdocs\pdl-is\resources\js\pages\certificates\show.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 333, 0, 9, 18, 360
+"c:\xampp\htdocs\pdl-is\resources\js\pages\dashboard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 581, 0, 17, 30, 628
+"c:\xampp\htdocs\pdl-is\resources\js\pages\forgot-password.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 156, 0, 7, 20, 183
+"c:\xampp\htdocs\pdl-is\resources\js\pages\law-enforcement\dashboard\dashboard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 488, 0, 14, 24, 526
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\dashboard\dashboard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 581, 0, 17, 30, 628
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\jail-events\jail-events.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 394, 0, 10, 35, 439
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-archives\pdl-archives.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 113, 0, 8, 16, 137
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\case-information.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 95, 0, 1, 11, 107
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\cell-assignment.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 131, 0, 4, 15, 150
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\cell-management.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 8, 79
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\court-order.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 0, 0, 10, 83
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\create-pdl-information.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1414, 0, 29, 61, 1504
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\health-assessment.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 0, 1, 7, 81
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\medical-records.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 94, 0, 0, 11, 105
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\personal-information-admin.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96, 0, 0, 9, 105
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\personal-information.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 110, 0, 2, 12, 124
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\physical-characteristics.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 0, 0, 11, 92
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\update-pdl-information.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1395, 0, 28, 59, 1482
+"c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\profile-management\profile-management.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 165, 0, 3, 14, 182
+"c:\xampp\htdocs\pdl-is\resources\js\pages\search\detail.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 579, 0, 5, 21, 605
+"c:\xampp\htdocs\pdl-is\resources\js\pages\search\results.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 287, 0, 3, 18, 308
+"c:\xampp\htdocs\pdl-is\resources\js\pages\welcome.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 208, 0, 30, 23, 261
+"c:\xampp\htdocs\pdl-is\resources\js\ssr.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 5, 4, 31
+"c:\xampp\htdocs\pdl-is\resources\js\types\global.d.ts", "TypeScript", 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 6
+"c:\xampp\htdocs\pdl-is\resources\js\types\index.d.ts", "TypeScript", 151, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 15, 167
+"c:\xampp\htdocs\pdl-is\resources\js\types\vite-env.d.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2
+"c:\xampp\htdocs\pdl-is\resources\views\app.blade.php", "PHP", 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 34
+"c:\xampp\htdocs\pdl-is\resources\views\reports\drug-cases-monthly.blade.php", "PHP", 0, 0, 0, 144, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 162
+"c:\xampp\htdocs\pdl-is\resources\views\reports\gcta-tastm.blade.php", "PHP", 0, 0, 0, 249, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 301
+"c:\xampp\htdocs\pdl-is\resources\views\reports\inmate-status-report.blade.php", "PHP", 0, 0, 0, 91, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 97
+"c:\xampp\htdocs\pdl-is\resources\views\reports\inmates-status.blade.php", "PHP", 0, 0, 0, 235, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 262
+"c:\xampp\htdocs\pdl-is\resources\views\reports\pdl-list.blade.php", "PHP", 0, 0, 0, 121, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 126
+"c:\xampp\htdocs\pdl-is\resources\views\reports\pdl-report.blade.php", "PHP", 0, 0, 0, 222, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50, 272
+"c:\xampp\htdocs\pdl-is\resources\views\reports\population-report.blade.php", "PHP", 0, 0, 0, 95, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 98
+"c:\xampp\htdocs\pdl-is\routes\auth.php", "PHP", 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 23
+"c:\xampp\htdocs\pdl-is\routes\console.php", "PHP", 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 13
+"c:\xampp\htdocs\pdl-is\routes\settings.php", "PHP", 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 22
+"c:\xampp\htdocs\pdl-is\routes\web.php", "PHP", 0, 0, 0, 182, 0, 0, 0, 0, 0, 0, 0, 0, 12, 51, 245
+"c:\xampp\htdocs\pdl-is\tests\Feature\Auth\AuthenticationTest.php", "PHP", 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 43
+"c:\xampp\htdocs\pdl-is\tests\Feature\Auth\EmailVerificationTest.php", "PHP", 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 48
+"c:\xampp\htdocs\pdl-is\tests\Feature\Auth\PasswordConfirmationTest.php", "PHP", 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 34
+"c:\xampp\htdocs\pdl-is\tests\Feature\Auth\PasswordResetTest.php", "PHP", 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 62
+"c:\xampp\htdocs\pdl-is\tests\Feature\Auth\RegistrationTest.php", "PHP", 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 21
+"c:\xampp\htdocs\pdl-is\tests\Feature\DashboardTest.php", "PHP", 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 15
+"c:\xampp\htdocs\pdl-is\tests\Feature\ExampleTest.php", "PHP", 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 8
+"c:\xampp\htdocs\pdl-is\tests\Feature\Settings\PasswordUpdateTest.php", "PHP", 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 42
+"c:\xampp\htdocs\pdl-is\tests\Feature\Settings\ProfileUpdateTest.php", "PHP", 0, 0, 0, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 87
+"c:\xampp\htdocs\pdl-is\tests\Pest.php", "PHP", 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 32, 7, 48
+"c:\xampp\htdocs\pdl-is\tests\TestCase.php", "PHP", 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 11
+"c:\xampp\htdocs\pdl-is\tests\Unit\ExampleTest.php", "PHP", 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 6
+"c:\xampp\htdocs\pdl-is\tsconfig.json", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 88, 9, 123
+"c:\xampp\htdocs\pdl-is\vite.config.ts", "TypeScript", 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 26
+"Total", "-", 204, 20754, 52, 9269, 1857, 339, 370, 26, 3, 70, 19863, 156, 2124, 4096, 59183

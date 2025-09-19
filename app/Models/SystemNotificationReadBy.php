@@ -16,7 +16,7 @@ class SystemNotificationReadBy extends Model
         'personnel_id',
     ];
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     public function notification()
     {
