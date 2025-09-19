@@ -485,7 +485,7 @@ class PDLManagementController extends Controller
 
             // Create Court Order
             $pdl->courtOrders()->create([
-                'court_order_number' => $request->court_order_number,
+                'court_order_number' => "",
                 'order_type' => $request->order_type,
                 'order_date' => $request->order_date,
                 'received_date' => $request->received_date,

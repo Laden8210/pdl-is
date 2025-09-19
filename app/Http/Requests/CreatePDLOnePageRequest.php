@@ -28,7 +28,7 @@ class CreatePDLOnePageRequest extends FormRequest
 
 
             // Court Order
-            'court_order_number' => 'required|string|max:255',
+
             'order_type' => 'required|string|max:255',
             'order_date' => 'required|date',
             'received_date' => 'required|date',
@@ -89,6 +89,8 @@ class CreatePDLOnePageRequest extends FormRequest
             'gender.in' => 'Gender must be either Male or Female',
             'civil_status.required' => 'Civil status is required',
             'civil_status.in' => 'Civil status must be Single, Married, Widowed, or Divorced',
+            'ethnic_group.required' => 'Ethnic group is required',
+            'ethnic_group.max' => 'Ethnic group must not exceed 255 characters',
             'ethnic_group.regex' => 'Ethnic group must be a valid string',
             'brgy.regex' => 'Barangay must be a valid string',
             'city.regex' => 'City must be a valid string',
@@ -101,8 +103,6 @@ class CreatePDLOnePageRequest extends FormRequest
             'province.max' => 'Province must not exceed 255 characters',
 
             // Court Order Information
-            'court_order_number.required' => 'Court order number is required',
-            'court_order_number.max' => 'Court order number must not exceed 255 characters',
             'order_type.required' => 'Order type is required',
             'order_type.max' => 'Order type must not exceed 255 characters',
             'order_date.required' => 'Order date is required',

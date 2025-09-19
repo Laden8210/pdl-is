@@ -185,8 +185,7 @@ Route::middleware(['auth', 'law.enforcement'])->prefix('law-enforcement')->group
     Route::get('/dashboard', [DashboardController::class, 'lawEnforcementDashboard'])->name('dashboard.law-enforcement');
     Route::get('/pdl-management/personal-information', [PDLManagementController::class, 'personal_information'])->name('pdl-management.personal-information');
     Route::post('/pdl-management/personal-information/transfer/', [PDLManagementController::class, 'transfer'])->name('pdl-management.transfer');
-    Route::get('/pdl-management/personal-information/create', [PDLManagementController::class, 'view_create'])->name('pdl-management.personal-information.create');
-    Route::post('/pdl-management/personal-information/create', [PDLManagementController::class, 'store_create'])->name('pdl-management.personal-information.create');
+
 
     Route::get('/pdl-management/personal-information/{pdl_id}', [PDLManagementController::class, 'view_update'])->name('pdl-management.personal-information.view');
 
@@ -252,6 +251,8 @@ Route::middleware(['auth'])->group(function () {
 
 // Global Search Routes - Available to all authenticated users
 Route::middleware(['auth'])->group(function () {
+    Route::get('/pdl-management/personal-information/create', [PDLManagementController::class, 'view_create'])->name('pdl-management.personal-information.create');
+    Route::post('/pdl-management/personal-information/create', [PDLManagementController::class, 'store_create'])->name('pdl-management.personal-information.create');
     Route::get('/search', [SearchController::class, 'globalSearch'])->name('search.global');
     Route::get('/search/quick', [SearchController::class, 'quickSearch'])->name('search.quick');
     Route::get('/search/test', [App\Http\Controllers\SearchTestController::class, 'testSearch'])->name('search.test');

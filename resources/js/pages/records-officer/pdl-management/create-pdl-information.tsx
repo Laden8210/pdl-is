@@ -307,7 +307,7 @@ export default function CreatePDLInformation() {
         brgy: string;
         city: string;
         province: string;
-        court_order_number: string;
+
         order_type: string;
         order_date: string;
         received_date: string;
@@ -527,7 +527,7 @@ export default function CreatePDLInformation() {
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="ethnic_group">Ethnic Group</Label>
+                                    <Label htmlFor="ethnic_group">Ethnic Group <span className="text-red-500">*</span></Label>
                                     <Input
                                         id="ethnic_group"
                                         name="ethnic_group"
@@ -537,7 +537,7 @@ export default function CreatePDLInformation() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Civil Status</Label>
+                                    <Label>Civil Status <span className="text-red-500">*</span></Label>
                                     <Select value={data.civil_status} onValueChange={(value) => setData('civil_status', value)}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select civil status" />
@@ -589,18 +589,7 @@ export default function CreatePDLInformation() {
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <Label htmlFor="court_order_number">
-                                        Court Order Number <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input
-                                        id="court_order_number"
-                                        name="court_order_number"
-                                        value={data.court_order_number}
-                                        onChange={handleChange}
-                                        placeholder="Enter court order number"
-                                    />
-                                </div>
+
                                 <div className="space-y-2">
                                     <Label htmlFor="order_type">
                                         Order Type <span className="text-red-500">*</span>
@@ -1232,11 +1221,7 @@ export default function CreatePDLInformation() {
                                 <div className="space-y-3">
                                     <h3 className="text-lg font-semibold">Court Order</h3>
                                     <div className="space-y-2 text-sm">
-                                        {data.court_order_number && (
-                                            <div>
-                                                <span className="font-medium">Order Number:</span> {data.court_order_number}
-                                            </div>
-                                        )}
+
                                         {data.order_type && (
                                             <div>
                                                 <span className="font-medium">Order Type:</span> {data.order_type}

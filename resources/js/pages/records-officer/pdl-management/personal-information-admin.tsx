@@ -204,7 +204,7 @@ export default function PersonalInformation() {
 
                                 <div className="flex gap-2">
                                     <Link
-                                        href="/law-enforcement/pdl-management/personal-information/create"
+                                    href="/pdl-management/personal-information/create"
                                         className="flex items-center gap-2 rounded-sm bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
                                     >
                                         Add PDL Information
