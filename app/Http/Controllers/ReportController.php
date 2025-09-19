@@ -788,9 +788,7 @@ class ReportController extends Controller
             // Get detainees count for the month (filter for drug-related through case information)
             $detainees = Pdl::with('cases')
                 ->whereBetween('created_at', [$startDate, $endDate])
-                ->whereHas('cases', function ($query) {
-                    $query->where('drug_related', true);
-                })
+
                 ->get();
 
             $maleDetainees = $detainees->where('gender', 'Male')->count();
@@ -799,17 +797,13 @@ class ReportController extends Controller
 
             // Get committed count (drug-related PDLs created in this month)
             $committed = Pdl::whereBetween('created_at', [$startDate, $endDate])
-                ->whereHas('cases', function ($query) {
-                    $query->where('drug_related', true);
-                })
+
                 ->count();
 
             // Get discharged count (drug-related PDLs with discharge status)
             $discharged = Pdl::whereBetween('updated_at', [$startDate, $endDate])
                 ->where('archive_status', '!=', null)
-                ->whereHas('cases', function ($query) {
-                    $query->where('drug_related', true);
-                })
+
                 ->count();
 
             // Get drug-related cases for the month
