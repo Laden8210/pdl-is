@@ -811,7 +811,7 @@ class ReportController extends Controller
                 ->where('drug_related', true)
                 ->whereBetween('date_committed', [$startDate, $endDate])
                 ->get();
-            // Get discharge causes for drug-related cases using the actual database values
+
             $bonded = $drugCases->filter(function ($case) {
                 return $case->pdl && $case->pdl->archive_status === 'BONDED';
             })->count();
