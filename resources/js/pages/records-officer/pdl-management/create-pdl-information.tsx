@@ -298,6 +298,7 @@ export default function CreatePDLInformation() {
     const { data, setData, post, processing, errors, reset } = useForm<{
         fname: string;
         lname: string;
+        mname: string;
         alias: string;
         birthdate: string;
         age: string;
@@ -343,6 +344,7 @@ export default function CreatePDLInformation() {
     }>({
         fname: '',
         lname: '',
+        mname: '',
         alias: '',
         birthdate: '',
         age: '',
@@ -497,6 +499,14 @@ export default function CreatePDLInformation() {
                                     </Label>
                                     <Input id="lname" name="lname" value={data.lname} onChange={handleChange} placeholder="Enter last name" />
                                 </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="mname">
+                                        Middle Name <span className="text-red-500">*</span>
+                                    </Label>
+                                    <Input id="mname" name="mname" value={data.mname} onChange={handleChange} placeholder="Enter middle name" />
+                                </div>
+
                                 <div className="space-y-2">
                                     <Label htmlFor="alias">Alias
                                         <span className="text-red-500">*</span>
