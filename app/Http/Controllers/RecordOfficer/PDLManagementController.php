@@ -459,6 +459,7 @@ class PDLManagementController extends Controller
             $pdl = Pdl::create([
                 'fname' => $request->fname,
                 'lname' => $request->lname,
+                'mname' => $request->mname,
                 'alias' => $request->alias,
                 'birthdate' => $request->birthdate,
                 'age' => $request->age,

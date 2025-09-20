@@ -17,6 +17,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'fname' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'lname' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'alias' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
+            'mname' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'birthdate' => 'required|date',
             'age' => 'required|integer|min:18',
             'gender' => 'required|string|in:Male,Female',
@@ -91,6 +92,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'civil_status.in' => 'Civil status must be Single, Married, Widowed, or Divorced',
             'ethnic_group.required' => 'Ethnic group is required',
             'ethnic_group.max' => 'Ethnic group must not exceed 255 characters',
+
             'ethnic_group.regex' => 'Ethnic group must be a valid string',
             'brgy.regex' => 'Barangay must be a valid string',
             'city.regex' => 'City must be a valid string',

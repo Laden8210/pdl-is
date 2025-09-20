@@ -15,6 +15,7 @@ class Pdl extends Model
     protected $fillable = [
         'fname',
         'lname',
+        'mname',
         'alias',
         'birthdate',
         'age',
