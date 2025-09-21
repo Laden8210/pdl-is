@@ -1449,11 +1449,12 @@ export default function CreatePDLInformation() {
                                                     <SelectValue placeholder="Select status" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="on trial">On Trial</SelectItem>
+                                                    <SelectItem value="on_trial">On Trial</SelectItem>
                                                     <SelectItem value="pending">Pending</SelectItem>
                                                     <SelectItem value="convicted">Convicted</SelectItem>
                                                     <SelectItem value="deceased">Deceased</SelectItem>
-                                                    <SelectItem value="case closed">Case Closed</SelectItem>
+                                                        <SelectItem value="case_closed">Case Closed</SelectItem>
+                                                    <SelectItem value="open">Open</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
