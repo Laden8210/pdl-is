@@ -1,142 +1,695 @@
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { PageProps, type BreadcrumbItem } from '@/types';
+
 import { Head } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
+import {
+  Activity,
+  AlertCircle,
+  Building,
+  FileText,
+  Shield,
+  Stethoscope,
+  Users,
+  TrendingUp,
+  Clock,
+  Scale,
+  UserCheck,
+  AlertTriangle,
+  CheckCircle
+} from 'lucide-react';
+import { Bar, BarChart, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-
-const quarterlyData = [
-    { name: 'Sentence', value: 62 },
-    { name: 'Parole', value: 58 },
-    { name: 'Positive', value: 21 },
-    { name: 'Negative', value: 10 },
+const breadcrumbs = [
+  {
+    title: 'Dashboard',
+    href: '/dashboard',
+  },
 ];
 
-const populationData = [
-    { name: 'Male', value: 300 },
-    { name: 'Female', value: 187 },
-];
+interface DashboardProps extends PageProps {
+  dashboardData: {
+    pdlByGender: { name: string; value: number; color: string }[];
+    caseStatusData: { name: string; value: number }[];
+    monthlyAdmissions: { month: string; admissions: number; releases: number }[];
+    cellOccupancy: { cell: string; capacity: number; occupied: number }[];
+    timeAllowanceData: { type: string; count: number; color: string; description: string }[];
+    securityClassificationData: { classification: string; count: number; color: string }[];
+    courtOrderTypes: { type: string; count: number; color: string }[];
+    verificationStatusData: { status: string; count: number; color: string }[];
+    personnelByPosition: { position: string; count: number; color: string }[];
+    recentActivities: { type: string; title: string; description: string; badge: string; color: string }[];
+    metrics: {
+      totalPDL: number;
+      activeCases: number;
+      totalCases: number;
+      totalCapacity: number;
+      totalOccupied: number;
+      overallUtilization: number;
+      pendingVerifications: number;
+      totalTimeAllowances: number;
+      totalCourtOrders: number;
+      totalMedicalRecords: number;
+      activePersonnel: number;
+    };
+  };
+  [key: string]: unknown;
+}
 
-const COLORS = ['#4f46e5', '#a855f7'];
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-    },
-];
+export default function PDLDashboard() {
+    const {props} = usePage<DashboardProps>();
+    const { dashboardData } = props;
+    const {
+      pdlByGender,
+      caseStatusData,
+      monthlyAdmissions,
+      cellOccupancy,
+      timeAllowanceData,
+      securityClassificationData,
+      courtOrderTypes,
+      verificationStatusData,
+      personnelByPosition,
+      recentActivities,
+      metrics
+    } = dashboardData;
 
-export default function Dashboard() {
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+    const {
+        totalPDL,
+        activeCases,
+        totalCases,
+        totalCapacity,
+        totalOccupied,
+        overallUtilization,
+        pendingVerifications,
+        totalTimeAllowances,
+        totalCourtOrders,
+        totalMedicalRecords,
+        activePersonnel
+    } = metrics;
 
-            <div className="flex flex-col gap-6 p-4">
-                <h1 className="text-2xl font-bold">Dashboard</h1>
 
-                {/* Top Stats */}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-sm text-muted-foreground">Total Inmate Population</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center justify-between gap-4">
-                                {/* Left: Total number */}
-                                <div>
-                                    <p className="text-3xl font-bold">487</p>
-                                    <p className="mt-1 text-sm text-muted-foreground">Total Inmates</p>
-                                </div>
+  const getActivityBadgeStyle = (color: string) => {
+    const styles: Record<string, string> = {
+      blue: 'bg-blue-50 text-blue-700',
+      green: 'bg-green-50 text-green-700',
+      orange: 'bg-orange-50 text-orange-700',
+      red: 'bg-red-50 text-red-700',
+      purple: 'bg-purple-50 text-purple-700'
+    };
+    return styles[color] || 'bg-gray-50 text-gray-700';
+  };
 
-                                {/* Right: Pie Chart */}
-                                <div className="h-[80px] w-[80px]">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <PieChart>
-                                            <Pie data={populationData} innerRadius={20} outerRadius={40} paddingAngle={2} dataKey="value">
-                                                {populationData.map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                                ))}
-                                            </Pie>
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+  const getActivityDotColor = (color: string) => {
+    const colors: Record<string, string> = {
+      blue: 'bg-blue-500',
+      green: 'bg-green-500',
+      orange: 'bg-orange-500',
+      red: 'bg-red-500',
+      purple: 'bg-purple-500'
+    };
+    return colors[color] || 'bg-gray-500';
+  };
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-sm text-muted-foreground">Quarterly Inmate Status Reports</CardTitle>
-                        </CardHeader>
 
-                        <CardContent>
-                            <div className="flex items-start justify-between gap-4">
-                                {/* Left: Summary Text */}
-                                <div className="flex-1 space-y-1 text-sm">
-                                    <p>• Sentence Progression: 62% complete</p>
-                                    <p>• Parole Eligibility: 58 inmates eligible</p>
-                                    <p>• Behavioral Remarks: 21 positive, 10 negative</p>
-                                </div>
-
-                                {/* Right: Bar Chart */}
-                                <div className="h-32 w-48">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={quarterlyData}>
-                                            <XAxis dataKey="name" fontSize={10} hide />
-                                            <YAxis fontSize={10} hide />
-                                            <Tooltip />
-                                            <Bar dataKey="value" fill="#4f46e5" radius={[4, 4, 0, 0]} />
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-sm text-muted-foreground">Drug Clearing Status</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-1 text-sm">
-                            <p>
-                                Cleared: <strong>135</strong>
-                            </p>
-                            <p>
-                                Pending: <strong>54</strong>
-                            </p>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Middle Section */}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-sm text-muted-foreground">Monthly Drug-related Cases</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-1 text-sm">
-                            <p>• New Admissions: 29 inmates</p>
-                            <p>• Rehab Program Completed: 9 inmates</p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-sm text-muted-foreground">Upcoming Activities</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-1 text-sm">
-                            <p>
-                                <strong>10:00 AM</strong> – PDL Transfer
-                            </p>
-                            <p>
-                                <strong>02:00 PM</strong> – Hearing
-                            </p>
-                            <p>
-                                <strong>03:00 PM</strong> – System Update
-                            </p>
-                        </CardContent>
-                    </Card>
-                </div>
+  const { auth } = props;
+  const isAdmin = auth?.user?.position === 'admin';
+  return (
+    <>
+      <AppLayout breadcrumbs={breadcrumbs}>
+        <Head title="PDL Management Dashboard" />
+        <div className="min-h-screen">
+          <div className="mx-auto space-y-6 p-4">
+            {/* Header */}
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                {isAdmin && (
+                    <h1 className="text-2xl font-bold">Administrative Dashboard</h1>
+                )}
+                {!isAdmin && (
+                    <h1 className="text-2xl font-bold">Record Officer Dashboard</h1>
+                )}
             </div>
-        </AppLayout>
-    );
+
+            {/* Key Metrics */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+              <Card className="border-l-4 border-l-blue-500">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">Total PDL</CardTitle>
+                  <Users className="h-5 w-5 text-blue-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900">{totalPDL}</div>
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <TrendingUp className="h-4 w-4 text-green-500" />
+                    <span>Active records</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-l-4 border-l-green-500">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">Active Cases</CardTitle>
+                  <FileText className="h-5 w-5 text-green-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900">{activeCases}</div>
+                  <p className="text-sm text-gray-500">Out of {totalCases} total cases</p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-l-4 border-l-orange-500">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">Facility Utilization</CardTitle>
+                  <Building className="h-5 w-5 text-orange-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900">{overallUtilization}%</div>
+                  <p className="text-sm text-gray-500">{totalOccupied}/{totalCapacity} beds occupied</p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-l-4 border-l-red-500">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">Pending Verifications</CardTitle>
+                  <AlertCircle className="h-5 w-5 text-red-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900">{pendingVerifications}</div>
+                  <p className="text-sm text-gray-500">Awaiting review</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Second Row Metrics */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">GCTA Awards</CardTitle>
+                  <Clock className="h-5 w-5 text-green-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900">
+                    {timeAllowanceData.find(item => item.type === 'GCTA')?.count || 0}
+                  </div>
+                  <p className="text-sm text-gray-500">Good Conduct Time Allowance</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">TASTM Awards</CardTitle>
+                  <Clock className="h-5 w-5 text-orange-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900">
+                    {timeAllowanceData.find(item => item.type === 'TASTM')?.count || 0}
+                  </div>
+                  <p className="text-sm text-gray-500">Study, Teaching & Mentoring</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">Court Orders</CardTitle>
+                  <Scale className="h-5 w-5 text-indigo-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900">{totalCourtOrders}</div>
+                  <p className="text-sm text-gray-500">Total processed</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">Medical Records</CardTitle>
+                  <Stethoscope className="h-5 w-5 text-pink-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900">{totalMedicalRecords}</div>
+                  <p className="text-sm text-gray-500">Total records</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">Active Personnel</CardTitle>
+                  <UserCheck className="h-5 w-5 text-cyan-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900">{activePersonnel}</div>
+                  <p className="text-sm text-gray-500">Staff members</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {/* PDL Demographics */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    PDL Demographics
+                  </CardTitle>
+                  <CardDescription>Distribution of Persons Deprived of Liberty by gender</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {pdlByGender.length > 0 ? (
+                    <div className="space-y-4">
+                      {/* Legend */}
+                      <div className="space-y-2">
+                        {pdlByGender.map((item, index) => (
+                          <div key={index} className="flex items-center gap-3">
+                            <div className="h-3 w-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+                            <span className="text-sm text-gray-600">
+                              <strong>{item.name}:</strong> {item.value} ({totalPDL > 0 ? (item.value / totalPDL * 100).toFixed(1) : 0}%)
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Chart */}
+                      <div className="flex justify-center">
+                        <div className="h-48 w-48">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie
+                                data={pdlByGender}
+                                dataKey="value"
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={70}
+                                innerRadius={40}
+                                label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+                                labelLine={false}
+                              >
+                                {pdlByGender.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                              </Pie>
+                              <Tooltip formatter={(value) => [`${value} PDL`, 'Count']} />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">No demographic data available</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Case Status Distribution */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Case Status Distribution
+                  </CardTitle>
+                  <CardDescription>Current status of all legal cases</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {caseStatusData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={caseStatusData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">No case data available</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Monthly Admissions and Releases */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-5 w-5" />
+                    Monthly Admissions & Releases
+                  </CardTitle>
+                  <CardDescription>Trends over the past 6 months</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {monthlyAdmissions.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={monthlyAdmissions}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line type="monotone" dataKey="admissions" stroke="#3b82f6" strokeWidth={2} name="Admissions" />
+                        <Line type="monotone" dataKey="releases" stroke="#10b981" strokeWidth={2} name="Releases" />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">No admission/release data available</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Security Classification */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Security Classification
+                  </CardTitle>
+                  <CardDescription>Distribution of PDL by security level</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {securityClassificationData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={securityClassificationData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="classification" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                          {securityClassificationData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">No security classification data available</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Cell Occupancy */}
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building className="h-5 w-5" />
+                    Cell Occupancy Status
+                  </CardTitle>
+                  <CardDescription>Current utilization of facility cells</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {cellOccupancy.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      {cellOccupancy.map((cell, index) => {
+                        const occupancyRate = cell.capacity > 0 ? (cell.occupied / cell.capacity) * 100 : 0;
+                        const isNearCapacity = occupancyRate > 90;
+                        const isUnderUtilized = occupancyRate < 75;
+
+                        return (
+                          <div key={index} className="space-y-2 rounded-lg border p-4">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium">{cell.cell}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-600">
+                                  {cell.occupied}/{cell.capacity}
+                                </span>
+                                {isNearCapacity ? (
+                                  <Badge variant="destructive" className="text-xs">
+                                    <AlertTriangle className="mr-1 h-3 w-3" />
+                                    {occupancyRate.toFixed(0)}% Full
+                                  </Badge>
+                                ) : isUnderUtilized ? (
+                                  <Badge variant="outline" className="text-xs">
+                                    <CheckCircle className="mr-1 h-3 w-3" />
+                                    {occupancyRate.toFixed(0)}% Full
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="secondary" className="text-xs">
+                                    {occupancyRate.toFixed(0)}% Full
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                            <div className="h-2 rounded-full bg-gray-200">
+                              <div
+                                className={`h-2 rounded-full ${
+                                  isNearCapacity
+                                    ? 'bg-red-500'
+                                    : isUnderUtilized
+                                      ? 'bg-green-500'
+                                      : 'bg-blue-500'
+                                }`}
+                                style={{ width: `${occupancyRate}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">No cell occupancy data available</div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Additional Admin Charts */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {/* Court Order Types */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Scale className="h-5 w-5" />
+                    Court Order Types
+                  </CardTitle>
+                  <CardDescription>Distribution of court orders by type</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {courtOrderTypes.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={courtOrderTypes}
+                          dataKey="count"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={100}
+                          innerRadius={60}
+                          label={({ type, percent }) => `${type}: ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {courtOrderTypes.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value) => [`${value} orders`, 'Count']} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">No court order data available</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Verification Status */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <UserCheck className="h-5 w-5" />
+                    Verification Status
+                  </CardTitle>
+                  <CardDescription>Status of PDL verification requests</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {verificationStatusData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={verificationStatusData} layout="vertical">
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" />
+                        <YAxis dataKey="status" type="category" width={80} />
+                        <Tooltip />
+                        <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                          {verificationStatusData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">No verification data available</div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Personnel and System Status */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              {/* Personnel Distribution */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <UserCheck className="h-5 w-5" />
+                    Personnel Distribution
+                  </CardTitle>
+                  <CardDescription>Staff members by position</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {personnelByPosition.length > 0 ? (
+                    <div className="space-y-3">
+                      {personnelByPosition.map((item, index) => (
+                        <div key={index} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
+                            <span className="text-sm font-medium">{item.position}</span>
+                          </div>
+                          <Badge variant="secondary">{item.count}</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">No personnel data available</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* GCTA Time Allowances */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    GCTA Time Allowances
+                  </CardTitle>
+                  <CardDescription>Good Conduct Time Allowance distribution</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {(() => {
+                    const gctaData = timeAllowanceData.find(item => item.type === 'GCTA');
+                    return gctaData ? (
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <div className="h-4 w-4 rounded-full" style={{ backgroundColor: gctaData.color }} />
+                            <span className="text-lg font-semibold">{gctaData.type}</span>
+                          </div>
+                          <Badge variant="secondary" className="text-lg px-3 py-1">{gctaData.count}</Badge>
+                        </div>
+                        <div className="text-sm text-muted-foreground mb-2">{gctaData.description}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div
+                            className="h-3 rounded-full transition-all duration-300"
+                            style={{
+                              width: `${totalTimeAllowances > 0 ? (gctaData.count / totalTimeAllowances * 100) : 0}%`,
+                              backgroundColor: gctaData.color
+                            }}
+                          />
+                        </div>
+                        <div className="mt-2 text-xs text-gray-500">
+                          {totalTimeAllowances > 0 ? (gctaData.count / totalTimeAllowances * 100).toFixed(1) : 0}% of total allowances
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">No GCTA data available</div>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+
+              {/* TASTM Time Allowances */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    TASTM Time Allowances
+                  </CardTitle>
+                  <CardDescription>Time Allowance for Study, Teaching, and Mentoring distribution</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {(() => {
+                    const tastmData = timeAllowanceData.find(item => item.type === 'TASTM');
+                    return tastmData ? (
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <div className="h-4 w-4 rounded-full" style={{ backgroundColor: tastmData.color }} />
+                            <span className="text-lg font-semibold">{tastmData.type}</span>
+                          </div>
+                          <Badge variant="secondary" className="text-lg px-3 py-1">{tastmData.count}</Badge>
+                        </div>
+                        <div className="text-sm text-muted-foreground mb-2">{tastmData.description}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div
+                            className="h-3 rounded-full transition-all duration-300"
+                            style={{
+                              width: `${totalTimeAllowances > 0 ? (tastmData.count / totalTimeAllowances * 100) : 0}%`,
+                              backgroundColor: tastmData.color
+                            }}
+                          />
+                        </div>
+                        <div className="mt-2 text-xs text-gray-500">
+                          {totalTimeAllowances > 0 ? (tastmData.count / totalTimeAllowances * 100).toFixed(1) : 0}% of total allowances
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">No TASTM data available</div>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+
+              {/* System Status */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    System Status
+                  </CardTitle>
+                  <CardDescription>Current system metrics</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Active Personnel:</span>
+                    <Badge variant="default">{activePersonnel}</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Total Court Orders:</span>
+                    <Badge variant="secondary">{totalCourtOrders}</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Pending Verifications:</span>
+                    <Badge variant={pendingVerifications > 0 ? "destructive" : "default"}>{pendingVerifications}</Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent Activities */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Recent Activities
+                </CardTitle>
+                <CardDescription>Latest system events and activities</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {recentActivities.length > 0 ? (
+                  <div className="space-y-4">
+                    {recentActivities.map((activity, index) => (
+                      <div key={index} className="flex items-start gap-3 border-b border-gray-100 pb-3 last:border-b-0">
+                        <div className={`mt-2 h-2 w-2 rounded-full ${getActivityDotColor(activity.color)}`} />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{activity.title}</p>
+                          <p className="text-xs text-gray-500">{activity.description}</p>
+                        </div>
+                        <Badge variant="outline" className={`text-xs ${getActivityBadgeStyle(activity.color)}`}>
+                          {activity.badge}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">No recent activities</div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </AppLayout>
+    </>
+  );
 }

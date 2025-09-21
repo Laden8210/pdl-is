@@ -19,8 +19,6 @@ class ProfileManagementController extends Controller
         return Inertia::render('admin/profile-management/profie');
     }
 
-
-
     public function update(UpdateProfileRequest $request): RedirectResponse
     {
         $user = Auth::user();
@@ -29,7 +27,7 @@ class ProfileManagementController extends Controller
         $user->lname = $request->input('lastName');
         $user->mname = $request->input('middleName');
         $user->position = $request->input('position');
-        $user->status = $request->input('status');
+
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->input('password'));
@@ -42,7 +40,7 @@ class ProfileManagementController extends Controller
             }
 
             $path = $request->file('profileImage')->store('profile_images', 'public');
-            
+
             $user->avatar = $path;
         }
 

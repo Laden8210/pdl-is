@@ -26,8 +26,8 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                     .filter((item) => !item.userType || item.userType === user?.position)
                     .map((item) => {
                         const hasChildren = item.children && item.children.length > 0;
-                        const isDropdownOpen =
-                            openDropdowns[item.title] || (hasChildren && item.children?.some((child) => page.url.startsWith(child.href ?? '')));
+                        const isChildActive = hasChildren && item.children?.some((child) => page.url.startsWith(`/${child.href ?? ''}`));
+                        const isDropdownOpen = openDropdowns[item.title] || isChildActive;
 
                         return (
                             <div key={item.title}>
@@ -59,13 +59,14 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                             <SidebarMenuItem key={child.title}>
                                                 <SidebarMenuButton
                                                     asChild
-                                                    isActive={child.href ? page.url === child.href : false}
+                                                    isActive={child.href ? page.url.startsWith(`/${child.href}`) : false}
                                                     tooltip={{ children: child.title }}
                                                 >
                                                     <Link
                                                         href={`/${(child.href ?? '').replace(/^\/+/, '')}`}
                                                         prefetch
-                                                        className="flex items-center gap-2"
+                                                        className="flex items-center gap-2 text-left"
+                                                        onClick={(e) => e.stopPropagation()}
                                                     >
                                                         {child.icon && <child.icon />}
                                                         <span>{child.title}</span>

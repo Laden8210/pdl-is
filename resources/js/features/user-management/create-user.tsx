@@ -12,16 +12,18 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Head, useForm, usePage } from '@inertiajs/react';
+import { after } from 'node:test';
 import { FormEventHandler, useRef } from 'react';
-
+import { useEffect } from 'react';
 
 export function CreateUser() {
     const avatarRef = useRef<HTMLInputElement>(null);
-    const { props } = usePage<PageProps>();
+    const { props } = usePage<any>();
     const successMessage = props.success;
 
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         firstName: '',
         middleName: '',
         lastName: '',
@@ -31,17 +33,42 @@ export function CreateUser() {
         password: '',
         position: '',
         agency: '',
+
     });
+
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-
         post(route('user-management.store'), {
             preserveScroll: true,
             forceFormData: true,
-            onSuccess: () => {},
+            onSuccess: () => {
+                setData({
+                    firstName: '',
+                    middleName: '',
+                    lastName: '',
+                    contactNumber: '',
+                    avatar: null,
+                    username: '',
+                    password: '',
+                    position: '',
+                    agency: '',
+                });
+
+
+                setTimeout(() => {
+                 const closeButton = document.querySelector('.dialog-close-button') as HTMLElement;
+                 if (closeButton) {
+                      closeButton.click();
+                 }
+                }, 3000);
+
+            },
         });
     };
+
+
+
     return (
         <Dialog>
             <Head title="Create User" />
@@ -78,7 +105,7 @@ export function CreateUser() {
 
                     <div className="grid grid-cols-3 gap-4 py-2">
                         <div className="col-span-2">
-                            <Label htmlFor="firstName">First Name</Label>
+                            <Label htmlFor="firstName">First Name *</Label>
                             <Input
                                 id="firstName"
                                 name="firstName"
@@ -99,7 +126,7 @@ export function CreateUser() {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="lastName">Last Name</Label>
+                            <Label htmlFor="lastName">Last Name *</Label>
                             <Input
                                 id="lastName"
                                 name="lastName"
@@ -110,7 +137,7 @@ export function CreateUser() {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="contactNumber">Contact Number</Label>
+                            <Label htmlFor="contactNumber">Contact Number *</Label>
                             <Input
                                 id="contactNumber"
                                 name="contactNumber"
@@ -121,7 +148,7 @@ export function CreateUser() {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="avatar">Avatar</Label>
+                            <Label htmlFor="avatar">Avatar *</Label>
                             <Input
                                 id="avatar"
                                 name="avatar"
@@ -133,7 +160,7 @@ export function CreateUser() {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="username">Username</Label>
+                            <Label htmlFor="username">Username *</Label>
                             <Input
                                 id="username"
                                 name="username"
@@ -144,7 +171,7 @@ export function CreateUser() {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">Password *</Label>
                             <Input
                                 id="password"
                                 name="password"
@@ -156,19 +183,33 @@ export function CreateUser() {
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="position">Position</Label>
-                            <Input
-                                id="position"
-                                name="position"
+                            <Label htmlFor="userType">User Type *</Label>
+                            <Select
                                 value={data.position}
-                                onChange={(e) => setData('position', e.target.value)}
+                                onValueChange={(value) => setData('position', value)}
                                 required
-                            />
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select user type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="law-enforcement">Law Enforcement</SelectItem>
+                                    <SelectItem value="admin">Administrator</SelectItem>
+                                    <SelectItem value="record-officer">Records Officer</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
 
+
                         <div className="col-span-3">
-                            <Label htmlFor="agency">Agency</Label>
-                            <Input id="agency" name="agency" value={data.agency} onChange={(e) => setData('agency', e.target.value)} required />
+                            <Label htmlFor="agency">Agency *    </Label>
+                            <Input
+                                id="agency"
+                                name="agency"
+                                value={data.agency}
+                                onChange={(e) => setData('agency', e.target.value)}
+                                required
+                            />
                         </div>
                     </div>
 
@@ -176,8 +217,13 @@ export function CreateUser() {
                         <DialogClose asChild>
                             <Button variant="secondary">Cancel</Button>
                         </DialogClose>
-                        <Button type="submit" form="create-user-form" className="bg-blue-500 hover:bg-blue-600" disabled={processing}>
-                            Create User
+                        <Button
+                            type="submit"
+                            form="create-user-form"
+                            className="bg-blue-500 hover:bg-blue-600"
+                            disabled={processing}
+                        >
+                            {processing ? 'Creating...' : 'Create User'}
                         </Button>
                     </DialogFooter>
                 </form>

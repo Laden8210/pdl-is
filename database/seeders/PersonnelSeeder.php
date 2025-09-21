@@ -41,6 +41,22 @@ class PersonnelSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+
+            // [
+            //     'fname' => 'Alice',
+            //     'mname' => 'C.',
+            //     'lname' => 'Johnson',
+            //     'contactnum' => '09172345678',
+            //     'avatar' => null,
+            //     'username' => 'alicejohnson',
+            //     'password' => Hash::make('alicepass'),
+            //     'position' => 'law-enforcement',
+            //     'agency' => 'LGU Buenavista',
+            //     'created_at' => now(),
+            //     'updated_at' => now(),
+            // ],
+
+
         ]);
     }
 }
