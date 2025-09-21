@@ -59,8 +59,7 @@ export default function Calendar() {
                 return '#3b82f6'; // blue
             case 'medical':
                 return '#ef4444'; // red
-            case 'visitation':
-                return '#10b981'; // green
+
             case 'rehabilitation':
                 return '#f59e0b'; // amber
             case 'transfer':
@@ -103,10 +102,7 @@ export default function Calendar() {
                         <div className="h-3 w-3 rounded-full bg-[#ef4444]"></div>
                         <span className="text-xs">Medical</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                        <div className="h-3 w-3 rounded-full bg-[#10b981]"></div>
-                        <span className="text-xs">Visitation</span>
-                    </div>
+
                     <div className="flex items-center gap-1">
                         <div className="h-3 w-3 rounded-full bg-[#f59e0b]"></div>
                         <span className="text-xs">Rehabilitation</span>

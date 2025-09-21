@@ -36,7 +36,7 @@ class PdlArchiveController extends Controller
                 'archive_reason' => 'required|string|max:1000',
                 'archive_court_order_type' => 'required|in:' . implode(',', array_keys(Pdl::getCourtOrderTypeOptions())),
                 'archive_court_order_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
-                'archive_case_number' => 'required|string|max:255',
+
             ]);
 
             // Handle file upload
@@ -49,7 +49,7 @@ class PdlArchiveController extends Controller
                 'archive_reason' => $request->archive_reason,
                 'archive_court_order_type' => $request->archive_court_order_type,
                 'archive_court_order_file' => $filePath,
-                'archive_case_number' => $request->archive_case_number,
+
                 'archive_court_order_date' => now(),
                 'archived_at' => now(),
             ]);

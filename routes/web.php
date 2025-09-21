@@ -125,7 +125,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
 
     Route::get('/jail-events', [JailEventsController::class, 'index'])->name('admin.jail-events.index');
-    Route::post('/jail-events', [JailEventsController::class, 'store'])->name('admin.jail-events.store');
+
 
     // PDL Alerts and Reminders
     Route::get('/pdl-management/alerts', [PdlAlertController::class, 'index'])->name('pdl-alerts.index');
@@ -156,7 +156,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 Route::middleware(['auth', 'record.officer'])->prefix('record-officer')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.record-officer');
     Route::get('/jail-events', [JailEventsController::class, 'index'])->name('record-officer.jail-events.index');
-    Route::post('/jail-events', [JailEventsController::class, 'store'])->name('record-officer.jail-events.store');
+
     Route::get('/pdl-management/personal-information/{pdl_id}', [PDLManagementController::class, 'view_update'])->name('pdl-management.personal-information.view');
 
 
@@ -298,7 +298,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/pdl-management/court-order/{courtOrder}', [PDLManagementController::class, 'update_court_order'])->name('court-orders.update');
     Route::post('/pdl-management/cell-assignment', [CellAssignmentController::class, 'assign'])->name('cell-assignments.store');
     Route::get('/pdl-management/cell-assignment', [CellAssignmentController::class, 'index'])->name('cell-assignments.index');
-
+    Route::post('/jail-events', [JailEventsController::class, 'store'])->name('admin.jail-events.store');
+    Route::post('/jail-events', [JailEventsController::class, 'store'])->name('record-officer.jail-events.store');
 });
 
 Route::get('storage/profile_images/{filename}', function ($filename) {

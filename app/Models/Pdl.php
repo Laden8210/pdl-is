@@ -31,7 +31,7 @@ class Pdl extends Model
         'archived_at',
         'archive_court_order_type',
         'archive_court_order_file',
-        'archive_case_number',
+
         'archive_court_order_date',
     ];
 

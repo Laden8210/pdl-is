@@ -34,7 +34,7 @@ interface PersonalInformationProps extends PageProps {
 
 export default function PersonalInformation() {
     const { props } = usePage<PersonalInformationProps>();
-    const { verifications, flash } = props;
+    const { verifications, flash, } = props;
     console.log('Verifications:', verifications);
 
     const { auth, errors } = props;
@@ -80,7 +80,7 @@ export default function PersonalInformation() {
         archive_reason: '',
         archive_court_order_type: '',
         archive_court_order_file: null as File | null,
-        archive_case_number: '',
+
     });
 
     const handleCustodyDates = (pdl: any) => {
@@ -115,7 +115,7 @@ export default function PersonalInformation() {
             archive_reason: '',
             archive_court_order_type: '',
             archive_court_order_file: null,
-            archive_case_number: '',
+
         });
         setArchiveDialogOpen(true);
     };
@@ -175,7 +175,7 @@ export default function PersonalInformation() {
                         archive_reason: '',
                         archive_court_order_type: '',
                         archive_court_order_file: null,
-                        archive_case_number: '',
+
                     });
                 },
                 onError: (errors) => {
@@ -190,6 +190,7 @@ export default function PersonalInformation() {
     };
     const successMessage = props.success;
 
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Personal Information" />
@@ -203,12 +204,14 @@ export default function PersonalInformation() {
                                 <span>Personal Information List</span>
 
                                 <div className="flex gap-2">
+                                    {!isAdmin && (
                                     <Link
                                     href="/pdl-management/personal-information/create"
                                         className="flex items-center gap-2 rounded-sm bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
-                                    >
-                                        Add PDL Information
-                                    </Link>
+                                            >
+                                            Add PDL Information
+                                        </Link>
+                                    )}
                                 </div>
                             </div>
                         </CardTitle>
@@ -253,11 +256,13 @@ export default function PersonalInformation() {
 
                                                 <TableCell className="space-x-1">
                                                     <ViewPdlInformation pdl={verification.pdl} />
+                                                    {!isAdmin && (
 
                                                     <Button variant="outline" size="sm" onClick={() => handleArchive(verification.pdl)}>
                                                         <Archive className="mr-1 h-4 w-4" />
                                                         Archive
                                                     </Button>
+                                                    )}
 
                                                     {!isAdmin && (
                                                         <Button
@@ -547,16 +552,6 @@ export default function PersonalInformation() {
                                 <p className="text-sm text-gray-500">Upload PDF, JPG, JPEG, or PNG file (max 10MB)</p>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="archive_case_number">Case Number *</Label>
-                                <Input
-                                    id="archive_case_number"
-                                    placeholder="Enter case number (must match PDL's case number)"
-                                    value={archiveData.archive_case_number}
-                                    onChange={(e) => setArchiveData('archive_case_number', e.target.value)}
-                                    className={errors?.archive_case_number ? 'border-red-500' : ''}
-                                />
-                            </div>
 
                             <div className="flex justify-end space-x-2">
                                 <Button variant="outline" onClick={() => setArchiveDialogOpen(false)}>
@@ -572,8 +567,7 @@ export default function PersonalInformation() {
                                             !archiveData.archive_status ||
                                             !archiveData.archive_reason ||
                                             !archiveData.archive_court_order_type ||
-                                            !archiveData.archive_court_order_file ||
-                                            !archiveData.archive_case_number
+                                            !archiveData.archive_court_order_file
                                         }
                                     >
                                         {archiveProcessing ? 'Archiving...' : 'Archive PDL'}

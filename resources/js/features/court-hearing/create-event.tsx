@@ -43,7 +43,6 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
     const activitySuggestions = [
         'Court Hearing',
         'Medical',
-        'Visitation',
         'Rehabilitation',
         'Jail Activity/Transfer',
         'Other'
@@ -292,7 +291,7 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                                 <option value="court_hearing">Court Hearing</option>
                                 <option value="jail_activity">Jail Activity</option>
                                 <option value="medical">Medical</option>
-                                <option value="visitation">Visitation</option>
+
                                 <option value="rehabilitation">Rehabilitation</option>
                                 <option value="transfer">Transfer</option>
                                 <option value="other">Other</option>

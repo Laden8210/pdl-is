@@ -112,6 +112,9 @@ export default function PDLDashboard() {
     return colors[color] || 'bg-gray-500';
   };
 
+
+  const { auth } = props;
+  const isAdmin = auth?.user?.position === 'admin';
   return (
     <>
       <AppLayout breadcrumbs={breadcrumbs}>
@@ -120,7 +123,12 @@ export default function PDLDashboard() {
           <div className="mx-auto space-y-6 p-4">
             {/* Header */}
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <h1 className="text-2xl font-bold">Administrative Dashboard</h1>
+                {isAdmin && (
+                    <h1 className="text-2xl font-bold">Administrative Dashboard</h1>
+                )}
+                {!isAdmin && (
+                    <h1 className="text-2xl font-bold">Record Officer Dashboard</h1>
+                )}
             </div>
 
             {/* Key Metrics */}

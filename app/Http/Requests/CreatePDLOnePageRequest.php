@@ -16,12 +16,12 @@ class CreatePDLOnePageRequest extends FormRequest
         return [
             'fname' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'lname' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
-            'alias' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
+            'alias' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'mname' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'birthdate' => 'required|date',
             'age' => 'required|integer|min:18',
             'gender' => 'required|string|in:Male,Female',
-            'ethnic_group' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
+            'ethnic_group' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'civil_status' => 'required|string|in:Single,Married,Widowed,Divorced',
             'brgy' => 'required|string|max:255',
             'city' => 'required|string|max:255',
@@ -35,15 +35,15 @@ class CreatePDLOnePageRequest extends FormRequest
             'received_date' => 'required|date',
             'document_type' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png,txt|max:10240',
             'court_branch' => 'required|string|max:255',
-            'cod_remarks' => 'nullable|string',
+            'cod_remarks' => 'required|string',
 
             // Medical Record
-            'complaint' => 'nullable|string',
+            'complaint' => 'required|string',
             'date' => 'required|date',
-            'prognosis' => 'nullable|string',
-            'medical_file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png,txt|max:10240',
-            'prescription' => 'nullable|string',
-            'findings' => 'nullable|string',
+            'prognosis' => 'required|string',
+            'medical_file' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png,txt|max:10240',
+            'prescription' => 'required|string',
+            'findings' => 'required|string',
 
             // Physical Characteristics
             'height' => 'required|numeric',
@@ -54,7 +54,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'eye_color' => 'required|string|max:255',
             'identification_marks' => 'required|string',
             'mark_location' => 'required|string',
-            'pc_remark' => 'nullable|string',
+            'pc_remark' => 'required|string',
 
             // Cases
             'cases' => 'required|array',
@@ -63,7 +63,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'cases.*.date_committed' => 'required|date',
             'cases.*.time_committed' => 'required|date_format:H:i',
             'cases.*.case_status' => 'required|string|in:open,pending,convicted,deceased,case closed',
-            'cases.*.case_remarks' => 'nullable|string',
+            'cases.*.case_remarks' => 'required|string',
             'cases.*.security_classification' => 'required|string|in:low,medium,high,maximum',
         ];
     }
