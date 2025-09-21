@@ -34,12 +34,15 @@ class CellAssignmentController extends Controller
             ->paginate($perPage);
 
         $cells = Cells::all();
-        $pdls = Pdl::all();
+        $pdls = Pdl::whereDoesntHave('assignments')->get();
+
+
 
         return Inertia::render('records-officer/pdl-management/cell-assignment', [
             'assignments' => $assignments->items(),
             'cells' => $cells,
             'pdls' => $pdls,
+
             'filters' => [
                 'search' => $search,
             ],
@@ -86,7 +89,7 @@ class CellAssignmentController extends Controller
             }
 
             // Check gender compatibility
-            if ($cell->gender !== $pdl->gender) {
+            if (strtolower($cell->gender) !== strtolower($pdl->gender)) {
                 $errors[] = "PDL {$pdl->fname} {$pdl->lname} (Gender: {$pdl->gender}) cannot be assigned to {$cell->cell_name} (Gender: {$cell->gender})";
                 continue;
             }

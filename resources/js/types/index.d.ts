@@ -146,6 +146,7 @@ export interface PhysicalCharacteristic {
     remark: string | null;
     created_at?: string;
     updated_at?: string;
+    pc_remark: string;
     pdl?: {
         fname: string;
         lname: string;

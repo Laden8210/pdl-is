@@ -154,11 +154,7 @@ const mainNavItems: NavItem[] = [
                 href: 'admin/report/inmate-population',
                 icon: UserCheck,
             },
-            {
-                title: 'Inmates Status Daily Report',
-                href: 'admin/report/inmates-status-daily',
-                icon: UserCheck,
-            },
+
 
             {
                 title: 'Certificate of No Records',

@@ -1,4 +1,3 @@
-// create-case-information.tsx
 'use client';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -25,6 +24,7 @@ import { Pdl } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { format } from 'date-fns';
 
 // Criminal case types for dropdown
 const criminalCaseTypes = [
@@ -83,10 +83,10 @@ const criminalCaseTypes = [
     ]}
 ];
 
-export function CreateCaseInformation({ pdls }: { pdls: Pdl[] }) {
+export function EditCaseInformation({ caseInfo }: { caseInfo: any }) {
     const [crimeCommittedOpen, setCrimeCommittedOpen] = useState(false);
 
-    const { data, setData, post, processing, errors, reset } = useForm<{
+    const { data, setData, put, processing, errors, reset } = useForm<{
         case_number: string;
         crime_committed: string;
         date_committed: string;
@@ -97,38 +97,41 @@ export function CreateCaseInformation({ pdls }: { pdls: Pdl[] }) {
         drug_related: boolean;
         pdl_id: string;
     }>({
-        case_number: '',
-        crime_committed: '',
-        date_committed: '',
-        time_committed: '',
-        case_status: 'pending',
-        case_remarks: '',
-        security_classification: 'medium',
-        drug_related: false,
-        pdl_id: '',
+        case_number: caseInfo.case_number || '',
+        crime_committed: caseInfo.crime_committed || '',
+        date_committed: caseInfo.date_committed ? format(new Date(caseInfo.date_committed), 'yyyy-MM-dd') : '',
+        time_committed: caseInfo.time_committed || '',
+        case_status: caseInfo.case_status || '',
+        case_remarks: caseInfo.case_remarks || '',
+        security_classification: caseInfo.security_classification || '',
+        drug_related: caseInfo.drug_related || false,
+        pdl_id: caseInfo.pdl_id.toString(),
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('case-information.store'), {
+        put(route('case-information.update', caseInfo.case_id), {
             preserveScroll: true,
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                // Don't reset the form on success, just close the dialog
+            },
         });
     };
 
-
-        const { props } = usePage();
-        const successMessage = (props as any).success;
+    const { props } = usePage();
+    const successMessage = (props as any).success;
 
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="outline">Create Case</Button>
+                <Button variant="ghost" className="w-full justify-start">
+                    Edit
+                </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-3xl">
                 <DialogHeader>
-                    <DialogTitle>Create Case Information</DialogTitle>
-                    <DialogDescription>Fill in the details for the new case.</DialogDescription>
+                    <DialogTitle>Edit Case Information</DialogTitle>
+                    <DialogDescription>Update the case details</DialogDescription>
                 </DialogHeader>
 
                 {Object.keys(errors).length > 0 && (
@@ -304,22 +307,7 @@ export function CreateCaseInformation({ pdls }: { pdls: Pdl[] }) {
                             </div>
                         </div>
 
-                        {/* PDL */}
-                        <div className="space-y-2">
-                            <Label>PDL (Person Deprived of Liberty)</Label>
-                            <Select value={data.pdl_id} onValueChange={(value) => setData('pdl_id', value)} required>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a PDL" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {pdls.map((pdl) => (
-                                        <SelectItem key={pdl.id} value={pdl.id.toString()}>
-                                            {pdl.fname} {pdl.lname} (ID: {pdl.id})
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+
                     </div>
 
                     {/* Remarks */}
@@ -333,7 +321,7 @@ export function CreateCaseInformation({ pdls }: { pdls: Pdl[] }) {
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
                         <Button type="submit" disabled={processing}>
-                            {processing ? 'Creating...' : 'Create Case'}
+                            {processing ? 'Updating...' : 'Update Case'}
                         </Button>
                     </DialogFooter>
                 </form>

@@ -10,12 +10,14 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { router } from "@inertiajs/react";
+import { DeleteCaseInformation } from "@/features/pdl-management/delete-case-information";
 
 export type CaseInformation = {
   case_id: number;
   case_number: string;
   crime_committed: string;
-  date_committed: string;
+  date_committed: Date;
   time_committed: string;
   case_status: string;
   case_remarks: string;
@@ -93,13 +95,16 @@ export const case_information_columns: ColumnDef<CaseInformation>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem asChild>
-
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => router.visit(route('case-information.edit', caseInfo.case_id))}
+              >
+                Edit
+              </Button>
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => console.log("Delete case", caseInfo.case_id)}
-              className="text-red-500"
-            >
-              Delete
+            <DropdownMenuItem asChild>
+              <DeleteCaseInformation caseInfo={caseInfo} />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

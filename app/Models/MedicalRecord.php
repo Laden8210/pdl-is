@@ -18,9 +18,10 @@ class MedicalRecord extends Model
         'complaint',
         'date',
         'prognosis',
-        'laboratory',
         'prescription',
         'findings',
+        'stored_filename',
+        'file_path',
     ];
 
     protected $casts = [

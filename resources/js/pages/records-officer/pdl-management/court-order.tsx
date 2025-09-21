@@ -18,12 +18,26 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+interface PageProps {
+    courtOrders: CourtOrder[];
+    pdls: any[];
+    filters?: {
+        search: string;
+    };
+    auth?: {
+        user?: {
+            position?: string;
+        };
+    };
+    [key: string]: any;
+}
+
 
 
 export default function CourtOrderManagement() {
     const { props } = usePage<PageProps>();
-    const { courtOrders, pdls, filters } = props;
-    const [searchInput, setSearchInput] = useState(filters.search || '');
+    const { courtOrders, pdls, filters, auth } = props;
+    const [searchInput, setSearchInput] = useState(filters?.search || '');
 
     const handleSearch = () => {
         router.get(route('pdl-management.court-order'), {
@@ -51,7 +65,9 @@ export default function CourtOrderManagement() {
                         <CardTitle>
                             <div className="flex items-center justify-between">
                                 <span>Court Order List</span>
-                                <CreateCourtOrder pdls={pdls} />
+                                {/* {auth?.user?.position !== 'law-enforcement' && (
+                                    <CreateCourtOrder pdls={pdls} />
+                                )} */}
                             </div>
                         </CardTitle>
                     </CardHeader>

@@ -118,7 +118,6 @@ class SearchController extends Controller
             ->where(function ($q) use ($searchTerm) {
                 $q->where('order_type', 'LIKE', $searchTerm)
                   ->orWhere('court_branch', 'LIKE', $searchTerm)
-                  ->orWhere('court_order_number', 'LIKE', $searchTerm)
                   ->orWhere('remarks', 'LIKE', $searchTerm)
                   ->orWhereHas('pdl', function ($pdlQuery) use ($searchTerm) {
                       $pdlQuery->where('fname', 'LIKE', $searchTerm)

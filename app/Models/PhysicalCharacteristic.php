@@ -21,6 +21,7 @@ class PhysicalCharacteristic extends Model
         'identification_marks',
         'mark_location',
         'remark',
+        'pc_remark',
         'pdl_id',
     ];
 

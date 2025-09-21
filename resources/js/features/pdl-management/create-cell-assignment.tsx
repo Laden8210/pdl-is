@@ -252,7 +252,7 @@ export function CreateCellAssignment({ cells, pdls }: CreateCellAssignmentProps)
                                                 htmlFor={`pdl-${pdl.id}`}
                                                 className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                             >
-                                                {pdl.fname} {pdl.lname} (ID: {pdl.id})
+                                                {pdl.fname} {pdl.lname} (ID: {pdl.id}) {pdl.gender}
                                             </label>
                                         </div>
                                     ))

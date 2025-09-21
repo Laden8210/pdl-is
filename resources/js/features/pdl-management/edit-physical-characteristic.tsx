@@ -17,29 +17,39 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useForm } from '@inertiajs/react';
-import { Pdl, PhysicalCharacteristic } from '@/types';
+import { PhysicalCharacteristic } from '@/types';
+import { usePage } from '@inertiajs/react';
 
-export function EditPhysicalCharacteristic({ characteristic, pdls }: { characteristic: PhysicalCharacteristic; pdls: Pdl[] }) {
+export function EditPhysicalCharacteristic({ characteristic }: { characteristic: PhysicalCharacteristic }) {
     const { data, setData, put, processing, errors, reset } = useForm({
-        pdl_id: characteristic.pdl_id.toString(),
-        height: characteristic.height,
-        weight: characteristic.weight,
-        build: characteristic.build,
-        complexion: characteristic.complexion,
-        hair_color: characteristic.hair_color,
-        eye_color: characteristic.eye_color,
-        identification_marks: characteristic.identification_marks,
-        mark_location: characteristic.mark_location,
+        pdl_id: characteristic.pdl_id?.toString() || '',
+        height: characteristic.height?.toString() || '',
+        weight: characteristic.weight?.toString() || '',
+        build: characteristic.build || '',
+        complexion: characteristic.complexion || '',
+        hair_color: characteristic.hair_color || '',
+        eye_color: characteristic.eye_color || '',
+        identification_marks: characteristic.identification_marks || '',
+        mark_location: characteristic.mark_location || '',
         remark: characteristic.remark || '',
+        pc_remark: characteristic.pc_remark || '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         put(route('physical-characteristics.update', characteristic.characteristic_id), {
             preserveScroll: true,
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                // Don't reset the form on success, just close the dialog
+            },
+            onError: (errors) => {
+                console.error('Update failed:', errors);
+            }
         });
     };
+
+    const { props } = usePage();
+    const successMessage = (props as any).success;
 
     return (
         <Dialog>
@@ -67,29 +77,14 @@ export function EditPhysicalCharacteristic({ characteristic, pdls }: { character
                             </AlertDescription>
                         </Alert>
                     )}
+                    {successMessage && (
+                        <Alert variant="default">
+                            <AlertTitle>Success</AlertTitle>
+                            <AlertDescription>{successMessage}</AlertDescription>
+                        </Alert>
+                    )}
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        {/* PDL */}
-                        <div className="space-y-2">
-                            <Label>PDL (Person Deprived of Liberty)</Label>
-                            <Select
-                                value={data.pdl_id}
-                                onValueChange={(value) => setData('pdl_id', value)}
-                                required
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a PDL" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {pdls.map((pdl) => (
-                                        <SelectItem key={pdl.id} value={pdl.id.toString()}>
-                                            {pdl.fname} {pdl.lname} (ID: {pdl.id})
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
                         {/* Height */}
                         <div className="space-y-2">
                             <Label htmlFor="height">Height (cm)</Label>
@@ -98,9 +93,9 @@ export function EditPhysicalCharacteristic({ characteristic, pdls }: { character
                                 id="height"
                                 min="100"
                                 max="250"
-                                value={data.height}
-                                onChange={(e) => setData('height', parseFloat(e.target.value))}
-                                required
+                                step="0.01"
+                                value={data.height || ''}
+                                onChange={(e) => setData('height', e.target.value)}
                             />
                         </div>
 
@@ -112,9 +107,9 @@ export function EditPhysicalCharacteristic({ characteristic, pdls }: { character
                                 id="weight"
                                 min="30"
                                 max="300"
-                                value={data.weight}
-                                onChange={(e) => setData('weight', parseFloat(e.target.value))}
-                                required
+                                step="0.01"
+                                value={data.weight || ''}
+                                onChange={(e) => setData('weight', e.target.value)}
                             />
                         </div>
 
@@ -123,9 +118,8 @@ export function EditPhysicalCharacteristic({ characteristic, pdls }: { character
                             <Label htmlFor="build">Build</Label>
                             <Input
                                 id="build"
-                                value={data.build}
+                                value={data.build || ''}
                                 onChange={(e) => setData('build', e.target.value)}
-                                required
                             />
                         </div>
 
@@ -134,9 +128,8 @@ export function EditPhysicalCharacteristic({ characteristic, pdls }: { character
                             <Label htmlFor="complexion">Complexion</Label>
                             <Input
                                 id="complexion"
-                                value={data.complexion}
+                                value={data.complexion || ''}
                                 onChange={(e) => setData('complexion', e.target.value)}
-                                required
                             />
                         </div>
 
@@ -145,9 +138,8 @@ export function EditPhysicalCharacteristic({ characteristic, pdls }: { character
                             <Label htmlFor="hair_color">Hair Color</Label>
                             <Input
                                 id="hair_color"
-                                value={data.hair_color}
+                                value={data.hair_color || ''}
                                 onChange={(e) => setData('hair_color', e.target.value)}
-                                required
                             />
                         </div>
 
@@ -156,9 +148,8 @@ export function EditPhysicalCharacteristic({ characteristic, pdls }: { character
                             <Label htmlFor="eye_color">Eye Color</Label>
                             <Input
                                 id="eye_color"
-                                value={data.eye_color}
+                                value={data.eye_color || ''}
                                 onChange={(e) => setData('eye_color', e.target.value)}
-                                required
                             />
                         </div>
                     </div>
@@ -166,22 +157,22 @@ export function EditPhysicalCharacteristic({ characteristic, pdls }: { character
                     {/* Identification Marks */}
                     <div className="space-y-2">
                         <Label htmlFor="identification_marks">Identification Marks</Label>
-                        <Input
+                        <Textarea
                             id="identification_marks"
-                            value={data.identification_marks}
+                            value={data.identification_marks || ''}
                             onChange={(e) => setData('identification_marks', e.target.value)}
-                            required
+                            rows={3}
                         />
                     </div>
 
                     {/* Mark Location */}
                     <div className="space-y-2">
                         <Label htmlFor="mark_location">Mark Location</Label>
-                        <Input
+                        <Textarea
                             id="mark_location"
-                            value={data.mark_location}
+                            value={data.mark_location || ''}
                             onChange={(e) => setData('mark_location', e.target.value)}
-                            required
+                            rows={3}
                         />
                     </div>
 
@@ -190,8 +181,19 @@ export function EditPhysicalCharacteristic({ characteristic, pdls }: { character
                         <Label htmlFor="remark">Remarks</Label>
                         <Textarea
                             id="remark"
-                            value={data.remark}
+                            value={data.remark || ''}
                             onChange={(e) => setData('remark', e.target.value)}
+                            rows={3}
+                        />
+                    </div>
+
+                    {/* PC Remarks */}
+                    <div className="space-y-2">
+                        <Label htmlFor="pc_remark">Physical Characteristic Remarks</Label>
+                        <Textarea
+                            id="pc_remark"
+                            value={data.pc_remark || ''}
+                            onChange={(e) => setData('pc_remark', e.target.value)}
                             rows={3}
                         />
                     </div>

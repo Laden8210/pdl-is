@@ -8,6 +8,7 @@ use App\Services\NotificationService;
 use App\Models\MedicalRecord;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Pdl;
+use Illuminate\Support\Facades\Auth;
 
 class MedicalRecordController extends Controller
 {
@@ -55,7 +56,6 @@ class MedicalRecordController extends Controller
             'complaint' => 'required|string|max:1000',
             'date' => 'required|date',
             'prognosis' => 'required|string|max:1000',
-            'laboratory' => 'required|string|max:1000',
             'prescription' => 'required|string|max:1000',
             'findings' => 'required|string|max:1000',
         ]);
@@ -63,10 +63,18 @@ class MedicalRecordController extends Controller
         $medicalRecord = MedicalRecord::create($validated);
         $pdl = Pdl::findOrFail($validated['pdl_id']);
 
-        NotificationService::medicalRecordCreated($medicalRecord, $pdl, auth()->user());
+        NotificationService::medicalRecordCreated($medicalRecord, $pdl, Auth::user());
 
         return redirect()->route('medical-records.index')
             ->with('success', 'Medical record created successfully');
+    }
+
+    public function edit($id)
+    {
+        $record = MedicalRecord::findOrFail($id);
+        return Inertia::render('records-officer/pdl-management/edit-medical-record', [
+            'record' => $record
+        ]);
     }
 
     public function update(Request $request, MedicalRecord $medicalRecord)
@@ -76,7 +84,6 @@ class MedicalRecordController extends Controller
             'complaint' => 'required|string|max:1000',
             'date' => 'required|date',
             'prognosis' => 'required|string|max:1000',
-            'laboratory' => 'required|string|max:1000',
             'prescription' => 'required|string|max:1000',
             'findings' => 'required|string|max:1000',
         ]);

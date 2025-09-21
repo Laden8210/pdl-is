@@ -5,6 +5,7 @@ import { router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { MoreHorizontal } from 'lucide-react';
+import { DeleteMedicalRecord } from '@/features/pdl-management/delete-medical-record';
 
 export type MedicalRecord = {
     medical_record_id: number;
@@ -15,6 +16,8 @@ export type MedicalRecord = {
     prognosis: string;
     prescription: string;
     findings: string;
+    stored_filename: string;
+    file_path: string;
     pdl?: {
         fname: string;
         lname: string;
@@ -51,6 +54,22 @@ export const medical_record_columns: ColumnDef<MedicalRecord>[] = [
         cell: ({ row }) => <div className="max-w-[200px] truncate">{row.original.prognosis}</div>,
     },
     {
+        accessorKey: 'prescription',
+        header: 'Prescription',
+        cell: ({ row }) => <div className="max-w-[200px] truncate">{row.original.prescription}</div>,
+    },
+
+    {
+        accessorKey: 'stored_filename',
+        header: 'Medical Record',
+        cell: ({ row }) => <div className="max-w-[200px] truncate">
+            <Button variant="outline" onClick={() => window.open(`/storage/${row.original.file_path}`, '_blank')}>
+                Preview
+            </Button>
+        </div>,
+    },
+
+    {
         id: 'actions',
         header: 'Actions',
         cell: ({ row }) => {
@@ -67,13 +86,16 @@ export const medical_record_columns: ColumnDef<MedicalRecord>[] = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem asChild>
-                            <EditMedicalRecord record={record} pdls={[]} />
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start"
+                            onClick={() => router.visit(route('medical-records.edit', record.medical_record_id))}
+                          >
+                            Edit
+                          </Button>
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onClick={() => router.delete(route('medical-records.destroy', record.medical_record_id))}
-                            className="text-red-500"
-                        >
-                            Delete
+                        <DropdownMenuItem asChild>
+                            <DeleteMedicalRecord record={record} />
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

@@ -12,11 +12,11 @@ class CourtOrder extends Model
     protected $primaryKey = 'court_order_id';
 
     protected $fillable = [
-        'court_order_number',
         'order_type',
         'order_date',
         'received_date',
         'remarks',
+        'cod_remarks',
         'document_type',
         'document_path',
         'original_filename',

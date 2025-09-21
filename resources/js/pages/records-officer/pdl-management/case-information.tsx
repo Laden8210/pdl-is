@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { case_information_columns } from '@/features/pdl-management/case-information-columns';
 import { CreateCaseInformation } from '@/features/pdl-management/create-case-information';
 import { BreadcrumbItem } from '@/types';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -47,6 +48,7 @@ interface PageProps {
             position?: string;
         };
     };
+    [key: string]: any;
 }
 
 export default function CaseInformation() {
@@ -83,6 +85,8 @@ export default function CaseInformation() {
             handleSearch();
         }
     };
+    const { props: pageProps } = usePage();
+    const successMessage = (pageProps as any).success;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -93,10 +97,12 @@ export default function CaseInformation() {
                 <Card>
                     <CardHeader>
                         <CardTitle>
-                            <div className="flex items-center justify-between">
-                                <span>Case Information List</span>
-                                <CreateCaseInformation pdls={pdls} />
-                            </div>
+                            {successMessage && (
+                                <Alert variant="default">
+                                    <AlertTitle>Success</AlertTitle>
+                                    <AlertDescription>{successMessage}</AlertDescription>
+                                </Alert>
+                            )}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>

@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\CaseInformation;
 use App\Services\NotificationService;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Pdl;
+
 
 class CaseInformationController extends Controller
 {
@@ -54,7 +56,7 @@ class CaseInformationController extends Controller
             'crime_committed' => 'required|string|max:255',
             'date_committed' => 'required|date',
             'time_committed' => 'required|date_format:H:i',
-            'case_status' => 'required|in:open,closed,pending',
+            'case_status' => 'required|in:open,pending,convicted,deceased,case closed',
             'case_remarks' => 'nullable|string',
             'security_classification' => 'required|in:low,medium,high,maximum',
             'drug_related' => 'required|boolean',
@@ -67,9 +69,44 @@ class CaseInformationController extends Controller
         $case = CaseInformation::create($validated);
         $pdl = Pdl::findOrFail($validated['pdl_id']);
 
-        NotificationService::caseCreated($case, $pdl, auth()->user());
+        NotificationService::caseCreated($case, $pdl, Auth::user());
 
         return redirect()->back()
             ->with('success', 'Case information created successfully');
+    }
+
+    public function edit($id)
+    {
+        $caseInfo = CaseInformation::findOrFail($id);
+        return Inertia::render('records-officer/pdl-management/edit-case-information', [
+            'caseInfo' => $caseInfo
+        ]);
+    }
+
+    public function update(Request $request, CaseInformation $case)
+    {
+        $pdl = $case->pdl;
+        $validated = $request->validate([
+            'case_number' => 'required|string|max:255',
+            'crime_committed' => 'required|string|max:255',
+            'date_committed' => 'required|date',
+            'time_committed' => 'required|date_format:H:i',
+            'case_status' => 'required|in:open,pending,convicted,deceased,case closed',
+            'case_remarks' => 'nullable|string',
+            'security_classification' => 'required|in:low,medium,high,maximum',
+            'drug_related' => 'required|boolean',
+        ]);
+
+        $case->update($validated);
+
+        NotificationService::caseUpdated($case, $pdl, Auth::user());
+
+        return redirect()->back()->with('success', 'Case information updated successfully');
+    }
+
+    public function destroy(CaseInformation $case)
+    {
+        $case->delete();
+        return redirect()->back()->with('success', 'Case information deleted successfully.');
     }
 }

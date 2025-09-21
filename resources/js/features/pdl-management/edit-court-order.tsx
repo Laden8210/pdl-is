@@ -18,10 +18,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Check, ChevronsUpDown, FileText, Image, Upload, X, Eye } from 'lucide-react';
 import { Pdl } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
-import { Check, ChevronsUpDown, FileText, Image, Upload, X, Eye } from 'lucide-react';
 import { useState } from 'react';
 
 // Order type suggestions
@@ -54,18 +54,19 @@ const orderTypeSuggestions = [
     'Others'
 ];
 
-export function CreateCourtOrder({ pdls }: { pdls: Pdl[] }) {
+export function EditCourtOrder({ order, pdls }: { order: any; pdls: Pdl[] }) {
     const [orderTypeOpen, setOrderTypeOpen] = useState(false);
     const [documentPreview, setDocumentPreview] = useState<string | null>(null);
 
-    const { data, setData, post, processing, errors, reset } = useForm({
-        order_type: '',
-        order_date: '',
-        received_date: '',
+    const { data, setData, put, processing, errors, reset } = useForm({
+        court_order_number: order.court_order_number || '',
+        order_type: order.order_type || '',
+        order_date: order.order_date || '',
+        received_date: order.received_date || '',
         document_type: null as File | null,
-        court_branch: '',
-        pdl_id: '',
-        cod_remarks: '',
+        court_branch: order.court_branch || '',
+        pdl_id: order.pdl_id.toString(),
+        remarks: order.remarks || '',
     });
 
     const { props } = usePage();
@@ -112,11 +113,11 @@ export function CreateCourtOrder({ pdls }: { pdls: Pdl[] }) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('court-orders.store'), {
+        put(route('court-orders.update', order.court_order_id), {
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
-                reset();
+                // Don't reset the form on success, just close the dialog
                 setDocumentPreview(null);
                 setOrderTypeOpen(false);
             },
@@ -126,15 +127,28 @@ export function CreateCourtOrder({ pdls }: { pdls: Pdl[] }) {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="outline">Create Court Order</Button>
+                <Button variant="ghost" className="w-full justify-start">
+                    Edit
+                </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-3xl">
                 <DialogHeader>
-                    <DialogTitle>Create Court Order</DialogTitle>
-                    <DialogDescription>Fill in the details for the new court order.</DialogDescription>
+                    <DialogTitle>Edit Court Order</DialogTitle>
+                    <DialogDescription>Update the court order details</DialogDescription>
                 </DialogHeader>
 
-
+                {Object.keys(errors).length > 0 && (
+                    <Alert variant="destructive" className="mt-4 mb-4">
+                        <AlertTitle>Unable to process request</AlertTitle>
+                        <AlertDescription>
+                            <ul className="list-inside list-disc text-sm">
+                                {Object.values(errors).map((error, index) => (
+                                    <li key={index}>{error}</li>
+                                ))}
+                            </ul>
+                        </AlertDescription>
+                    </Alert>
+                )}
 
                 {successMessage && (
                     <Alert variant="default" className="mb-4">
@@ -158,6 +172,17 @@ export function CreateCourtOrder({ pdls }: { pdls: Pdl[] }) {
                     )}
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {/* Court Order Number */}
+                        <div className="space-y-2">
+                            <Label htmlFor="court_order_number">Court Order Number</Label>
+                            <Input
+                                id="court_order_number"
+                                value={data.court_order_number}
+                                onChange={(e) => setData('court_order_number', e.target.value)}
+                                required
+                            />
+                        </div>
+
                         {/* Order Type */}
                         <div className="space-y-2">
                             <Label htmlFor="order_type">
@@ -234,7 +259,7 @@ export function CreateCourtOrder({ pdls }: { pdls: Pdl[] }) {
                         {/* Document Upload */}
                         <div className="space-y-2">
                             <Label htmlFor="document_type">
-                                Upload Document <span className="text-red-500">*</span>
+                                Upload Document
                             </Label>
                             <input
                                 type="file"
@@ -378,11 +403,11 @@ export function CreateCourtOrder({ pdls }: { pdls: Pdl[] }) {
 
                     {/* Remarks */}
                     <div className="space-y-2">
-                        <Label htmlFor="cod_remarks">Remarks</Label>
+                        <Label htmlFor="remarks">Remarks</Label>
                         <Textarea
-                            id="cod_remarks"
-                            value={data.cod_remarks}
-                            onChange={(e) => setData('cod_remarks', e.target.value)}
+                            id="remarks"
+                            value={data.remarks}
+                            onChange={(e) => setData('remarks', e.target.value)}
                             rows={3}
                         />
                     </div>
@@ -392,7 +417,7 @@ export function CreateCourtOrder({ pdls }: { pdls: Pdl[] }) {
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
                         <Button type="submit" disabled={processing}>
-                            {processing ? 'Creating...' : 'Create Order'}
+                            {processing ? 'Updating...' : 'Update Order'}
                         </Button>
                     </DialogFooter>
                 </form>

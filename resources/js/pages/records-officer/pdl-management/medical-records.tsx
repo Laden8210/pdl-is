@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { CreateMedicalRecord } from '@/features/pdl-management/create-medical-record';
 import { medical_record_columns } from '@/features/pdl-management/medical-record-columns';
 import { type BreadcrumbItem } from '@/types';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -81,6 +82,8 @@ export default function MedicalRecords() {
             handleSearch();
         }
     };
+    const { props: pageProps } = usePage();
+    const successMessage = (pageProps as any).success;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -91,10 +94,12 @@ export default function MedicalRecords() {
                 <Card>
                     <CardHeader>
                         <CardTitle>
-                            <div className="flex items-center justify-between">
-                                <span>Medical Records</span>
-                                <CreateMedicalRecord pdls={pdls} />
-                            </div>
+                        {successMessage && (
+                                <Alert variant="default">
+                                    <AlertTitle>Success</AlertTitle>
+                                    <AlertDescription>{successMessage}</AlertDescription>
+                                </Alert>
+                            )}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>

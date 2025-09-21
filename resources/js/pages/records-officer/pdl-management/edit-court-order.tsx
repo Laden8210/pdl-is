@@ -1,0 +1,448 @@
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Check, ChevronsUpDown, FileText, Image, Upload, X, Eye, ArrowLeft } from 'lucide-react';
+import { router } from '@inertiajs/react';
+import { format } from 'date-fns';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Court Orders',
+        href: '/pdl-management/court-order',
+    },
+    {
+        title: 'Edit Court Order',
+        href: '#',
+    },
+];
+
+// Order type suggestions
+const orderTypeSuggestions = [
+    'Commitment Order',
+    'Detention Order',
+    'Transfer Order',
+    'Release Order',
+    'Bail Order',
+    'Arrest Warrant',
+    'Search Warrant',
+    'Subpoena',
+    'Court Order',
+    'Administrative Order',
+    'Medical Order',
+    'Visitation Order',
+    'Classification Order',
+    'Disciplinary Order',
+    'Work Assignment Order',
+    'Educational Order',
+    'Rehabilitation Order',
+    'Parole Order',
+    'Probation Order',
+    'Appeal Order',
+    'Motion Order',
+    'Hearing Order',
+    'Trial Order',
+    'Sentencing Order',
+    'Execution Order',
+    'Others'
+];
+
+interface PageProps {
+    order: any;
+    pdls: any[];
+    [key: string]: any;
+}
+
+export default function EditCourtOrder() {
+    const { props } = usePage<PageProps>();
+    const { order, pdls } = props;
+    const [orderTypeOpen, setOrderTypeOpen] = useState(false);
+    const [documentPreview, setDocumentPreview] = useState<string | null>(null);
+
+    const { data, setData, put, processing, errors } = useForm({
+
+        order_type: order.order_type || '',
+        order_date: format(new Date(order.order_date), 'yyyy-MM-dd') || '',
+        received_date: format(new Date(order.received_date), 'yyyy-MM-dd') || '',
+        document_type: null as File | null,
+        court_branch: order.court_branch || '',
+        pdl_id: order.pdl_id.toString(),
+        remarks: order.remarks || '',
+    });
+
+    const { props: pageProps } = usePage();
+    const successMessage = (pageProps as any).success;
+
+    // Handle order type input change
+    const handleOrderTypeInputChange = (value: string) => {
+        setData('order_type', value);
+    };
+
+    // Handle document preview
+    const handleDocumentPreview = (file: File) => {
+        const reader = new FileReader();
+
+        if (file.type.startsWith('image/')) {
+            reader.onload = (e) => {
+                setDocumentPreview(e.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else if (file.type === 'application/pdf') {
+            reader.onload = (e) => {
+                setDocumentPreview(e.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else if (file.type === 'text/plain') {
+            reader.onload = (e) => {
+                setDocumentPreview(e.target?.result as string);
+            };
+            reader.readAsText(file);
+        } else if (file.type.includes('document') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
+            setDocumentPreview('document-file');
+        } else {
+            setDocumentPreview(null);
+        }
+    };
+
+    const formatFileSize = (bytes: number) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        put(route('court-orders.update', order.court_order_id), {
+
+            preserveScroll: true,
+            onSuccess: () => {
+                router.visit(route('pdl-management.court-order'));
+            },
+        });
+    };
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Edit Court Order" />
+
+            <div className="flex flex-col gap-6 p-4">
+                <div className="flex items-center gap-4">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => router.visit(route('pdl-management.court-order'))}
+                    >
+                        <ArrowLeft className="h-4 w-4 mr-2" />
+                        Back to Court Orders
+                    </Button>
+                    <h1 className="text-2xl font-bold">Edit Court Order</h1>
+                </div>
+
+                {Object.keys(errors).length > 0 && (
+                    <Alert variant="destructive">
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>
+                            <ul className="list-inside list-disc">
+                                {Object.values(errors).map((error, index) => (
+                                    <li key={index}>{error}</li>
+                                ))}
+                            </ul>
+                        </AlertDescription>
+                    </Alert>
+                )}
+
+                {successMessage && (
+                    <Alert variant="default">
+                        <AlertTitle>Success</AlertTitle>
+                        <AlertDescription>{successMessage}</AlertDescription>
+                    </Alert>
+                )}
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Court Order Details</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+
+                                {/* Order Type */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="order_type">
+                                        Order Type <span className="text-red-500">*</span>
+                                    </Label>
+                                    <Popover open={orderTypeOpen} onOpenChange={setOrderTypeOpen}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                role="combobox"
+                                                aria-expanded={orderTypeOpen}
+                                                className="w-full justify-between"
+                                            >
+                                                {data.order_type || 'Select or type order type...'}
+                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-full p-0" align="start">
+                                            <Command>
+                                                <CommandInput
+                                                    placeholder="Search order types or type custom..."
+                                                    value={data.order_type}
+                                                    onValueChange={handleOrderTypeInputChange}
+                                                />
+                                                <CommandList>
+                                                    <CommandEmpty>
+                                                        <div className="p-2 text-sm text-muted-foreground">
+                                                            No order type found. Press Enter to add "{data.order_type}"
+                                                            as custom order type.
+                                                        </div>
+                                                    </CommandEmpty>
+                                                    <CommandGroup>
+                                                        {orderTypeSuggestions.map((orderType) => (
+                                                            <CommandItem
+                                                                key={orderType}
+                                                                value={orderType}
+                                                                onSelect={(currentValue) => {
+                                                                    setData('order_type', currentValue);
+                                                                    setOrderTypeOpen(false);
+                                                                }}
+                                                            >
+                                                                <Check
+                                                                    className={`mr-2 h-4 w-4 ${
+                                                                        data.order_type === orderType
+                                                                            ? 'opacity-100'
+                                                                            : 'opacity-0'
+                                                                    }`}
+                                                                />
+                                                                {orderType}
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <div className="text-xs text-muted-foreground">
+                                        Select from common order types or type a custom order type
+                                    </div>
+                                </div>
+
+                                {/* Order Date */}
+                                <div className="space-y-2">
+                                    <Label>Order Date</Label>
+                                    <Input
+                                        type="date"
+                                        value={data.order_date}
+                                        onChange={(e) => setData('order_date', e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                {/* Received Date */}
+                                <div className="space-y-2">
+                                    <Label>Received Date</Label>
+                                    <Input
+                                        type="date"
+                                        value={data.received_date}
+                                        onChange={(e) => setData('received_date', e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                {/* Document Upload */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="document_type">
+                                        Upload Document
+                                    </Label>
+                                    <input
+                                        type="file"
+                                        id="document_type"
+                                        name="document_type"
+                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                setData('document_type', file);
+                                                handleDocumentPreview(file);
+                                            }
+                                        }}
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    />
+                                    <div className="text-xs text-muted-foreground">
+                                        Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
+                                    </div>
+
+                                    {/* Document Preview */}
+                                    {documentPreview && (
+                                        <div className="mt-4 space-y-2">
+                                            <Label>Document Preview</Label>
+                                            <div className="relative">
+                                                {documentPreview === 'document-file' ? (
+                                                    <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
+                                                        <div className="text-center">
+                                                            <FileText className="mx-auto h-16 w-16 text-gray-400" />
+                                                            <p className="mt-2 text-sm font-medium text-gray-900">
+                                                                {data.document_type?.name}
+                                                            </p>
+                                                            <p className="text-xs text-gray-500">
+                                                                Document file - Preview not available
+                                                            </p>
+                                                            <p className="text-xs text-gray-400">
+                                                                {formatFileSize(data.document_type?.size || 0)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ) : documentPreview.startsWith('data:image/') ? (
+                                                    <img
+                                                        src={documentPreview}
+                                                        alt="Document preview"
+                                                        className="max-h-64 w-full rounded-lg border object-contain"
+                                                    />
+                                                ) : documentPreview.startsWith('data:application/pdf') ? (
+                                                    <iframe
+                                                        src={documentPreview}
+                                                        className="h-64 w-full rounded-lg border"
+                                                        title="PDF Preview"
+                                                    />
+                                                ) : (
+                                                    <div className="h-64 w-full rounded-lg border bg-white p-4">
+                                                        <pre className="h-full w-full overflow-auto text-sm text-gray-900 whitespace-pre-wrap">
+                                                            {documentPreview}
+                                                        </pre>
+                                                    </div>
+                                                )}
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="absolute top-2 right-2"
+                                                    onClick={() => setDocumentPreview(null)}
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* File Info */}
+                                    {data.document_type && (
+                                        <div className="mt-2 rounded-lg bg-gray-50 p-3">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center space-x-2">
+                                                    {data.document_type.type.startsWith('image/') ? (
+                                                        <Image className="h-4 w-4 text-blue-500" />
+                                                    ) : (
+                                                        <FileText className="h-4 w-4 text-gray-500" />
+                                                    )}
+                                                    <div>
+                                                        <p className="text-sm font-medium">{data.document_type.name}</p>
+                                                        <p className="text-xs text-gray-500">
+                                                            {formatFileSize(data.document_type.size)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => data.document_type && handleDocumentPreview(data.document_type)}
+                                                        className="text-blue-500 hover:text-blue-700"
+                                                        title="Preview file"
+                                                    >
+                                                        <Eye className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setData('document_type', null);
+                                                            setDocumentPreview(null);
+                                                        }}
+                                                        className="text-red-500 hover:text-red-700"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Court Branch */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="court_branch">Court Branch</Label>
+                                    <Input
+                                        id="court_branch"
+                                        value={data.court_branch}
+                                        onChange={(e) => setData('court_branch', e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                {/* PDL ID */}
+                                <div className="space-y-2">
+                                    <Label>PDL (Person Deprived of Liberty)</Label>
+                                    <Select
+                                        value={data.pdl_id}
+                                        onValueChange={(value) => setData('pdl_id', value)}
+                                        required
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a PDL" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {pdls.map((pdl) => (
+                                                <SelectItem key={pdl.id} value={pdl.id.toString()}>
+                                                    {pdl.fname} {pdl.lname} (ID: {pdl.id})
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            {/* Remarks */}
+                            <div className="space-y-2">
+                                <Label htmlFor="remarks">Remarks</Label>
+                                <Textarea
+                                    id="remarks"
+                                    value={data.remarks}
+                                    onChange={(e) => setData('remarks', e.target.value)}
+                                    rows={3}
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-4">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => router.visit(route('pdl-management.court-order'))}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button type="submit" disabled={processing}>
+                                    {processing ? 'Updating...' : 'Update Order'}
+                                </Button>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
+            </div>
+        </AppLayout>
+    );
+}

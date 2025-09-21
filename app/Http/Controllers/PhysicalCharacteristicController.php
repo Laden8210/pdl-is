@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Services\NotificationService;
 use App\Models\Pdl;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use App\Models\PhysicalCharacteristic;
 
 
@@ -63,15 +63,24 @@ class PhysicalCharacteristicController extends Controller
             'identification_marks' => 'required|string|max:255',
             'mark_location' => 'required|string|max:255',
             'remark' => 'nullable|string|max:1000',
+            'pc_remark' => 'nullable|string|max:1000',
         ]);
 
         $physicalCharacteristic = PhysicalCharacteristic::create($validated);
         $pdl = Pdl::findOrFail($validated['pdl_id']);
 
-        NotificationService::physicalCharacteristicCreated($physicalCharacteristic, $pdl, auth()->user());
+        NotificationService::physicalCharacteristicCreated($physicalCharacteristic, $pdl, Auth::user());
 
         return redirect()->route('physical-characteristics.index')
             ->with('success', 'Physical characteristic created successfully');
+    }
+
+    public function edit($id)
+    {
+        $characteristic = PhysicalCharacteristic::findOrFail($id);
+        return Inertia::render('records-officer/pdl-management/edit-physical-characteristic', [
+            'characteristic' => $characteristic
+        ]);
     }
 
     public function update(Request $request, PhysicalCharacteristic $characteristic)
@@ -87,6 +96,7 @@ class PhysicalCharacteristicController extends Controller
             'identification_marks' => 'required|string|max:255',
             'mark_location' => 'required|string|max:255',
             'remark' => 'nullable|string|max:1000',
+            'pc_remark' => 'nullable|string|max:1000',
         ]);
 
         $characteristic->update($validated);

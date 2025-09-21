@@ -23,9 +23,9 @@ class CreatePDLOnePageRequest extends FormRequest
             'gender' => 'required|string|in:Male,Female',
             'ethnic_group' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'civil_status' => 'required|string|in:Single,Married,Widowed,Divorced',
-            'brgy' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:255',
-            'province' => 'nullable|string|max:255',
+            'brgy' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'province' => 'required|string|max:255',
 
 
             // Court Order
@@ -38,12 +38,12 @@ class CreatePDLOnePageRequest extends FormRequest
             'cod_remarks' => 'nullable|string',
 
             // Medical Record
-            'complaint' => 'required|string',
+            'complaint' => 'nullable|string',
             'date' => 'required|date',
-            'prognosis' => 'required|string',
-            'laboratory' => 'required|string',
-            'prescription' => 'required|string',
-            'findings' => 'required|string',
+            'prognosis' => 'nullable|string',
+            'medical_file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png,txt|max:10240',
+            'prescription' => 'nullable|string',
+            'findings' => 'nullable|string',
 
             // Physical Characteristics
             'height' => 'required|numeric',
@@ -62,7 +62,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'cases.*.crime_committed' => 'required|string',
             'cases.*.date_committed' => 'required|date',
             'cases.*.time_committed' => 'required|date_format:H:i',
-            'cases.*.case_status' => 'required|string|in:open,closed,pending',
+            'cases.*.case_status' => 'required|string|in:open,pending,convicted,deceased,case closed',
             'cases.*.case_remarks' => 'nullable|string',
             'cases.*.security_classification' => 'required|string|in:low,medium,high,maximum',
         ];
@@ -94,14 +94,11 @@ class CreatePDLOnePageRequest extends FormRequest
             'ethnic_group.max' => 'Ethnic group must not exceed 255 characters',
 
             'ethnic_group.regex' => 'Ethnic group must be a valid string',
-            'brgy.regex' => 'Barangay must be a valid string',
-            'city.regex' => 'City must be a valid string',
-            'province.regex' => 'Province must be a valid string',
-
-
-            // Address Information
+            'brgy.required' => 'Barangay is required',
             'brgy.max' => 'Barangay must not exceed 255 characters',
+            'city.required' => 'City is required',
             'city.max' => 'City must not exceed 255 characters',
+            'province.required' => 'Province is required',
             'province.max' => 'Province must not exceed 255 characters',
 
             // Court Order Information
@@ -123,9 +120,11 @@ class CreatePDLOnePageRequest extends FormRequest
             'date.required' => 'Medical record date is required',
             'date.date' => 'Medical record date must be valid',
             'prognosis.required' => 'Prognosis is required',
-            'laboratory.required' => 'Laboratory results are required',
             'prescription.required' => 'Prescription is required',
             'findings.required' => 'Medical findings are required',
+            'medical_file.file' => 'Medical file must be a valid file',
+            'medical_file.mimes' => 'Medical file must be a PDF, DOC, DOCX, JPG, JPEG, PNG, or TXT file',
+            'medical_file.max' => 'Medical file size must not exceed 10MB',
 
             // Physical Characteristics
             'height.required' => 'Height is required',

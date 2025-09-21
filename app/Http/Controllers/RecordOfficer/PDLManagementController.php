@@ -143,7 +143,7 @@ class PDLManagementController extends Controller
 
         $orders = CourtOrder::with('pdl:id,fname,lname')
             ->when($search, function ($query, $search) {
-                $query->where('court_order_number', 'like', "%{$search}%")
+                $query
                     ->orWhere('order_type', 'like', "%{$search}%")
                     ->orWhere('document_type', 'like', "%{$search}%")
                     ->orWhere('court_branch', 'like', "%{$search}%")
@@ -187,6 +187,58 @@ class PDLManagementController extends Controller
         return redirect()->back()->with('success', 'Court order created successfully.');
     }
 
+    public function edit_court_order($id)
+    {
+        $order = CourtOrder::findOrFail($id);
+        $pdls = Pdl::select('id', 'fname', 'lname')->get();
+        return Inertia::render('records-officer/pdl-management/edit-court-order', [
+            'order' => $order,
+            'pdls' => $pdls
+        ]);
+    }
+
+    public function update_court_order(Request $request, $courtOrderId)
+    {
+
+
+        $validated = $request->validate([
+
+            'order_type' => 'required|string|max:255',
+            'order_date' => 'required|date',
+            'received_date' => 'required|date',
+            'document_type' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png,txt|max:10240',
+            'court_branch' => 'required|string|max:255',
+            'pdl_id' => 'required|exists:pdl,id',
+            'remarks' => 'nullable|string',
+        ]);
+
+        $courtOrder = CourtOrder::findOrFail($courtOrderId);
+
+        // Handle document upload if provided
+        if ($request->hasFile('document_type')) {
+            $file = $request->file('document_type');
+            $originalName = $file->getClientOriginalName();
+            $extension = $file->getClientOriginalExtension();
+            $filename = time() . '_' . uniqid() . '.' . $extension;
+            $documentPath = $file->storeAs('court_documents', $filename, 'public');
+
+            $validated['document_type'] = pathinfo($originalName, PATHINFO_FILENAME);
+            $validated['document_path'] = $documentPath;
+            $validated['original_filename'] = $originalName;
+        }
+
+        $courtOrder->update($validated);
+
+        return redirect()->back()->with('success', 'Court order updated successfully.');
+    }
+
+    public function destroy_court_order($courtOrderId)
+    {
+        $courtOrder = CourtOrder::findOrFail($courtOrderId);
+        $courtOrder->delete();
+        return redirect()->back()->with('success', 'Court order deleted successfully.');
+    }
+
 
 
 
@@ -215,6 +267,14 @@ class PDLManagementController extends Controller
         $validated = $request->validated();
         $user = Auth::user();
         $pdl = Pdl::findOrFail($validated['pdl_id']);
+
+        // check if pdl is already in verfication
+        $verification = Verifications::where('pdl_id', $pdl->id)->where('status', 'pending')->first();
+        if ($verification) {
+            return redirect()->back()->with('error', 'PDL is already in verification.');
+        }
+
+
 
         NotificationService::pdlTransferred($pdl, $validated['reason'], $user);
 
@@ -284,7 +344,7 @@ class PDLManagementController extends Controller
             // Update or create Court Order
             if ($request->court_order_id) {
                 $courtOrderData = [
-                    'court_order_number' => $request->court_order_number,
+
                     'order_type' => $request->order_type,
                     'order_date' => $request->order_date,
                     'received_date' => $request->received_date,
@@ -305,7 +365,7 @@ class PDLManagementController extends Controller
                 );
             } else {
                 $courtOrderData = [
-                    'court_order_number' => $request->court_order_number,
+
                     'order_type' => $request->order_type,
                     'order_date' => $request->order_date,
                     'received_date' => $request->received_date,
@@ -486,57 +546,40 @@ class PDLManagementController extends Controller
 
             // Create Court Order
             $pdl->courtOrders()->create([
-                'court_order_number' => "",
+
                 'order_type' => $request->order_type,
                 'order_date' => $request->order_date,
                 'received_date' => $request->received_date,
                 'remarks' => $request->cod_remarks,
+                'cod_remarks' => $request->cod_remarks,
                 'document_type' => $documentFilename ? pathinfo($request->file('document_type')->getClientOriginalName(), PATHINFO_FILENAME) : 'uploaded_document',
                 'document_path' => $documentPath,
                 'original_filename' => $documentFilename ? $request->file('document_type')->getClientOriginalName() : null,
                 'court_branch' => $request->court_branch,
             ]);
 
-            // Create Medical Record
+            $medicalRecordPath = null;
+            $medicalRecordFilename = null;
+
+            if ($request->hasFile('medical_file')) {
+                $file = $request->file('medical_file');
+                $originalName = $file->getClientOriginalName();
+                $extension = $file->getClientOriginalExtension();
+                $filename = time() . '_' . uniqid() . '.' . $extension;
+                $medicalRecordPath = $file->storeAs('medical_documents', $filename, 'public');
+                $medicalRecordFilename = $filename;
+            }
+
             $medicalRecord = $pdl->medicalRecords()->create([
                 'complaint' => $request->complaint,
                 'date' => $request->date,
                 'prognosis' => $request->prognosis,
-                'laboratory' => $request->laboratory,
                 'prescription' => $request->prescription,
                 'findings' => $request->findings,
+                'stored_filename' => $medicalRecordFilename,
+                'file_path' => $medicalRecordPath,
             ]);
 
-            // Handle Medical Document Uploads
-            if ($request->hasFile('medical_files')) {
-                foreach ($request->file('medical_files') as $file) {
-                    $originalName = $file->getClientOriginalName();
-                    $extension = $file->getClientOriginalExtension();
-                    $filename = time() . '_' . uniqid() . '.' . $extension;
-                    $path = $file->storeAs('medical_documents', $filename, 'public');
-
-                    // Determine document type based on file extension
-                    $documentType = match(strtolower($extension)) {
-                        'jpg', 'jpeg', 'png', 'gif', 'bmp' => 'image',
-                        'pdf' => 'pdf',
-                        'doc', 'docx' => 'document',
-                        'txt' => 'text',
-                        default => 'other'
-                    };
-
-                    MedicalDocument::create([
-                        'medical_record_medical_record_id' => $medicalRecord->medical_record_id,
-                        'document_type' => $documentType,
-                        'original_filename' => $originalName,
-                        'stored_filename' => $filename,
-                        'file_path' => $path,
-                        'mime_type' => $file->getMimeType(),
-                        'file_size' => $file->getSize(),
-                        'description' => 'Medical document uploaded during PDL creation',
-                        'uploaded_by' => $user->id,
-                    ]);
-                }
-            }
 
             // Create Physical Characteristics
             $pdl->physicalCharacteristics()->create([
@@ -549,6 +592,7 @@ class PDLManagementController extends Controller
                 'identification_marks' => $request->identification_marks,
                 'mark_location' => $request->mark_location,
                 'remark' => $request->pc_remark,
+                'pc_remark' => $request->pc_remark,
             ]);
 
             // Create Cases

@@ -110,14 +110,19 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     // Additional PDL Management routes for notifications
     Route::get('/pdl-management/case-information', [CaseInformationController::class, 'index'])->name('case-information.index');
     Route::post('/pdl-management/case-information', [CaseInformationController::class, 'store'])->name('case-information.store');
+    Route::get('/pdl-management/case-information/{case}/edit', [CaseInformationController::class, 'edit'])->name('case-information.edit');
+    Route::put('/pdl-management/case-information/{case}', [CaseInformationController::class, 'update'])->name('case-information.update');
+    Route::delete('/pdl-management/case-information/{case}', [CaseInformationController::class, 'destroy'])->name('case-information.destroy');
 
     Route::get('/pdl-management/court-order', [PDLManagementController::class, 'court_order'])->name('pdl-management.court-order');
     Route::post('/pdl-management/court-order', [PDLManagementController::class, 'store_court_order'])->name('court-orders.store');
+    Route::get('/pdl-management/court-order/{courtOrder}/edit', [PDLManagementController::class, 'edit_court_order'])->name('court-orders.edit');
+
+    Route::delete('/pdl-management/court-order/{courtOrder}', [PDLManagementController::class, 'destroy_court_order'])->name('court-orders.destroy');
 
     Route::get('/pdl-management/physical-characteristics', [PhysicalCharacteristicController::class, 'index'])->name('physical-characteristics.index');
     Route::post('/pdl-management/physical-characteristics', [PhysicalCharacteristicController::class, 'store'])->name('physical-characteristics.store');
-    Route::put('/pdl-management/physical-characteristics/{characteristic}', [PhysicalCharacteristicController::class, 'update'])->name('physical-characteristics.update');
-    Route::delete('/pdl-management/physical-characteristics/{characteristic}', [PhysicalCharacteristicController::class, 'destroy'])->name('physical-characteristics.destroy');
+
 
     Route::get('/jail-events', [JailEventsController::class, 'index'])->name('admin.jail-events.index');
     Route::post('/jail-events', [JailEventsController::class, 'store'])->name('admin.jail-events.store');
@@ -162,19 +167,26 @@ Route::middleware(['auth', 'record.officer'])->prefix('record-officer')->group(f
     Route::get('/pdl-management/personal-information', [PDLManagementController::class, 'personal_information_admin'])->name('pdl-management.personal-information');
     Route::get('/pdl-management/health-assessment', [PDLManagementController::class, 'health_assessment'])->name('pdl-management.health-assessment');
     Route::get('/pdl-management/medical-records', [PDLManagementController::class, 'medical_records'])->name('pdl-management.medical-records');
-    Route::get('/pdl-management/cell-assignment', [CellAssignmentController::class, 'index'])->name('cell-assignments.index');
+
     Route::get('/pdl-management/time-allowance', [TimeAllowanceController::class, 'index'])->name('record-officer.pdl-management.time-allowance');
     Route::post('/pdl-management/time-allowance/{pdl}', [TimeAllowanceController::class, 'updateTimeAllowance'])->name('record-officer.time-allowance.update');
 
     // Additional PDL Management routes for notifications
     Route::get('/pdl-management/case-information', [CaseInformationController::class, 'index'])->name('case-information.index');
     Route::post('/pdl-management/case-information', [CaseInformationController::class, 'store'])->name('case-information.store');
+    Route::get('/pdl-management/case-information/{case}/edit', [CaseInformationController::class, 'edit'])->name('case-information.edit');
+    Route::put('/pdl-management/case-information/{case}', [CaseInformationController::class, 'update'])->name('case-information.update');
+    Route::delete('/pdl-management/case-information/{case}', [CaseInformationController::class, 'destroy'])->name('case-information.destroy');
 
     Route::get('/pdl-management/court-order', [PDLManagementController::class, 'court_order'])->name('pdl-management.court-order');
     Route::post('/pdl-management/court-order', [PDLManagementController::class, 'store_court_order'])->name('court-orders.store');
+    Route::get('/pdl-management/court-order/{courtOrder}/edit', [PDLManagementController::class, 'edit_court_order'])->name('court-orders.edit');
+    Route::put('/pdl-management/court-order/{courtOrder}', [PDLManagementController::class, 'update_court_order'])->name('court-orders.update');
+    Route::delete('/pdl-management/court-order/{courtOrder}', [PDLManagementController::class, 'destroy_court_order'])->name('court-orders.destroy');
 
     Route::get('/pdl-management/physical-characteristics', [PhysicalCharacteristicController::class, 'index'])->name('physical-characteristics.index');
     Route::post('/pdl-management/physical-characteristics', [PhysicalCharacteristicController::class, 'store'])->name('physical-characteristics.store');
+    Route::get('/pdl-management/physical-characteristics/{characteristic}/edit', [PhysicalCharacteristicController::class, 'edit'])->name('physical-characteristics.edit');
     Route::put('/pdl-management/physical-characteristics/{characteristic}', [PhysicalCharacteristicController::class, 'update'])->name('physical-characteristics.update');
     Route::delete('/pdl-management/physical-characteristics/{characteristic}', [PhysicalCharacteristicController::class, 'destroy'])->name('physical-characteristics.destroy');
 });
@@ -191,14 +203,23 @@ Route::middleware(['auth', 'law.enforcement'])->prefix('law-enforcement')->group
 
     Route::get('/pdl-management/court-order', [PDLManagementController::class, 'court_order'])->name('pdl-management.court-order');
     Route::post('/pdl-management/court-order', [PDLManagementController::class, 'store_court_order'])->name('court-orders.store');
+    Route::get('/pdl-management/court-order/{courtOrder}/edit', [PDLManagementController::class, 'edit_court_order'])->name('court-orders.edit');
+    Route::put('/pdl-management/court-order/{courtOrder}', [PDLManagementController::class, 'update_court_order'])->name('court-orders.update');
+    Route::delete('/pdl-management/court-order/{courtOrder}', [PDLManagementController::class, 'destroy_court_order'])->name('court-orders.destroy');
     Route::get('/pdl-management/case-information', [CaseInformationController::class, 'index'])->name('case-information.index');
     Route::post('/pdl-management/case-information', [CaseInformationController::class, 'store'])->name('case-information.store');
+    Route::get('/pdl-management/case-information/{case}/edit', [CaseInformationController::class, 'edit'])->name('case-information.edit');
+    Route::put('/pdl-management/case-information/{case}', [CaseInformationController::class, 'update'])->name('case-information.update');
+    Route::delete('/pdl-management/case-information/{case}', [CaseInformationController::class, 'destroy'])->name('case-information.destroy');
 
     Route::get('/pdl-management/medical-records', [MedicalRecordController::class, 'index'])
         ->name('medical-records.index');
 
     Route::post('/medical-records', [MedicalRecordController::class, 'store'])
         ->name('medical-records.store');
+
+    Route::get('/medical-records/{medicalRecord}/edit', [MedicalRecordController::class, 'edit'])
+        ->name('medical-records.edit');
 
     Route::put('/medical-records/{medicalRecord}', [MedicalRecordController::class, 'update'])
         ->name('medical-records.update');
@@ -219,8 +240,7 @@ Route::middleware(['auth', 'law.enforcement'])->prefix('law-enforcement')->group
         ->name('physical-characteristics.destroy');
 
     // Additional PDL Management routes for notifications
-    Route::get('/pdl-management/cell-assignment', [CellAssignmentController::class, 'index'])->name('cell-assignments.index');
-    Route::post('/pdl-management/cell-assignment', [CellAssignmentController::class, 'assign'])->name('cell-assignments.store');
+
 
     Route::get('/pdl-management/time-allowance', [TimeAllowanceController::class, 'index'])->name('law-enforcement.pdl-management.time-allowance');
     Route::post('/pdl-management/time-allowance/{pdl}', [TimeAllowanceController::class, 'updateTimeAllowance'])->name('law-enforcement.time-allowance.update');
@@ -271,6 +291,14 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/admin/verification/{verification}/update', [VerificationController::class, 'update'])
         ->name('admin.verification.update');
     Route::post('/profile/update', [ProfileManagementController::class, 'update'])->name('admin.profile.update');
+    Route::put('/pdl-management/case-information/{case}', [CaseInformationController::class, 'update'])->name('case-information.update');
+    Route::get('/pdl-management/physical-characteristics/{characteristic}/edit', [PhysicalCharacteristicController::class, 'edit'])->name('physical-characteristics.edit');
+    Route::put('/pdl-management/physical-characteristics/{characteristic}', [PhysicalCharacteristicController::class, 'update'])->name('physical-characteristics.update');
+    Route::delete('/pdl-management/physical-characteristics/{characteristic}', [PhysicalCharacteristicController::class, 'destroy'])->name('physical-characteristics.destroy');
+    Route::put('/pdl-management/court-order/{courtOrder}', [PDLManagementController::class, 'update_court_order'])->name('court-orders.update');
+    Route::post('/pdl-management/cell-assignment', [CellAssignmentController::class, 'assign'])->name('cell-assignments.store');
+    Route::get('/pdl-management/cell-assignment', [CellAssignmentController::class, 'index'])->name('cell-assignments.index');
+
 });
 
 require __DIR__ . '/auth.php';

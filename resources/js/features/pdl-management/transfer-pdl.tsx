@@ -1,12 +1,12 @@
 'use client';
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import {Alert, AlertTitle, AlertDescription} from '@/components/ui/alert';
 
 export function TransferPDL({ pdl }: { pdl: { id: number; full_name: string } }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -17,6 +17,7 @@ export function TransferPDL({ pdl }: { pdl: { id: number; full_name: string } })
 
     const { props } = usePage();
     const successMessage = (props as any).success;
+    const errorMessage = (props as any).error;
 
     const handleSubmit = () => {
         post(route('pdl-management.transfer', pdl.id), {
@@ -28,12 +29,11 @@ export function TransferPDL({ pdl }: { pdl: { id: number; full_name: string } })
         });
     };
 
+
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" >
-                    Transfer PDL
-                </Button>
+                <Button variant="ghost">Transfer PDL</Button>
             </DialogTrigger>
 
             <DialogContent className="sm:max-w-md">
@@ -49,14 +49,23 @@ export function TransferPDL({ pdl }: { pdl: { id: number; full_name: string } })
                             <AlertDescription>{successMessage}</AlertDescription>
                         </Alert>
                     )}
+                    {errorMessage && (
+                        <Alert variant="destructive">
+                            <AlertTitle>Error</AlertTitle>
+                            <AlertDescription>{errorMessage}</AlertDescription>
+                        </Alert>
+                    )}
                     {Object.keys(errors).length > 0 && (
-                        <div className="rounded-md bg-red-100 p-3 text-red-700">
-                            <ul className="list-disc pl-5">
-                                {Object.values(errors).map((error, index) => (
-                                    <li key={index}>{error}</li>
-                                ))}
-                            </ul>
-                        </div>
+                        <Alert variant="destructive">
+                            <AlertTitle>Error</AlertTitle>
+                            <AlertDescription>
+                                <ul className="list-inside list-disc">
+                                    {Object.values(errors).map((error, index) => (
+                                        <li key={index}>{error}</li>
+                                    ))}
+                                </ul>
+                            </AlertDescription>
+                        </Alert>
                     )}
 
                     <div className="space-y-2">

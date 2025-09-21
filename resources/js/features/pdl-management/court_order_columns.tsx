@@ -7,19 +7,20 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { EyeIcon, MoreHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
 import { format } from "date-fns";
+import { router } from "@inertiajs/react";
+import { DeleteCourtOrder } from "@/features/pdl-management/delete-court-order";
 
 export type CourtOrder = {
   court_order_id: number;
-  court_order_number: string;
   order_type: string;
   order_date: string;
   received_date: string;
   remarks: string;
   document_type: string;
+  document_path: string;
   court_branch: string;
   pdl_id: number;
   pdl?: {
@@ -28,11 +29,9 @@ export type CourtOrder = {
   };
 };
 
+
+
 export const court_order_columns: ColumnDef<CourtOrder>[] = [
-  {
-    accessorKey: "court_order_number",
-    header: "Court Order Number",
-  },
   {
     accessorKey: "order_type",
     header: "Order Type",
@@ -55,6 +54,20 @@ export const court_order_columns: ColumnDef<CourtOrder>[] = [
   {
     accessorKey: "document_type",
     header: "Document Type",
+
+    cell: ({ row }) => {
+      const handleDocumentPreview = (document_path: string) => {
+
+        window.open(`/storage/${document_path}`, '_blank');
+
+      };
+      return (
+      <Button variant="outline"
+      onClick={() => row.original.document_type && handleDocumentPreview(row.original.document_path)}>
+       Preview
+      </Button>
+    );
+    },
   },
   {
     accessorKey: "court_branch",
@@ -91,13 +104,16 @@ export const court_order_columns: ColumnDef<CourtOrder>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem asChild>
-              {/* <UpdateCourtOrder order={order} /> */}
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => router.visit(route('court-orders.edit', order.court_order_id))}
+              >
+                Edit
+              </Button>
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => console.log("Delete order", order.court_order_id)}
-              className="text-red-500"
-            >
-              Delete
+            <DropdownMenuItem asChild>
+              <DeleteCourtOrder order={order} />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

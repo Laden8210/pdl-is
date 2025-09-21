@@ -8,9 +8,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
-import { EditPhysicalCharacteristic } from "@/features/pdl-management/edit-physical-characteristic";
 import { router } from "@inertiajs/react";
 import { PhysicalCharacteristic } from "@/types";
+import { DeletePhysicalCharacteristic } from "@/features/pdl-management/delete-physical-characteristic";
 
 export const physical_characteristic_columns: ColumnDef<PhysicalCharacteristic>[] = [
   {
@@ -62,13 +62,16 @@ export const physical_characteristic_columns: ColumnDef<PhysicalCharacteristic>[
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem asChild>
-              <EditPhysicalCharacteristic characteristic={characteristic} pdls={[]} />
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => router.visit(route('physical-characteristics.edit', characteristic.characteristic_id))}
+              >
+                Edit
+              </Button>
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => router.delete(route('physical-characteristics.destroy', characteristic.characteristic_id))}
-              className="text-red-500"
-            >
-              Delete
+            <DropdownMenuItem asChild>
+              <DeletePhysicalCharacteristic characteristic={characteristic} />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

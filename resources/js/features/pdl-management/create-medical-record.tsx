@@ -25,7 +25,6 @@ export function CreateMedicalRecord({ pdls = [] }: { pdls?: Pdl[] }) {
         complaint: '',
         date: new Date().toISOString().split('T')[0],
         prognosis: '',
-        laboratory: '',
         prescription: '',
         findings: '',
     });
@@ -105,7 +104,6 @@ export function CreateMedicalRecord({ pdls = [] }: { pdls?: Pdl[] }) {
                             id="complaint"
                             value={data.complaint}
                             onChange={(e) => setData('complaint', e.target.value)}
-                            required
                             rows={3}
                         />
                     </div>
@@ -117,12 +115,10 @@ export function CreateMedicalRecord({ pdls = [] }: { pdls?: Pdl[] }) {
                             id="findings"
                             value={data.findings}
                             onChange={(e) => setData('findings', e.target.value)}
-                            required
                             rows={3}
                         />
                     </div>
 
-                    {/* Progonosis */}
                     {/* Prognosis */}
                     <div className="space-y-2">
                         <Label htmlFor="prognosis">Prognosis</Label>
@@ -130,18 +126,6 @@ export function CreateMedicalRecord({ pdls = [] }: { pdls?: Pdl[] }) {
                             id="prognosis"
                             value={data.prognosis}
                             onChange={(e) => setData('prognosis', e.target.value)}
-                            required
-                            rows={3}
-                        />
-                    </div>
-                    {/* Laboratory */}
-                    <div className="space-y-2">
-                        <Label htmlFor="laboratory">Laboratory Results</Label>
-                        <Textarea
-                            id="laboratory"
-                            value={data.laboratory}
-                            onChange={(e) => setData('laboratory', e.target.value)}
-                            required
                             rows={3}
                         />
                     </div>
@@ -153,7 +137,6 @@ export function CreateMedicalRecord({ pdls = [] }: { pdls?: Pdl[] }) {
                             id="prescription"
                             value={data.prescription}
                             onChange={(e) => setData('prescription', e.target.value)}
-                            required
                             rows={3}
                         />
                     </div>

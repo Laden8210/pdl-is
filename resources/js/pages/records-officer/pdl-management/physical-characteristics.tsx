@@ -1,16 +1,14 @@
 import { DataTable } from '@/components/data-table';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AppLayout from '@/layouts/app-layout';
-import { Head, usePage } from '@inertiajs/react';
-import { useState } from 'react';
-import { router } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { CreatePhysicalCharacteristic } from '@/features/pdl-management/create-physical-characteristic';
 import { physical_characteristic_columns } from '@/features/pdl-management/physical-characteristic-columns';
-import { type BreadcrumbItem } from '@/types';
-import { PhysicalCharacteristic } from '@/types';
+import AppLayout from '@/layouts/app-layout';
+import { PhysicalCharacteristic, type BreadcrumbItem } from '@/types';
+import { Head, router, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -18,7 +16,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/physical-characteristics',
     },
 ];
-
 
 interface PageProps {
     characteristics: PhysicalCharacteristic[];
@@ -55,12 +52,16 @@ export default function PhysicalCharacteristics() {
     };
 
     const handleSearch = () => {
-        router.get(getUserRoute(), {
-            search: searchInput,
-        }, {
-            preserveState: true,
-            replace: true,
-        });
+        router.get(
+            getUserRoute(),
+            {
+                search: searchInput,
+            },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -68,6 +69,9 @@ export default function PhysicalCharacteristics() {
             handleSearch();
         }
     };
+
+    const { props: pageProps } = usePage();
+    const successMessage = (pageProps as any).success;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -78,10 +82,12 @@ export default function PhysicalCharacteristics() {
                 <Card>
                     <CardHeader>
                         <CardTitle>
-                            <div className="flex items-center justify-between">
-                                <span>Physical Characteristics</span>
-                                <CreatePhysicalCharacteristic pdls={pdls} />
-                            </div>
+                            {successMessage && (
+                                <Alert variant="default">
+                                    <AlertTitle>Success</AlertTitle>
+                                    <AlertDescription>{successMessage}</AlertDescription>
+                                </Alert>
+                            )}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -115,7 +121,9 @@ export default function PhysicalCharacteristics() {
                                     </div>
                                 ) : (
                                     <div className="text-muted-foreground">
-                                        <p className="text-sm">Found {totalResults} physical characteristic{totalResults !== 1 ? 's' : ''} matching "{filters?.search}"</p>
+                                        <p className="text-sm">
+                                            Found {totalResults} physical characteristic{totalResults !== 1 ? 's' : ''} matching "{filters?.search}"
+                                        </p>
                                     </div>
                                 )}
                             </div>

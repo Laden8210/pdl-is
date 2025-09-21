@@ -2,7 +2,6 @@
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
     Dialog,
     DialogClose,
@@ -16,27 +15,32 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useForm } from '@inertiajs/react';
-import { Pdl, MedicalRecord } from '@/types';
+import type { MedicalRecord } from '@/features/pdl-management/medical-record-columns';
+import { useForm, usePage } from '@inertiajs/react';
+import { format } from 'date-fns';
 
-export function EditMedicalRecord({ record, pdls }: { record: MedicalRecord; pdls: Pdl[] }) {
+export function EditMedicalRecord({ record }: { record: MedicalRecord }) {
     const { data, setData, put, processing, errors, reset } = useForm({
         pdl_id: record.pdl_id.toString(),
-        complaint: record.complaint,
-        date: record.date.split('T')[0],
-        progonosis: record.progonosis,
-        laboratory: record.laboratory,
-        prescription: record.prescription,
-        findings: record.findings,
+        complaint: record.complaint || '',
+        date: record.date ? format(new Date(record.date), 'yyyy-MM-dd') : '',
+        prognosis: record.prognosis || '',
+        prescription: record.prescription || '',
+        findings: record.findings || '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         put(route('medical-records.update', record.medical_record_id), {
             preserveScroll: true,
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                // Don't reset the form on success, just close the dialog
+            },
         });
     };
+
+    const { props } = usePage();
+    const successMessage = (props as any).success;
 
     return (
         <Dialog>
@@ -64,100 +68,44 @@ export function EditMedicalRecord({ record, pdls }: { record: MedicalRecord; pdl
                             </AlertDescription>
                         </Alert>
                     )}
+                    {successMessage && (
+                        <Alert variant="default">
+                            <AlertTitle>Success</AlertTitle>
+                            <AlertDescription>{successMessage}</AlertDescription>
+                        </Alert>
+                    )}
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        {/* PDL */}
-                        <div className="space-y-2">
-                            <Label>PDL (Person Deprived of Liberty)</Label>
-                            <Select
-                                value={data.pdl_id}
-                                onValueChange={(value) => setData('pdl_id', value)}
-                                required
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a PDL" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {pdls.map((pdl) => (
-                                        <SelectItem key={pdl.id} value={pdl.id.toString()}>
-                                            {pdl.fname} {pdl.lname} (ID: {pdl.id})
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
                         {/* Date */}
                         <div className="space-y-2">
                             <Label htmlFor="date">Date</Label>
-                            <Input
-                                type="date"
-                                id="date"
-                                value={data.date}
-                                onChange={(e) => setData('date', e.target.value)}
-                                required
-                            />
+                            <Input type="date" id="date" value={data.date} onChange={(e) => setData('date', e.target.value)} required />
                         </div>
+                        {/* Medical record preview */}
                     </div>
 
                     {/* Complaint */}
                     <div className="space-y-2">
                         <Label htmlFor="complaint">Complaint</Label>
-                        <Textarea
-                            id="complaint"
-                            value={data.complaint}
-                            onChange={(e) => setData('complaint', e.target.value)}
-                            required
-                            rows={3}
-                        />
+                        <Textarea id="complaint" value={data.complaint} onChange={(e) => setData('complaint', e.target.value)} rows={3} />
                     </div>
 
                     {/* Findings */}
                     <div className="space-y-2">
                         <Label htmlFor="findings">Findings</Label>
-                        <Textarea
-                            id="findings"
-                            value={data.findings}
-                            onChange={(e) => setData('findings', e.target.value)}
-                            required
-                            rows={3}
-                        />
+                        <Textarea id="findings" value={data.findings} onChange={(e) => setData('findings', e.target.value)} rows={3} />
                     </div>
 
-                    {/* Progonosis */}
+                    {/* Prognosis */}
                     <div className="space-y-2">
-                        <Label htmlFor="progonosis">Progonosis</Label>
-                        <Textarea
-                            id="progonosis"
-                            value={data.progonosis}
-                            onChange={(e) => setData('progonosis', e.target.value)}
-                            required
-                            rows={3}
-                        />
-                    </div>
-
-                    {/* Laboratory */}
-                    <div className="space-y-2">
-                        <Label htmlFor="laboratory">Laboratory Results</Label>
-                        <Textarea
-                            id="laboratory"
-                            value={data.laboratory}
-                            onChange={(e) => setData('laboratory', e.target.value)}
-                            required
-                            rows={3}
-                        />
+                        <Label htmlFor="prognosis">Prognosis</Label>
+                        <Textarea id="prognosis" value={data.prognosis} onChange={(e) => setData('prognosis', e.target.value)} rows={3} />
                     </div>
 
                     {/* Prescription */}
                     <div className="space-y-2">
                         <Label htmlFor="prescription">Prescription</Label>
-                        <Textarea
-                            id="prescription"
-                            value={data.prescription}
-                            onChange={(e) => setData('prescription', e.target.value)}
-                            required
-                            rows={3}
-                        />
+                        <Textarea id="prescription" value={data.prescription} onChange={(e) => setData('prescription', e.target.value)} rows={3} />
                     </div>
 
                     <DialogFooter>

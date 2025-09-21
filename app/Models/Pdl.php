@@ -73,6 +73,10 @@ class Pdl extends Model
     {
         return $this->hasMany(TimeAllowance::class);
     }
+    public function assignments()
+    {
+        return $this->hasMany(CellAssignment::class);
+    }
 
     // Get full name
     public function getFullNameAttribute()

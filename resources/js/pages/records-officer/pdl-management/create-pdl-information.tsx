@@ -19,7 +19,138 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { Check, ChevronsUpDown, FileText, Image, Upload, X } from 'lucide-react';
+import { Check, ChevronsUpDown, FileText, Image, Upload, X, Eye } from 'lucide-react';
+
+// Location data for South Cotabato Province
+const locationData = {
+    province: 'South Cotabato',
+    cities: {
+        'Koronadal City': [
+            'Assumption', 'Avanceña', 'Cacub', 'Caloocan', 'Concepcion',
+            'Esperanza', 'General Paulino Santos', 'Mabini', 'Magsaysay', 'Mambucal',
+            'Morales', 'Namnama', 'New Pangasinan', 'Paraiso', 'Rotonda',
+            'San Isidro', 'San Jose', 'San Roque', 'Santa Cruz', 'Saravia',
+            'Santo Niño', 'Topland', 'Zone I', 'Zone II', 'Zone III',
+            'Zone IV', 'Carpenter Hill'
+        ],
+        'General Santos City': [
+            'Apopong', 'Baluan', 'Batomelong', 'Buayan', 'Bula', 'Calumpang',
+            'City Heights', 'Dadiangas East', 'Dadiangas North', 'Dadiangas South',
+            'Dadiangas West', 'Fatima', 'Katangawan', 'Labangal', 'Lagao',
+            'Ligaya', 'Mabuhay', 'Nalum', 'Olympog', 'San Isidro',
+            'San Jose', 'Sinawal', 'Tambler', 'Tinagacan', 'Upper Labay',
+            'Conel'
+        ],
+        'Polomolok': [
+            'Bentung', 'Cannery Site', 'Crossing Palkan', 'Glamang', 'Kinilis',
+            'Klinan 6', 'Koronadal Proper', 'Lam-Caliaf', 'Landan', 'Lapu',
+            'Lumakil', 'Magsaysay', 'Maligo', 'Pagalungan', 'Palkan',
+            'Poblacion', 'Polo', 'Rubber', 'Silway 7', 'Silway 8',
+            'Sulit', 'Sumbakil', 'Upper Klinan'
+        ],
+        'Tupi': [
+            'Acmonan', 'Bololmala', 'Bunao', 'Cebuano', 'Crossing Rubber',
+            'Kalkam', 'Linan', 'Lunen', 'Miasong', 'Palian',
+            'Poblacion', 'Polonuling', 'Simbo', 'Tamayo', 'Tubeng'
+        ],
+        'Tampakan': [
+            'Albagan', 'Buto', 'Danlag', 'Kipalbig', 'Lambayong',
+            'Lampitak', 'Liberty', 'Maltana', 'Palo', 'Poblacion',
+            'Pula-bato', 'San Isidro', 'Santa Cruz', 'Tablu'
+        ],
+        'Santo Niño': [
+            'Ambalgan', 'Guinsang-an', 'Katipunan', 'Manuel Roxas', 'Panay',
+            'Poblacion', 'Sajaneba', 'San Isidro', 'San Vicente', 'Teresita'
+        ],
+        'Surallah': [
+            'Ala', 'Buenavista', 'Centrala', 'Dajay', 'Duhay-Labi',
+            'Lambontong', 'Libertad', 'Littler', 'Moloy', 'Naci',
+            'Tala', 'Tibio', 'Tubi-Alla', 'Upper Sepaka', 'Columbio',
+            'Sultan Miralam', 'Lambingi'
+        ],
+        'Norala': [
+            'Benigno Aquino', 'Esperanza', 'Five Storey', 'J.P. Laurel', 'Kahilwayan',
+            'Katipunan', 'Lambontong', 'Liberty', 'Poblacion', 'Puting Bato',
+            'San Jose', 'San Miguel', 'Sto. Niño', 'Tinublaran'
+        ],
+        'Lake Sebu': [
+            'Bacdulong', 'Denlag', 'Halilan', 'Hanoon', 'Klubi',
+            'Lake Lahit', 'Lamcade', 'Lamdalag', 'Lamfugon', 'Lamlahak',
+            'Lower Maculan', 'Luhib', 'Ned', 'Poblacion', 'Siluton',
+            'Takunel', 'Talisay', 'Tasiman', 'Upper Maculan'
+        ],
+        'Banga': [
+            'Benitez', 'Cabudian', 'Cabuling', 'Cinco', 'Derilon',
+            'El Nonok', 'Improgo Village', 'Kusan', 'Lam-apos', 'Lamba',
+            'Lambingi', 'Lampari', 'Liwanay', 'Malaya', 'Punong Grande',
+            'Rang-ay', 'Reyes', 'Rizal', 'Rizal Poblacion', 'San Jose',
+            'San Vicente', 'Yangco Poblacion'
+        ]
+    }
+};
+
+// Order type suggestions
+const orderTypeSuggestions = [
+    'Commitment Order',
+    'Detention Order',
+    'Transfer Order',
+    'Release Order',
+    'Bail Order',
+    'Arrest Warrant',
+    'Search Warrant',
+    'Subpoena',
+    'Court Order',
+    'Administrative Order',
+    'Medical Order',
+    'Visitation Order',
+    'Classification Order',
+    'Disciplinary Order',
+    'Work Assignment Order',
+    'Educational Order',
+    'Rehabilitation Order',
+    'Parole Order',
+    'Probation Order',
+    'Appeal Order',
+    'Motion Order',
+    'Hearing Order',
+    'Trial Order',
+    'Sentencing Order',
+    'Execution Order',
+    'Others'
+];
+
+const getSecurityClassification = (crime: string): string => {
+    const highSecurityCrimes = [
+        'Murder', 'Homicide', 'Manslaughter', 'Terrorism', 'Mass Shooting',
+        'Kidnapping', 'Abduction', 'Rape', 'Sexual Assault', 'Armed Robbery',
+        'Drug Trafficking', 'Drug Manufacturing', 'Drug Distribution', 'Drug Importation',
+        'Human Trafficking', 'Weapons Trafficking', 'Espionage', 'Treason', 'Sedition',
+        'Bank Robbery', 'Organized Crime', 'Racketeering'
+    ];
+
+    const mediumSecurityCrimes = [
+        'Assault', 'Battery', 'Robbery', 'Domestic Violence', 'Child Abuse', 'Elder Abuse',
+        'Hate Crime', 'Gang Violence', 'Drug Possession', 'Methamphetamine', 'Cocaine Possession',
+        'Heroin Possession', 'Fraud', 'Identity Theft', 'Credit Card Fraud', 'Insurance Fraud',
+        'Money Laundering', 'Arson', 'Vandalism', 'Auto Theft', 'Grand Theft',
+        'Corporate Fraud', 'Securities Fraud', 'Bank Fraud', 'Wire Fraud', 'Mail Fraud',
+        'Internet Fraud', 'Ponzi Scheme', 'Insider Trading', 'Bribery', 'Corruption',
+        'Extortion', 'Cybercrime', 'Forgery', 'Counterfeiting', 'DUI/DWI', 'Reckless Driving',
+        'Hit and Run', 'Vehicular Manslaughter', 'Street Racing', 'Prostitution', 'Solicitation',
+        'Public Indecency', 'Obstruction of Justice', 'Resisting Arrest', 'Escape from Custody',
+        'Escape', 'Parole Violation', 'Probation Violation', 'Bail Jumping', 'Witness Tampering',
+        'Jury Tampering', 'Election Fraud', 'Environmental Crime', 'Animal Cruelty', 'Stalking',
+        'Harassment'
+    ];
+
+    if (highSecurityCrimes.includes(crime)) {
+        return 'high';
+    } else if (mediumSecurityCrimes.includes(crime)) {
+        return 'medium';
+    } else {
+        return 'low';
+    }
+};
 
 // Criminal case types for dropdown
 const criminalCaseTypes = [
@@ -234,11 +365,75 @@ export default function CreatePDLInformation() {
     const [currentStep, setCurrentStep] = useState(1);
     const [activeCaseIndex, setActiveCaseIndex] = useState(0);
     const [crimeCommittedOpen, setCrimeCommittedOpen] = useState(false);
-    const [medicalFiles, setMedicalFiles] = useState<File[]>([]);
+    const [medicalFile, setMedicalFile] = useState<File | null>(null);
+    const [selectedCity, setSelectedCity] = useState<string>('');
+    const [availableBarangays, setAvailableBarangays] = useState<string[]>([]);
+    const [documentPreview, setDocumentPreview] = useState<string | null>(null);
+    const [isCustomOrderType, setIsCustomOrderType] = useState<boolean>(false);
+    const [orderTypeOpen, setOrderTypeOpen] = useState(false);
 
     // Helper function to get all crime types as a flat array
     const getAllCrimeTypes = () => {
         return criminalCaseTypes.flatMap((category) => category.cases.map((crime) => ({ value: crime, label: crime, category: category.category })));
+    };
+
+    // Handle order type selection
+    const handleOrderTypeChange = (value: string) => {
+        if (value === 'Others') {
+            setIsCustomOrderType(true);
+            setData('order_type', '');
+        } else {
+            setIsCustomOrderType(false);
+            setData('order_type', value);
+        }
+    };
+
+    // Handle order type input change for custom input
+    const handleOrderTypeInputChange = (value: string) => {
+        setData('order_type', value);
+    };
+
+    // Handle city selection and update barangays
+    const handleCityChange = (city: string) => {
+        setSelectedCity(city);
+        setData('city', city);
+        if (city && locationData.cities[city as keyof typeof locationData.cities]) {
+            setAvailableBarangays(locationData.cities[city as keyof typeof locationData.cities]);
+        } else {
+            setAvailableBarangays([]);
+        }
+        // Clear barangay selection when city changes
+        setData('brgy', '');
+    };
+
+    // Handle document preview for all supported formats
+    const handleDocumentPreview = (file: File) => {
+        const reader = new FileReader();
+
+        if (file.type.startsWith('image/')) {
+            // Handle image files (JPG, JPEG, PNG)
+            reader.onload = (e) => {
+                setDocumentPreview(e.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else if (file.type === 'application/pdf') {
+            // Handle PDF files
+            reader.onload = (e) => {
+                setDocumentPreview(e.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else if (file.type === 'text/plain') {
+            // Handle TXT files
+            reader.onload = (e) => {
+                setDocumentPreview(e.target?.result as string);
+            };
+            reader.readAsText(file);
+        } else if (file.type.includes('document') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
+            // Handle DOC/DOCX files - show file info since we can't preview them directly
+            setDocumentPreview('document-file');
+        } else {
+            setDocumentPreview(null);
+        }
     };
 
     const handleAddNewCase = () => {
@@ -268,21 +463,38 @@ export default function CreatePDLInformation() {
     const handleCaseChange = (index: number, field: string, value: string | boolean) => {
         const newCases = [...data.cases];
         newCases[index] = { ...newCases[index], [field]: value };
+
+        // Auto-set security classification when crime is selected
+        if (field === 'crime_committed' && typeof value === 'string') {
+            const securityClassification = getSecurityClassification(value);
+            newCases[index].security_classification = securityClassification;
+        }
+
         setData('cases', newCases);
     };
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(event.target.files || []);
-        setMedicalFiles((prev) => [...prev, ...files]);
+        const file = event.target.files?.[0];
+        if (file) {
+            setMedicalFile(file);
+            setData('medical_file', file);
+        }
     };
 
-    const removeFile = (index: number) => {
-        setMedicalFiles((prev) => prev.filter((_, i) => i !== index));
+    const removeFile = () => {
+        setMedicalFile(null);
+        setData('medical_file', null);
     };
 
     const getFileIcon = (file: File) => {
         if (file.type.startsWith('image/')) {
             return <Image className="h-4 w-4" />;
+        } else if (file.type === 'application/pdf') {
+            return <FileText className="h-4 w-4 text-red-500" />;
+        } else if (file.type === 'text/plain') {
+            return <FileText className="h-4 w-4 text-blue-500" />;
+        } else if (file.type.includes('document') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
+            return <FileText className="h-4 w-4 text-green-500" />;
         }
         return <FileText className="h-4 w-4" />;
     };
@@ -318,7 +530,7 @@ export default function CreatePDLInformation() {
         complaint: string;
         date: string;
         prognosis: string;
-        laboratory: string;
+
         prescription: string;
         findings: string;
         height: number;
@@ -340,7 +552,7 @@ export default function CreatePDLInformation() {
             security_classification: string;
             drug_related: boolean;
         }[];
-        medical_files: File[];
+        medical_file: File | null;
     }>({
         fname: '',
         lname: '',
@@ -353,8 +565,7 @@ export default function CreatePDLInformation() {
         civil_status: '',
         brgy: '',
         city: '',
-        province: '',
-        court_order_number: '',
+        province: locationData.province,
         order_type: '',
         order_date: '',
         received_date: '',
@@ -364,7 +575,7 @@ export default function CreatePDLInformation() {
         complaint: '',
         date: new Date().toISOString().split('T')[0],
         prognosis: '',
-        laboratory: '',
+
         prescription: '',
         findings: '',
         height: 170,
@@ -388,7 +599,7 @@ export default function CreatePDLInformation() {
                 drug_related: false,
             },
         ],
-        medical_files: [],
+        medical_file: null,
     });
 
     const { props } = usePage();
@@ -417,7 +628,7 @@ export default function CreatePDLInformation() {
         e.preventDefault();
 
         // Update form data with medical files
-        setData('medical_files', medicalFiles);
+        setData('medical_file', medicalFile);
 
         // Use the post method from useForm to handle flash messages properly
         post(route('pdl-management.personal-information.create'), {
@@ -428,7 +639,12 @@ export default function CreatePDLInformation() {
                 setDate(undefined);
                 setActiveCaseIndex(0);
                 setCurrentStep(1);
-                setMedicalFiles([]);
+                setMedicalFile(null);
+                setSelectedCity('');
+                setAvailableBarangays([]);
+                setDocumentPreview(null);
+                setIsCustomOrderType(false);
+                setOrderTypeOpen(false);
             },
         });
     };
@@ -570,28 +786,52 @@ export default function CreatePDLInformation() {
                                 <h3 className="mb-4 text-lg font-medium">Address Information</h3>
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                     <div className="space-y-2">
-                                        <Label htmlFor="brgy">Barangay
-                                            <span className="text-red-500">*</span>
-                                        </Label>
-                                        <Input id="brgy" name="brgy" value={data.brgy} onChange={handleChange} placeholder="Enter barangay" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="city">City
-                                            <span className="text-red-500">*</span>
-                                        </Label>
-                                        <Input id="city" name="city" value={data.city} onChange={handleChange} placeholder="Enter city" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="province">Province
-                                            <span className="text-red-500">*</span>
-                                        </Label>
+                                        <Label htmlFor="province">Province</Label>
                                         <Input
                                             id="province"
                                             name="province"
                                             value={data.province}
-                                            onChange={handleChange}
-                                            placeholder="Enter province"
+                                            disabled
+                                            className="bg-gray-100"
                                         />
+                                        <div className="text-xs text-muted-foreground">Default: South Cotabato</div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="city">City/Municipality
+                                            <span className="text-red-500">*</span>
+                                        </Label>
+                                        <Select value={selectedCity} onValueChange={handleCityChange}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select city/municipality" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {Object.keys(locationData.cities).map((city) => (
+                                                    <SelectItem key={city} value={city}>
+                                                        {city}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="brgy">Barangay
+                                            <span className="text-red-500">*</span>
+                                        </Label>
+                                        <Select value={data.brgy} onValueChange={(value) => setData('brgy', value)} disabled={!selectedCity}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder={selectedCity ? "Select barangay" : "Select city first"} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {availableBarangays.map((barangay) => (
+                                                    <SelectItem key={barangay} value={barangay}>
+                                                        {barangay}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {!selectedCity && (
+                                            <div className="text-xs text-muted-foreground">Please select a city/municipality first</div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -612,13 +852,60 @@ export default function CreatePDLInformation() {
                                     <Label htmlFor="order_type">
                                         Order Type <span className="text-red-500">*</span>
                                     </Label>
-                                    <Input
-                                        id="order_type"
-                                        name="order_type"
+                                    <Popover open={orderTypeOpen} onOpenChange={setOrderTypeOpen}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                role="combobox"
+                                                aria-expanded={orderTypeOpen}
+                                                className="w-full justify-between"
+                                            >
+                                                {data.order_type || 'Select or type order type...'}
+                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-full p-0" align="start">
+                                            <Command>
+                                                <CommandInput
+                                                    placeholder="Search order types or type custom..."
                                         value={data.order_type}
-                                        onChange={handleChange}
-                                        placeholder="Enter order type"
-                                    />
+                                                    onValueChange={handleOrderTypeInputChange}
+                                                />
+                                                <CommandList>
+                                                    <CommandEmpty>
+                                                        <div className="p-2 text-sm text-muted-foreground">
+                                                            No order type found. Press Enter to add "{data.order_type}"
+                                                            as custom order type.
+                                                        </div>
+                                                    </CommandEmpty>
+                                                    <CommandGroup>
+                                                        {orderTypeSuggestions.map((orderType) => (
+                                                            <CommandItem
+                                                                key={orderType}
+                                                                value={orderType}
+                                                                onSelect={(currentValue) => {
+                                                                    handleOrderTypeChange(currentValue);
+                                                                    setOrderTypeOpen(false);
+                                                                }}
+                                                            >
+                                                                <Check
+                                                                    className={`mr-2 h-4 w-4 ${
+                                                                        data.order_type === orderType
+                                                                            ? 'opacity-100'
+                                                                            : 'opacity-0'
+                                                                    }`}
+                                                                />
+                                                                {orderType}
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <div className="text-xs text-muted-foreground">
+                                        Select from common order types or type a custom order type
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label>
@@ -645,6 +932,7 @@ export default function CreatePDLInformation() {
                                             const file = e.target.files?.[0];
                                             if (file) {
                                                 setData('document_type', file);
+                                                handleDocumentPreview(file);
                                             }
                                         }}
                                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -652,6 +940,103 @@ export default function CreatePDLInformation() {
                                     <div className="text-xs text-muted-foreground">
                                         Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
                                     </div>
+
+                                    {/* Document Preview */}
+                                    {documentPreview && (
+                                        <div className="mt-4 space-y-2">
+                                            <Label>Document Preview</Label>
+                                            <div className="relative">
+                                                {documentPreview === 'document-file' ? (
+                                                    // DOC/DOCX file info display
+                                                    <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
+                                                        <div className="text-center">
+                                                            <FileText className="mx-auto h-16 w-16 text-gray-400" />
+                                                            <p className="mt-2 text-sm font-medium text-gray-900">
+                                                                {data.document_type?.name}
+                                                            </p>
+                                                            <p className="text-xs text-gray-500">
+                                                                Document file - Preview not available
+                                                            </p>
+                                                            <p className="text-xs text-gray-400">
+                                                                {formatFileSize(data.document_type?.size || 0)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ) : documentPreview.startsWith('data:image/') ? (
+                                                    // Image preview
+                                                    <img
+                                                        src={documentPreview}
+                                                        alt="Document preview"
+                                                        className="max-h-64 w-full rounded-lg border object-contain"
+                                                    />
+                                                ) : documentPreview.startsWith('data:application/pdf') ? (
+                                                    // PDF preview
+                                                    <iframe
+                                                        src={documentPreview}
+                                                        className="h-64 w-full rounded-lg border"
+                                                        title="PDF Preview"
+                                                    />
+                                                ) : (
+                                                    // Text file preview
+                                                    <div className="h-64 w-full rounded-lg border bg-white p-4">
+                                                        <pre className="h-full w-full overflow-auto text-sm text-gray-900 whitespace-pre-wrap">
+                                                            {documentPreview}
+                                                        </pre>
+                                                    </div>
+                                                )}
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="absolute top-2 right-2"
+                                                    onClick={() => setDocumentPreview(null)}
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* File Info */}
+                                    {data.document_type && (
+                                        <div className="mt-2 rounded-lg bg-gray-50 p-3">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center space-x-2">
+                                                    {getFileIcon(data.document_type)}
+                                                    <div>
+                                                        <p className="text-sm font-medium">{data.document_type.name}</p>
+                                                        <p className="text-xs text-gray-500">
+                                                            {formatFileSize(data.document_type.size)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => data.document_type && handleDocumentPreview(data.document_type)}
+                                                        className="text-blue-500 hover:text-blue-700"
+                                                        title="Preview file"
+                                                    >
+                                                        <Eye className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setData('document_type', null);
+                                                            setDocumentPreview(null);
+                                                        }}
+                                                        className="text-red-500 hover:text-red-700"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="court_branch">
@@ -843,9 +1228,11 @@ export default function CreatePDLInformation() {
                                                     <SelectValue placeholder="Select status" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="open">Open</SelectItem>
-                                                    <SelectItem value="closed">Closed</SelectItem>
+
                                                     <SelectItem value="pending">Pending</SelectItem>
+                                                    <SelectItem value="convicted">Convicted</SelectItem>
+                                                    <SelectItem value="deceased">Deceased</SelectItem>
+                                                    <SelectItem value="case closed">Case Closed</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -963,19 +1350,7 @@ export default function CreatePDLInformation() {
                                     />
                                     <div className="text-xs text-muted-foreground">Specify prognosis details in parentheses for clarity</div>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="laboratory">
-                                        Laboratory Results <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Textarea
-                                        id="laboratory"
-                                        name="laboratory"
-                                        value={data.laboratory}
-                                        onChange={handleChange}
-                                        rows={3}
-                                        placeholder="Enter laboratory test results..."
-                                    />
-                                </div>
+
                                 <div className="space-y-2">
                                     <Label htmlFor="prescription">
                                         Prescription <span className="text-red-500">*</span>
@@ -1000,47 +1375,107 @@ export default function CreatePDLInformation() {
                                     <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-gray-400">
                                         <input
                                             type="file"
-                                            id="medical-files"
-                                            multiple
+                                            id="medical-file"
                                             accept="image/*,.pdf,.doc,.docx,.txt"
                                             onChange={handleFileUpload}
                                             className="hidden"
                                         />
-                                        <label htmlFor="medical-files" className="cursor-pointer">
+                                        <label htmlFor="medical-file" className="cursor-pointer">
                                             <Upload className="mx-auto h-12 w-12 text-gray-400" />
                                             <div className="mt-2">
-                                                <span className="text-sm font-medium text-gray-900">Upload medical documents and images</span>
+                                                <span className="text-sm font-medium text-gray-900">Upload medical document</span>
                                                 <p className="text-xs text-gray-500">Click to upload or drag and drop</p>
                                                 <p className="mt-1 text-xs text-gray-400">Supports: Images (JPG, PNG, GIF), PDF, DOC, DOCX, TXT</p>
                                             </div>
                                         </label>
                                     </div>
 
-                                    {/* Uploaded Files List */}
-                                    {medicalFiles.length > 0 && (
+                                    {/* Uploaded File */}
+                                    {medicalFile && (
                                         <div className="space-y-2">
-                                            <h4 className="text-sm font-medium">Uploaded Files ({medicalFiles.length})</h4>
-                                            <div className="space-y-2">
-                                                {medicalFiles.map((file, index) => (
-                                                    <div key={index} className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                            <h4 className="text-sm font-medium">Uploaded File</h4>
+                                            <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                                                         <div className="flex items-center space-x-3">
-                                                            {getFileIcon(file)}
+                                                    {getFileIcon(medicalFile)}
                                                             <div>
-                                                                <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                                                                <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                                                        <p className="text-sm font-medium text-gray-900">{medicalFile.name}</p>
+                                                        <p className="text-xs text-gray-500">{formatFileSize(medicalFile.size)}</p>
                                                             </div>
                                                         </div>
+                                                <div className="flex items-center space-x-2">
                                                         <Button
                                                             type="button"
                                                             variant="ghost"
                                                             size="sm"
-                                                            onClick={() => removeFile(index)}
+                                                        onClick={() => handleDocumentPreview(medicalFile)}
+                                                        className="text-blue-500 hover:text-blue-700"
+                                                        title="Preview file"
+                                                    >
+                                                        <Eye className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={removeFile}
                                                             className="text-red-500 hover:text-red-700"
                                                         >
                                                             <X className="h-4 w-4" />
                                                         </Button>
                                                     </div>
-                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Medical Files Preview */}
+                                    {documentPreview && (
+                                        <div className="mt-4 space-y-2">
+                                            <Label>File Preview</Label>
+                                            <div className="relative">
+                                                {documentPreview === 'document-file' ? (
+                                                    // DOC/DOCX file info display
+                                                    <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
+                                                        <div className="text-center">
+                                                            <FileText className="mx-auto h-16 w-16 text-gray-400" />
+                                                            <p className="mt-2 text-sm font-medium text-gray-900">
+                                                                Document file - Preview not available
+                                                            </p>
+                                                            <p className="text-xs text-gray-500">
+                                                                Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ) : documentPreview.startsWith('data:image/') ? (
+                                                    // Image preview
+                                                    <img
+                                                        src={documentPreview}
+                                                        alt="File preview"
+                                                        className="max-h-64 w-full rounded-lg border object-contain"
+                                                    />
+                                                ) : documentPreview.startsWith('data:application/pdf') ? (
+                                                    // PDF preview
+                                                    <iframe
+                                                        src={documentPreview}
+                                                        className="h-64 w-full rounded-lg border"
+                                                        title="PDF Preview"
+                                                    />
+                                                ) : (
+                                                    // Text file preview
+                                                    <div className="h-64 w-full rounded-lg border bg-white p-4">
+                                                        <pre className="h-full w-full overflow-auto text-sm text-gray-900 whitespace-pre-wrap">
+                                                            {documentPreview}
+                                                        </pre>
+                                                    </div>
+                                                )}
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="absolute top-2 right-2"
+                                                    onClick={() => setDocumentPreview(null)}
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
                                             </div>
                                         </div>
                                     )}
@@ -1475,6 +1910,12 @@ export default function CreatePDLInformation() {
                                     reset();
                                     setDate(undefined);
                                     setCurrentStep(1);
+                                    setSelectedCity('');
+                                    setAvailableBarangays([]);
+                                    setDocumentPreview(null);
+                                    setMedicalFile(null);
+                                    setIsCustomOrderType(false);
+                                    setOrderTypeOpen(false);
                                 }}
                                 disabled={processing}
                             >
