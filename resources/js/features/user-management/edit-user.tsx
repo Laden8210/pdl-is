@@ -12,11 +12,17 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage, InertiaPageProps } from '@inertiajs/react';
 import { Pencil } from 'lucide-react';
 import { FormEventHandler, useEffect, useRef } from 'react';
 import { Personnel } from './user-columns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+interface PageProps extends InertiaPageProps {
+    success?: string;
+    errors: Record<string, string>;
+}
+
 interface EditUserProps {
     user: Personnel;
 }
@@ -27,10 +33,10 @@ export function EditUser({ user }: EditUserProps) {
     const successMessage = props.success;
 
     const { data, setData, put, processing, errors } = useForm({
-        firstName: user.fname,
-        middleName: user.mname || '',
-        lastName: user.lname,
-        contactNumber: user.contactnum,
+        fname: user.fname,
+        mname: user.mname || '',
+        lname: user.lname,
+        contactnum: user.contactnum,
         avatar: null as File | null,
         username: user.username,
         password: '',
@@ -40,10 +46,10 @@ export function EditUser({ user }: EditUserProps) {
 
     useEffect(() => {
         setData({
-            firstName: user.fname,
-            middleName: user.mname || '',
-            lastName: user.lname,
-            contactNumber: user.contactnum,
+            fname: user.fname,
+            mname: user.mname || '',
+            lname: user.lname,
+            contactnum: user.contactnum,
             avatar: null,
             username: user.username,
             password: '',
@@ -57,7 +63,7 @@ export function EditUser({ user }: EditUserProps) {
 
         put(route('user-management.update', user.id), {
             preserveScroll: true,
-            forceFormData: true,
+
             onSuccess: () => {
                 // Clear password field after successful update
                 setData('password', '');
@@ -106,10 +112,10 @@ export function EditUser({ user }: EditUserProps) {
                         <div className="col-span-2">
                             <Label htmlFor="firstName">First Name</Label>
                             <Input
-                                id="firstName"
-                                name="firstName"
-                                value={data.firstName}
-                                onChange={(e) => setData('firstName', e.target.value)}
+                                id="fname"
+                                name="fname"
+                                value={data.fname}
+                                onChange={(e) => setData('fname', e.target.value)}
                                 required
                             />
                         </div>
@@ -117,31 +123,31 @@ export function EditUser({ user }: EditUserProps) {
                         <div>
                             <Label htmlFor="middleName">Middle Name</Label>
                             <Input
-                                id="middleName"
-                                name="middleName"
-                                value={data.middleName}
-                                onChange={(e) => setData('middleName', e.target.value)}
+                                id="mname"
+                                name="mname"
+                                value={data.mname}
+                                onChange={(e) => setData('mname', e.target.value)}
                             />
                         </div>
 
                         <div className="col-span-3">
                             <Label htmlFor="lastName">Last Name</Label>
                             <Input
-                                id="lastName"
-                                name="lastName"
-                                value={data.lastName}
-                                onChange={(e) => setData('lastName', e.target.value)}
+                                id="lname"
+                                name="lname"
+                                value={data.lname}
+                                onChange={(e) => setData('lname', e.target.value)}
                                 required
                             />
                         </div>
 
                         <div className="col-span-3">
-                            <Label htmlFor="contactNumber">Contact Number</Label>
+                            <Label htmlFor="contactnum">Contact Number</Label>
                             <Input
-                                id="contactNumber"
-                                name="contactNumber"
-                                value={data.contactNumber}
-                                onChange={(e) => setData('contactNumber', e.target.value)}
+                                id="contactnum"
+                                name="contactnum"
+                                value={data.contactnum}
+                                onChange={(e) => setData('contactnum', e.target.value)}
                                 required
                             />
                         </div>

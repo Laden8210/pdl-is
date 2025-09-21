@@ -72,14 +72,15 @@ class UserManagementController extends Controller
 
     public function store(CreateUserRequest $request): RedirectResponse
     {
+
         $data = $request->validated();
 
         $user = new Personnel();
-        $user->fname = $data['firstName'];
-        $user->lname = $data['lastName'];
-        $user->mname = $data['middleName'] ?? null;
+        $user->fname = $data['fname'];
+        $user->lname = $data['lname'];
+        $user->mname = $data['mname'] ?? null;
         $user->position = $data['position'];
-        $user->contactnum = $data['contactNumber'];
+        $user->contactnum = $data['contactnum'];
         $user->agency = $data['agency'];
         $user->status = 1;
         $user->username = $data['username'];
@@ -116,10 +117,10 @@ class UserManagementController extends Controller
         $validated = $request->validated();
 
         $updateData = [
-            'fname' => $validated['firstName'],
-            'mname' => $validated['middleName'],
-            'lname' => $validated['lastName'],
-            'contactnum' => $validated['contactNumber'],
+            'fname' => $validated['fname'],
+            'mname' => $validated['mname'],
+            'lname' => $validated['lname'],
+            'contactnum' => $validated['contactnum'],
             'username' => $validated['username'],
             'position' => $validated['position'],
             'agency' => $validated['agency'],

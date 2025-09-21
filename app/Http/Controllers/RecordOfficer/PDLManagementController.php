@@ -13,7 +13,6 @@ use App\Models\CourtOrder;
 use App\Http\Requests\PDL\TransferRequest;
 use App\Services\NotificationService;
 use App\Models\Verifications;
-use App\Models\MedicalDocument;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
@@ -297,6 +296,40 @@ class PDLManagementController extends Controller
             'cases',
             'personnel:id,fname,lname'
         ])->findOrFail($pdl_id);
+
+        // Process medical records to include file information
+        if ($pdl->medicalRecords) {
+            $pdl->medicalRecords->transform(function ($record) {
+                // Handle multiple files from original_filename and file_path
+                if ($record->original_filename && $record->file_path) {
+                    $record->files = array_map(function ($filename, $filePath) {
+                        return [
+                            'original_filename' => $filename,
+                            'file_path' => $filePath,
+                            'extension' => pathinfo($filename, PATHINFO_EXTENSION),
+                            'size' => null, // We don't store file size in the current structure
+                        ];
+                    }, explode(',', $record->original_filename), explode(',', $record->file_path));
+                } else {
+                    $record->files = [];
+                }
+
+                // Handle single medical file from stored_filename
+                if ($record->stored_filename && $record->file_path) {
+                    $record->single_file = [
+                        'original_filename' => $record->stored_filename,
+                        'file_path' => $record->file_path,
+                        'extension' => pathinfo($record->stored_filename, PATHINFO_EXTENSION),
+                        'size' => null,
+                    ];
+                } else {
+                    $record->single_file = null;
+                }
+
+                return $record;
+            });
+        }
+
         return Inertia::render('records-officer/pdl-management/update-pdl-information', [
             'pdl' => $pdl
         ]);
@@ -329,7 +362,7 @@ class PDLManagementController extends Controller
                 'personnel_id' => $user->id,
             ]);
 
-            // Handle document upload
+            // Handle document upload - only if new file is provided
             $documentPath = null;
             $documentFilename = null;
             if ($request->hasFile('document_type')) {
@@ -344,17 +377,16 @@ class PDLManagementController extends Controller
             // Update or create Court Order
             if ($request->court_order_id) {
                 $courtOrderData = [
-
                     'order_type' => $request->order_type,
                     'order_date' => $request->order_date,
                     'received_date' => $request->received_date,
                     'remarks' => $request->cod_remarks,
-                    'document_type' => $documentFilename ? pathinfo($request->file('document_type')->getClientOriginalName(), PATHINFO_FILENAME) : ($request->document_type ?? 'uploaded_document'),
                     'court_branch' => $request->court_branch,
                 ];
 
-                // Add file fields if file was uploaded
+                // Only update document fields if new file was uploaded
                 if ($documentPath) {
+                    $courtOrderData['document_type'] = pathinfo($request->file('document_type')->getClientOriginalName(), PATHINFO_FILENAME);
                     $courtOrderData['document_path'] = $documentPath;
                     $courtOrderData['original_filename'] = $request->file('document_type')->getClientOriginalName();
                 }
@@ -365,17 +397,16 @@ class PDLManagementController extends Controller
                 );
             } else {
                 $courtOrderData = [
-
                     'order_type' => $request->order_type,
                     'order_date' => $request->order_date,
                     'received_date' => $request->received_date,
                     'remarks' => $request->cod_remarks,
-                    'document_type' => $documentFilename ? pathinfo($request->file('document_type')->getClientOriginalName(), PATHINFO_FILENAME) : ($request->document_type ?? 'uploaded_document'),
                     'court_branch' => $request->court_branch,
                 ];
 
                 // Add file fields if file was uploaded
                 if ($documentPath) {
+                    $courtOrderData['document_type'] = pathinfo($request->file('document_type')->getClientOriginalName(), PATHINFO_FILENAME);
                     $courtOrderData['document_path'] = $documentPath;
                     $courtOrderData['original_filename'] = $request->file('document_type')->getClientOriginalName();
                 }
@@ -407,33 +438,33 @@ class PDLManagementController extends Controller
                 ]);
             }
 
-            // Handle Medical Document Uploads
+            // Handle Medical Document Uploads - only if new files are provided
             if ($request->hasFile('medical_files')) {
-                foreach ($request->file('medical_files') as $file) {
-                    $originalName = $file->getClientOriginalName();
-                    $extension = $file->getClientOriginalExtension();
-                    $filename = time() . '_' . uniqid() . '.' . $extension;
-                    $path = $file->storeAs('medical_documents', $filename, 'public');
+                // Get the medical record ID (either existing or newly created)
+                $medicalRecordId = $request->medical_record_id ?: $pdl->medicalRecords()->latest()->first()?->medical_record_id;
 
-                    // Determine document type based on file extension
-                    $documentType = match(strtolower($extension)) {
-                        'jpg', 'jpeg', 'png', 'gif', 'bmp' => 'image',
-                        'pdf' => 'pdf',
-                        'doc', 'docx' => 'document',
-                        'txt' => 'text',
-                        default => 'other'
-                    };
+                if ($medicalRecordId) {
+                    $medicalRecord = $pdl->medicalRecords()->find($medicalRecordId);
 
-                    MedicalDocument::create([
-                        'medical_record_medical_record_id' => $medicalRecord->medical_record_id,
-                        'document_type' => $documentType,
-                        'original_filename' => $originalName,
-                        'stored_filename' => $filename,
-                        'file_path' => $path,
-                        'mime_type' => $file->getMimeType(),
-                        'file_size' => $file->getSize(),
-                        'description' => 'Medical document uploaded during PDL update',
-                        'uploaded_by' => $user->id,
+                    // Handle multiple files
+                    $filePaths = [];
+                    $originalFilenames = [];
+
+                    foreach ($request->file('medical_files') as $file) {
+                        $originalName = $file->getClientOriginalName();
+                        $extension = $file->getClientOriginalExtension();
+                        $filename = time() . '_' . uniqid() . '.' . $extension;
+                        $path = $file->storeAs('medical_documents', $filename, 'public');
+
+                        $filePaths[] = $path;
+                        $originalFilenames[] = $originalName;
+                    }
+
+                    // Update medical record with file information
+                    $medicalRecord->update([
+                        'stored_filename' => implode(',', $filePaths),
+                        'file_path' => implode(',', $filePaths),
+                        'original_filename' => implode(',', $originalFilenames),
                     ]);
                 }
             }

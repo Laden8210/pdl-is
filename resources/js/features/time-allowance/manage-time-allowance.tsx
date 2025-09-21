@@ -29,9 +29,22 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
     const { props } = usePage<any>();
     const successMessage = props.success;
 
+    // Get GCTA days based on years served
+    const getGctaDays = () => {
+        const yearsServed = typeof pdl?.years_served === 'object'
+            ? pdl.years_served.years
+            : pdl?.years_served || 0;
+
+        if (yearsServed >= 0 && yearsServed <= 2) return 20;
+        if (yearsServed >= 3 && yearsServed <= 5) return 23;
+        if (yearsServed >= 6 && yearsServed <= 10) return 25;
+        if (yearsServed >= 11) return 30;
+        return 20; // Default for 0 years
+    };
+
     const { data, setData, post, processing, errors, reset } = useForm({
         type: 'gcta',
-        days: pdl?.default_gcta_days || 0,
+        days: getGctaDays(),
         reason: '',
     });
 
@@ -48,9 +61,9 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
     const handleTypeChange = (value: 'gcta' | 'tastm') => {
         setData('type', value);
         if (value === 'gcta') {
-            setData('days', pdl?.default_gcta_days || 0);
+            setData('days', getGctaDays());
         } else {
-            setData('days', pdl?.default_tastm_days || 15);
+            setData('days', 15); // Fixed TASTM days
         }
     };
 
@@ -110,8 +123,8 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
                                 : `${pdl?.years_served || 0} years`}
                         </p>
                         <div className="mt-2 text-xs text-gray-600">
-                            <p><strong>GCTA Default:</strong> {pdl?.default_gcta_days || 0} days per month</p>
-                            <p><strong>TASTM Default:</strong> {pdl?.default_tastm_days || 15} days per year</p>
+                            <p><strong>GCTA Default:</strong> {getGctaDays()} days per month (based on {typeof pdl?.years_served === 'object' ? pdl.years_served.years : pdl?.years_served || 0} years served)</p>
+                            <p><strong>TASTM Default:</strong> 15 days per month (fixed)</p>
                         </div>
                     </div>
 
@@ -135,15 +148,27 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
 
                         <div className="grid gap-2">
                             <Label htmlFor="days">Days to Add</Label>
-                            <Input
-                                id="days"
-                                name="days"
-                                type="number"
-                                min="0"
-                                value={data.days}
-                                onChange={(e) => setData('days', parseInt(e.target.value) || 0)}
+                            <Select
+                                value={data.days.toString()}
+                                onValueChange={(value) => setData('days', parseInt(value))}
                                 required
-                            />
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select days to add" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {data.type === 'gcta' ? (
+                                        <>
+                                            <SelectItem value="20">20 days (0-2 years served)</SelectItem>
+                                            <SelectItem value="23">23 days (3-5 years served)</SelectItem>
+                                            <SelectItem value="25">25 days (6-10 years served)</SelectItem>
+                                            <SelectItem value="30">30 days (11+ years served)</SelectItem>
+                                        </>
+                                    ) : (
+                                        <SelectItem value="15">15 days (TASTM fixed)</SelectItem>
+                                    )}
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         <div className="grid gap-2">

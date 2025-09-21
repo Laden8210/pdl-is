@@ -19,7 +19,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { Check, ChevronsUpDown, FileText, Image, Upload, X } from 'lucide-react';
+import { Check, ChevronsUpDown, Eye, FileText, Image, Upload, X } from 'lucide-react';
 
 // Criminal case types for dropdown
 const criminalCaseTypes = [
@@ -401,6 +401,10 @@ export default function UpdatePDLInformation() {
     );
     const [crimeCommittedOpen, setCrimeCommittedOpen] = useState(false);
     const [medicalFiles, setMedicalFiles] = useState<File[]>([]);
+    const [documentPreview, setDocumentPreview] = useState<string | null>(null);
+    const [medicalPreview, setMedicalPreview] = useState<string | null>(null);
+    const [oldDocumentPreview, setOldDocumentPreview] = useState<string | null>(null);
+    const [oldMedicalPreview, setOldMedicalPreview] = useState<string | null>(null);
 
     // Helper function to get all crime types as a flat array
     const getAllCrimeTypes = () => {
@@ -410,6 +414,106 @@ export default function UpdatePDLInformation() {
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(event.target.files || []);
         setMedicalFiles((prev) => [...prev, ...files]);
+    };
+
+    // Handle document preview for all supported formats
+    const handleDocumentPreview = (file: File) => {
+        const reader = new FileReader();
+
+        if (file.type.startsWith('image/')) {
+            // Handle image files (JPG, JPEG, PNG)
+            reader.onload = (e) => {
+                setDocumentPreview(e.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else if (file.type === 'application/pdf') {
+            // Handle PDF files
+            reader.onload = (e) => {
+                setDocumentPreview(e.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else if (file.type === 'text/plain') {
+            // Handle TXT files
+            reader.onload = (e) => {
+                setDocumentPreview(e.target?.result as string);
+            };
+            reader.readAsText(file);
+        } else if (file.type.includes('document') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
+            // Handle DOC/DOCX files - show file info since we can't preview them directly
+            setDocumentPreview('document-file');
+        } else {
+            setDocumentPreview(null);
+        }
+    };
+
+    // Handle medical file preview for all supported formats
+    const handleMedicalPreview = (file: File) => {
+        const reader = new FileReader();
+
+        if (file.type.startsWith('image/')) {
+            // Handle image files (JPG, JPEG, PNG)
+            reader.onload = (e) => {
+                setMedicalPreview(e.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else if (file.type === 'application/pdf') {
+            // Handle PDF files
+            reader.onload = (e) => {
+                setMedicalPreview(e.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else if (file.type === 'text/plain') {
+            // Handle TXT files
+            reader.onload = (e) => {
+                setMedicalPreview(e.target?.result as string);
+            };
+            reader.readAsText(file);
+        } else if (file.type.includes('document') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
+            // Handle DOC/DOCX files - show file info since we can't preview them directly
+            setMedicalPreview('document-file');
+        } else {
+            setMedicalPreview(null);
+        }
+    };
+
+    // Handle old document preview from server
+    const handleOldDocumentPreview = (filePath: string, fileName: string) => {
+        const extension = fileName.split('.').pop()?.toLowerCase();
+
+        if (['jpg', 'jpeg', 'png', 'gif'].includes(extension || '')) {
+            setOldDocumentPreview(`/storage/${filePath}`);
+        } else if (extension === 'pdf') {
+            setOldDocumentPreview(`/storage/${filePath}`);
+        } else if (extension === 'txt') {
+            fetch(`/storage/${filePath}`)
+                .then(response => response.text())
+                .then(text => setOldDocumentPreview(text))
+                .catch(() => setOldDocumentPreview('document-file'));
+        } else if (['doc', 'docx'].includes(extension || '')) {
+            setOldDocumentPreview('document-file');
+        } else {
+            setOldDocumentPreview('document-file');
+        }
+    };
+
+    // Handle old medical file preview from server
+    const handleOldMedicalPreview = (filePath: string, fileName: string) => {
+        const extension = fileName.split('.').pop()?.toLowerCase();
+
+        if (['jpg', 'jpeg', 'png', 'gif'].includes(extension || '')) {
+            setOldMedicalPreview(`/storage/${filePath}`);
+        } else if (extension === 'pdf') {
+            setOldMedicalPreview(`/storage/${filePath}`);
+        } else if (extension === 'txt') {
+            fetch(`/storage/${filePath}`)
+                .then(response => response.text())
+                .then(text => setOldMedicalPreview(text))
+                .catch(() => setOldMedicalPreview('document-file'));
+        } else if (['doc', 'docx'].includes(extension || '')) {
+            setOldMedicalPreview('document-file');
+        } else {
+            setOldMedicalPreview('document-file');
+        }
     };
 
     const removeFile = (index: number) => {
@@ -699,6 +803,7 @@ export default function UpdatePDLInformation() {
                                             const file = e.target.files?.[0];
                                             if (file) {
                                                 setData('document_type', file);
+                                                handleDocumentPreview(file);
                                             }
                                         }}
                                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -707,8 +812,117 @@ export default function UpdatePDLInformation() {
                                         Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
                                     </div>
                                     {data.original_filename && (
-                                        <div className="text-sm text-blue-600">
-                                            Current file: {data.original_filename}
+                                        <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                            <div className="flex items-center space-x-3">
+                                                <FileText className="h-4 w-4 text-gray-400" />
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-900">{data.original_filename}</p>
+                                                    <p className="text-xs text-gray-500">Current file</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleOldDocumentPreview(data.document_path || '', data.original_filename || '')}
+                                                    className="text-blue-500 hover:text-blue-700"
+                                                    title="Preview current file"
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Document Preview */}
+                                    {documentPreview && (
+                                        <div className="mt-4 space-y-2">
+                                            <Label>New Document Preview</Label>
+                                            <div className="relative">
+                                                {documentPreview === 'document-file' ? (
+                                                    // DOC/DOCX file info display
+                                                    <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
+                                                        <div className="text-center">
+                                                            <FileText className="mx-auto h-16 w-16 text-gray-400" />
+                                                            <p className="mt-2 text-sm font-medium text-gray-900">{data.document_type?.name}</p>
+                                                            <p className="text-xs text-gray-500">Document file - Preview not available</p>
+                                                            <p className="text-xs text-gray-400">{formatFileSize(data.document_type?.size || 0)}</p>
+                                                        </div>
+                                                    </div>
+                                                ) : documentPreview.startsWith('data:image/') ? (
+                                                    // Image preview
+                                                    <img
+                                                        src={documentPreview}
+                                                        alt="Document preview"
+                                                        className="max-h-64 w-full rounded-lg border object-contain"
+                                                    />
+                                                ) : documentPreview.startsWith('data:application/pdf') ? (
+                                                    // PDF preview
+                                                    <iframe src={documentPreview} className="h-64 w-full rounded-lg border" title="PDF Preview" />
+                                                ) : (
+                                                    // Text file preview
+                                                    <div className="h-64 w-full rounded-lg border bg-white p-4">
+                                                        <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
+                                                            {documentPreview}
+                                                        </pre>
+                                                    </div>
+                                                )}
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="absolute top-2 right-2"
+                                                    onClick={() => setDocumentPreview(null)}
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Old Document Preview */}
+                                    {oldDocumentPreview && (
+                                        <div className="mt-4 space-y-2">
+                                            <Label>Current Document Preview</Label>
+                                            <div className="relative">
+                                                {oldDocumentPreview === 'document-file' ? (
+                                                    // DOC/DOCX file info display
+                                                    <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
+                                                        <div className="text-center">
+                                                            <FileText className="mx-auto h-16 w-16 text-gray-400" />
+                                                            <p className="mt-2 text-sm font-medium text-gray-900">{data.original_filename}</p>
+                                                            <p className="text-xs text-gray-500">Document file - Preview not available</p>
+                                                        </div>
+                                                    </div>
+                                                ) : oldDocumentPreview.startsWith('/storage/') && (oldDocumentPreview.includes('.jpg') || oldDocumentPreview.includes('.jpeg') || oldDocumentPreview.includes('.png')) ? (
+                                                    // Image preview
+                                                    <img
+                                                        src={oldDocumentPreview}
+                                                        alt="Current document preview"
+                                                        className="max-h-64 w-full rounded-lg border object-contain"
+                                                    />
+                                                ) : oldDocumentPreview.startsWith('/storage/') && oldDocumentPreview.includes('.pdf') ? (
+                                                    // PDF preview
+                                                    <iframe src={oldDocumentPreview} className="h-64 w-full rounded-lg border" title="PDF Preview" />
+                                                ) : (
+                                                    // Text file preview
+                                                    <div className="h-64 w-full rounded-lg border bg-white p-4">
+                                                        <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
+                                                            {oldDocumentPreview}
+                                                        </pre>
+                                                    </div>
+                                                )}
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="absolute top-2 right-2"
+                                                    onClick={() => setOldDocumentPreview(null)}
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -899,9 +1113,11 @@ export default function UpdatePDLInformation() {
                                                     <SelectValue placeholder="Select status" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="open">Open</SelectItem>
-                                                    <SelectItem value="closed">Closed</SelectItem>
+                                                    <SelectItem value="on trial">On Trial</SelectItem>
                                                     <SelectItem value="pending">Pending</SelectItem>
+                                                    <SelectItem value="convicted">Convicted</SelectItem>
+                                                    <SelectItem value="deceased">Deceased</SelectItem>
+                                                    <SelectItem value="case closed">Case Closed</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -1053,19 +1269,226 @@ export default function UpdatePDLInformation() {
                                                                 <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
                                                             </div>
                                                         </div>
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => removeFile(index)}
-                                                        >
-                                                            <X className="h-4 w-4" />
-                                                        </Button>
+                                                        <div className="flex items-center space-x-2">
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => handleMedicalPreview(file)}
+                                                                className="text-blue-500 hover:text-blue-700"
+                                                                title="Preview file"
+                                                            >
+                                                                <Eye className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => removeFile(index)}
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>
                                         </div>
                                     )}
+
+                                    {/* Medical Files Preview */}
+                                    {medicalPreview && (
+                                        <div className="mt-4 space-y-2">
+                                            <Label>New File Preview</Label>
+                                            <div className="relative">
+                                                {medicalPreview === 'document-file' ? (
+                                                    // DOC/DOCX file info display
+                                                    <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
+                                                        <div className="text-center">
+                                                            <FileText className="mx-auto h-16 w-16 text-gray-400" />
+                                                            <p className="mt-2 text-sm font-medium text-gray-900">
+                                                                Document file - Preview not available
+                                                            </p>
+                                                            <p className="text-xs text-gray-500">
+                                                                Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ) : medicalPreview.startsWith('data:image/') ? (
+                                                    // Image preview
+                                                    <img
+                                                        src={medicalPreview}
+                                                        alt="File preview"
+                                                        className="max-h-64 w-full rounded-lg border object-contain"
+                                                    />
+                                                ) : medicalPreview.startsWith('data:application/pdf') ? (
+                                                    // PDF preview
+                                                    <iframe src={medicalPreview} className="h-64 w-full rounded-lg border" title="PDF Preview" />
+                                                ) : (
+                                                    // Text file preview
+                                                    <div className="h-64 w-full rounded-lg border bg-white p-4">
+                                                        <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
+                                                            {medicalPreview}
+                                                        </pre>
+                                                    </div>
+                                                )}
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="absolute top-2 right-2"
+                                                    onClick={() => setMedicalPreview(null)}
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Single Medical File */}
+                                    {pdl.medical_records?.[0]?.single_file && (
+                                        <div className="mt-4 space-y-2">
+                                            <Label>Current Medical Record File</Label>
+                                            <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                                <div className="flex items-center space-x-3">
+                                                    <FileText className="h-4 w-4 text-gray-400" />
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-900">{pdl.medical_records[0].single_file.original_filename}</p>
+                                                        <p className="text-xs text-gray-500">{pdl.medical_records[0].single_file.extension?.toUpperCase()} • Medical record</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleOldMedicalPreview(pdl.medical_records[0].single_file.file_path, pdl.medical_records[0].single_file.original_filename)}
+                                                        className="text-blue-500 hover:text-blue-700"
+                                                        title="Preview file"
+                                                    >
+                                                        <Eye className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Multiple Medical Files */}
+                                    {(pdl.medical_records?.[0]?.files && pdl.medical_records[0].files.length > 0) ||
+                                     (pdl.medical_records?.[0]?.original_filename && pdl.medical_records[0].original_filename) ? (
+                                        <div className="mt-4 space-y-2">
+                                            <Label>Current Medical Documents</Label>
+                                            <div className="space-y-2">
+                                                {/* New structure with files array */}
+                                                {pdl.medical_records[0].files && pdl.medical_records[0].files.length > 0 ? (
+                                                    pdl.medical_records[0].files.map((file: any, index: number) => (
+                                                        <div key={index} className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                                            <div className="flex items-center space-x-3">
+                                                                <FileText className="h-4 w-4 text-gray-400" />
+                                                                <div>
+                                                                    <p className="text-sm font-medium text-gray-900">{file.original_filename}</p>
+                                                                    <p className="text-xs text-gray-500">{file.extension?.toUpperCase()} • Medical document</p>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center space-x-2">
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    onClick={() => handleOldMedicalPreview(file.file_path, file.original_filename)}
+                                                                    className="text-blue-500 hover:text-blue-700"
+                                                                    title="Preview file"
+                                                                >
+                                                                    <Eye className="h-4 w-4" />
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    /* Fallback for old structure */
+                                                    pdl.medical_records[0].original_filename.split(',').map((filename: string, index: number) => {
+                                                        const filePath = pdl.medical_records[0].file_path?.split(',')[index];
+                                                        return (
+                                                            <div key={index} className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                                                <div className="flex items-center space-x-3">
+                                                                    <FileText className="h-4 w-4 text-gray-400" />
+                                                                    <div>
+                                                                        <p className="text-sm font-medium text-gray-900">{filename}</p>
+                                                                        <p className="text-xs text-gray-500">Medical document</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex items-center space-x-2">
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        onClick={() => handleOldMedicalPreview(filePath || '', filename)}
+                                                                        className="text-blue-500 hover:text-blue-700"
+                                                                        title="Preview file"
+                                                                    >
+                                                                        <Eye className="h-4 w-4" />
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })
+                                                )}
+                                            </div>
+                                        </div>
+                                    ) : null}
+
+                                    {/* Old Medical Files Preview */}
+                                    {oldMedicalPreview && (
+                                        <div className="mt-4 space-y-2">
+                                            <Label>Current Medical File Preview</Label>
+                                            <div className="relative">
+                                                {oldMedicalPreview === 'document-file' ? (
+                                                    // DOC/DOCX file info display
+                                                    <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
+                                                        <div className="text-center">
+                                                            <FileText className="mx-auto h-16 w-16 text-gray-400" />
+                                                            <p className="mt-2 text-sm font-medium text-gray-900">
+                                                                Document file - Preview not available
+                                                            </p>
+                                                            <p className="text-xs text-gray-500">
+                                                                Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ) : oldMedicalPreview.startsWith('/storage/') && (oldMedicalPreview.includes('.jpg') || oldMedicalPreview.includes('.jpeg') || oldMedicalPreview.includes('.png')) ? (
+                                                    // Image preview
+                                                    <img
+                                                        src={oldMedicalPreview}
+                                                        alt="Current medical file preview"
+                                                        className="max-h-64 w-full rounded-lg border object-contain"
+                                                    />
+                                                ) : oldMedicalPreview.startsWith('/storage/') && oldMedicalPreview.includes('.pdf') ? (
+                                                    // PDF preview
+                                                    <iframe src={oldMedicalPreview} className="h-64 w-full rounded-lg border" title="PDF Preview" />
+                                                ) : (
+                                                    // Text file preview
+                                                    <div className="h-64 w-full rounded-lg border bg-white p-4">
+                                                        <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
+                                                            {oldMedicalPreview}
+                                                        </pre>
+                                                    </div>
+                                                )}
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="absolute top-2 right-2"
+                                                    onClick={() => setOldMedicalPreview(null)}
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className='space-y-2'>
+                                    <Label htmlFor="medical_records_preview">Medical Records Preview</Label>
+
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="laboratory">
