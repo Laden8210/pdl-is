@@ -577,6 +577,7 @@ export default function CreatePDLInformation() {
     const [selectedCity, setSelectedCity] = useState<string>('');
     const [availableBarangays, setAvailableBarangays] = useState<string[]>([]);
     const [documentPreview, setDocumentPreview] = useState<string | null>(null);
+    const [medicalPreview, setMedicalPreview] = useState<string | null>(null);
     const [isCustomOrderType, setIsCustomOrderType] = useState<boolean>(false);
     const [orderTypeOpen, setOrderTypeOpen] = useState(false);
 
@@ -644,6 +645,36 @@ export default function CreatePDLInformation() {
         }
     };
 
+    // Handle medical file preview for all supported formats
+    const handleMedicalPreview = (file: File) => {
+        const reader = new FileReader();
+
+        if (file.type.startsWith('image/')) {
+            // Handle image files (JPG, JPEG, PNG)
+            reader.onload = (e) => {
+                setMedicalPreview(e.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else if (file.type === 'application/pdf') {
+            // Handle PDF files
+            reader.onload = (e) => {
+                setMedicalPreview(e.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else if (file.type === 'text/plain') {
+            // Handle TXT files
+            reader.onload = (e) => {
+                setMedicalPreview(e.target?.result as string);
+            };
+            reader.readAsText(file);
+        } else if (file.type.includes('document') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
+            // Handle DOC/DOCX files - show file info since we can't preview them directly
+            setMedicalPreview('document-file');
+        } else {
+            setMedicalPreview(null);
+        }
+    };
+
     const handleAddNewCase = () => {
         setData('cases', [
             ...data.cases,
@@ -686,12 +717,14 @@ export default function CreatePDLInformation() {
         if (file) {
             setMedicalFile(file);
             setData('medical_file', file);
+            handleMedicalPreview(file);
         }
     };
 
     const removeFile = () => {
         setMedicalFile(null);
         setData('medical_file', null);
+        setMedicalPreview(null);
     };
 
     const getFileIcon = (file: File) => {
@@ -851,6 +884,7 @@ export default function CreatePDLInformation() {
                 setSelectedCity('');
                 setAvailableBarangays([]);
                 setDocumentPreview(null);
+                setMedicalPreview(null);
                 setIsCustomOrderType(false);
                 setOrderTypeOpen(false);
             },
@@ -1594,7 +1628,7 @@ export default function CreatePDLInformation() {
                                                         type="button"
                                                         variant="ghost"
                                                         size="sm"
-                                                        onClick={() => handleDocumentPreview(medicalFile)}
+                                                        onClick={() => handleMedicalPreview(medicalFile)}
                                                         className="text-blue-500 hover:text-blue-700"
                                                         title="Preview file"
                                                     >
@@ -1615,11 +1649,11 @@ export default function CreatePDLInformation() {
                                     )}
 
                                     {/* Medical Files Preview */}
-                                    {documentPreview && (
+                                    {medicalPreview && (
                                         <div className="mt-4 space-y-2">
                                             <Label>File Preview</Label>
                                             <div className="relative">
-                                                {documentPreview === 'document-file' ? (
+                                                {medicalPreview === 'document-file' ? (
                                                     // DOC/DOCX file info display
                                                     <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
                                                         <div className="text-center">
@@ -1632,21 +1666,21 @@ export default function CreatePDLInformation() {
                                                             </p>
                                                         </div>
                                                     </div>
-                                                ) : documentPreview.startsWith('data:image/') ? (
+                                                ) : medicalPreview.startsWith('data:image/') ? (
                                                     // Image preview
                                                     <img
-                                                        src={documentPreview}
+                                                        src={medicalPreview}
                                                         alt="File preview"
                                                         className="max-h-64 w-full rounded-lg border object-contain"
                                                     />
-                                                ) : documentPreview.startsWith('data:application/pdf') ? (
+                                                ) : medicalPreview.startsWith('data:application/pdf') ? (
                                                     // PDF preview
-                                                    <iframe src={documentPreview} className="h-64 w-full rounded-lg border" title="PDF Preview" />
+                                                    <iframe src={medicalPreview} className="h-64 w-full rounded-lg border" title="PDF Preview" />
                                                 ) : (
                                                     // Text file preview
                                                     <div className="h-64 w-full rounded-lg border bg-white p-4">
                                                         <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
-                                                            {documentPreview}
+                                                            {medicalPreview}
                                                         </pre>
                                                     </div>
                                                 )}
@@ -1655,7 +1689,7 @@ export default function CreatePDLInformation() {
                                                     variant="outline"
                                                     size="sm"
                                                     className="absolute top-2 right-2"
-                                                    onClick={() => setDocumentPreview(null)}
+                                                    onClick={() => setMedicalPreview(null)}
                                                 >
                                                     <X className="h-4 w-4" />
                                                 </Button>
@@ -2093,6 +2127,7 @@ export default function CreatePDLInformation() {
                                     setSelectedCity('');
                                     setAvailableBarangays([]);
                                     setDocumentPreview(null);
+                                    setMedicalPreview(null);
                                     setMedicalFile(null);
                                     setIsCustomOrderType(false);
                                     setOrderTypeOpen(false);

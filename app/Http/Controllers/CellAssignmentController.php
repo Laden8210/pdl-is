@@ -34,7 +34,11 @@ class CellAssignmentController extends Controller
             ->paginate($perPage);
 
         $cells = Cells::all();
-        $pdls = Pdl::whereDoesntHave('assignments')->get();
+        $pdls = Pdl::whereDoesntHave('assignments')
+        ->whereHas('verifications', function ($query) {
+            $query->where('status', 'approved');
+        })
+        ->get();
 
 
 

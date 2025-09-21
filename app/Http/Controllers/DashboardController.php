@@ -21,9 +21,12 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Get PDL demographics by gender
+        // Get PDL demographics by gender and accepted in verifications
         $pdlByGender = Pdl::select('gender', DB::raw('count(*) as value'))
             ->whereNull('deleted_at')
+            ->whereHas('verifications', function ($query) {
+                $query->where('status', 'approved');
+            })
             ->groupBy('gender')
             ->get()
             ->map(function ($item) {
@@ -185,7 +188,11 @@ class DashboardController extends Controller
             });
 
         // Calculate key metrics
-        $totalPDL = Pdl::whereNull('deleted_at')->count();
+        $totalPDL = Pdl::whereNull('deleted_at')
+        ->whereHas('verifications', function ($query) {
+            $query->where('status', 'approved');
+        })
+        ->count();
         $activeCases = CaseInformation::where('case_status', 'Active')->count();
         $totalCapacity = Cells::where('status', 'active')->sum('capacity');
         $totalOccupied = CellAssignment::whereHas('pdl', function ($query) {

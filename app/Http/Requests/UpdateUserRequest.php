@@ -17,10 +17,10 @@ class UpdateUserRequest extends FormRequest
         $userId = $this->route('user') ?? $this->route('id');
 
         return [
-            'firstName' => 'required|string|max:255',
-            'middleName' => 'nullable|string|max:255',
-            'lastName' => 'required|string|max:255',
-            'contactNumber' => 'required|string|max:20',
+            'fname' => 'required|string|max:255',
+            'mname' => 'nullable|string|max:255',
+            'lname' => 'required|string|max:255',
+            'contactnum' => 'required|string|max:20',
             'avatar' => 'nullable|image|max:2048',
             'username' => [
                 'required',
@@ -37,8 +37,8 @@ class UpdateUserRequest extends FormRequest
     public function messages()
     {
         return [
-            'firstName.required' => 'First name is required.',
-            'lastName.required' => 'Last name is required.',
+            'fname.required' => 'First name is required.',
+            'lname.required' => 'Last name is required.',
             'position.required' => 'Position is required.',
             'agency.required' => 'Agency is required.',
             'password.min' => 'Password must be at least 6 characters.',

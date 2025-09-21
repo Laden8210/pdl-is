@@ -24,10 +24,10 @@ export function CreateUser() {
     const successMessage = props.success;
 
     const { data, setData, post, processing, errors } = useForm({
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        contactNumber: '',
+        fname: '',
+        mname: '',
+        lname: '',
+        contactnum: '',
         avatar: null as File | null,
         username: '',
         password: '',
@@ -44,10 +44,10 @@ export function CreateUser() {
             forceFormData: true,
             onSuccess: () => {
                 setData({
-                    firstName: '',
-                    middleName: '',
-                    lastName: '',
-                    contactNumber: '',
+                    fname: '',
+                    mname: '',
+                    lname: '',
+                    contactnum: '',
                     avatar: null,
                     username: '',
                     password: '',
@@ -107,10 +107,10 @@ export function CreateUser() {
                         <div className="col-span-2">
                             <Label htmlFor="firstName">First Name *</Label>
                             <Input
-                                id="firstName"
-                                name="firstName"
-                                value={data.firstName}
-                                onChange={(e) => setData('firstName', e.target.value)}
+                                id="fname"
+                                name="fname"
+                                value={data.fname}
+                                onChange={(e) => setData('fname', e.target.value)}
                                 required
                             />
                         </div>
@@ -119,19 +119,19 @@ export function CreateUser() {
                             <Label htmlFor="middleName">Middle Name</Label>
                             <Input
                                 id="middleName"
-                                name="middleName"
-                                value={data.middleName}
-                                onChange={(e) => setData('middleName', e.target.value)}
+                                name="mname"
+                                value={data.mname}
+                                onChange={(e) => setData('mname', e.target.value)}
                             />
                         </div>
 
                         <div className="col-span-3">
                             <Label htmlFor="lastName">Last Name *</Label>
                             <Input
-                                id="lastName"
-                                name="lastName"
-                                value={data.lastName}
-                                onChange={(e) => setData('lastName', e.target.value)}
+                                id="lname"
+                                name="lname"
+                                value={data.lname}
+                                onChange={(e) => setData('lname', e.target.value)}
                                 required
                             />
                         </div>
@@ -139,10 +139,10 @@ export function CreateUser() {
                         <div className="col-span-3">
                             <Label htmlFor="contactNumber">Contact Number *</Label>
                             <Input
-                                id="contactNumber"
-                                name="contactNumber"
-                                value={data.contactNumber}
-                                onChange={(e) => setData('contactNumber', e.target.value)}
+                                id="contactnum"
+                                name="contactnum"
+                                value={data.contactnum}
+                                onChange={(e) => setData('contactnum', e.target.value)}
                                 required
                             />
                         </div>

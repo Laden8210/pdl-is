@@ -12,7 +12,12 @@ class JailEventsController extends Controller
 {
     public function index()
     {
-        $pdls = Pdl::with('personnel:id,fname,lname')->latest()->get();
+        $pdls = Pdl::with('personnel:id,fname,lname')
+        ->whereHas('verifications', function ($query) {
+            $query->where('status', 'approved');
+        })
+        ->latest()
+        ->get();
         $activities = Activity::with('pdl:id,fname,lname')->latest()->get();
 
         return Inertia::render('records-officer/jail-events/jail-events', [
