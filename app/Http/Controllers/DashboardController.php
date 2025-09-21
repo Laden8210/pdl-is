@@ -309,15 +309,19 @@ class DashboardController extends Controller
     public function lawEnforcementDashboard()
     {
         // Get PDL demographics by gender for law enforcement view
+
         $pdlByGender = Pdl::select('gender', DB::raw('count(*) as value'))
             ->whereNull('deleted_at')
+            ->whereDoesntHave('verifications', function ($q) {
+                $q->where('status', 'approved'); // exclude those with approved verification
+            })
             ->groupBy('gender')
             ->get()
             ->map(function ($item) {
                 return [
                     'name' => $item->gender,
                     'value' => $item->value,
-                    'color' => $item->gender === 'Male' ? '#3b82f6' : '#ec4899'
+                    'color' => $item->gender === 'Male' ? '#3b82f6' : '#ec4899',
                 ];
             });
 
@@ -444,7 +448,11 @@ class DashboardController extends Controller
             });
 
         // Calculate key metrics for law enforcement
-        $totalPDL = Pdl::whereNull('deleted_at')->count();
+        $totalPDL = Pdl::whereNull('deleted_at')
+        ->whereDoesntHave('verifications', function ($q) {
+            $q->where('status', 'approved'); // exclude those with approved verification
+        })
+        ->count();
         $activeCases = CaseInformation::where('case_status', 'Active')->count();
         $totalCases = CaseInformation::count();
         $pendingCourtOrdersCount = CourtOrder::where('order_date', '>=', now()->subDays(30))->count();
@@ -585,11 +593,11 @@ class DashboardController extends Controller
         $incompleteRecords = Pdl::whereNull('deleted_at')
             ->where(function ($query) {
                 $query->whereNull('fname')
-                      ->orWhereNull('lname')
-                      ->orWhereNull('birthdate')
-                      ->orWhereNull('gender')
-                      ->orWhereNull('ethnic_group')
-                      ->orWhereNull('civil_status');
+                    ->orWhereNull('lname')
+                    ->orWhereNull('birthdate')
+                    ->orWhereNull('gender')
+                    ->orWhereNull('ethnic_group')
+                    ->orWhereNull('civil_status');
             })
             ->limit(10)
             ->get()
@@ -703,7 +711,11 @@ class DashboardController extends Controller
         ])->sortByDesc('created_at')->take(5)->values();
 
         // Calculate key metrics for records officer
-        $totalPDL = Pdl::whereNull('deleted_at')->count();
+        $totalPDL = Pdl::whereNull('deleted_at')
+            ->whereHas('verifications', function ($query) {
+                $query->where('status', 'approved');
+            })
+        ->count();
         $pendingVerificationsCount = Verifications::where('status', 'pending')->count();
         $approvedVerificationsCount = Verifications::where('status', 'approved')->count();
         $rejectedVerificationsCount = Verifications::where('status', 'rejected')->count();
@@ -711,11 +723,11 @@ class DashboardController extends Controller
         $incompleteRecordsCount = Pdl::whereNull('deleted_at')
             ->where(function ($query) {
                 $query->whereNull('fname')
-                      ->orWhereNull('lname')
-                      ->orWhereNull('birthdate')
-                      ->orWhereNull('gender')
-                      ->orWhereNull('ethnic_group')
-                      ->orWhereNull('civil_status');
+                    ->orWhereNull('lname')
+                    ->orWhereNull('birthdate')
+                    ->orWhereNull('gender')
+                    ->orWhereNull('ethnic_group')
+                    ->orWhereNull('civil_status');
             })
             ->count();
         $totalCases = CaseInformation::count();
