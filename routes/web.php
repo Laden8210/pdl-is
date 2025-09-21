@@ -301,4 +301,35 @@ Route::middleware(['auth'])->group(function () {
 
 });
 
+Route::get('storage/profile_images/{filename}', function ($filename) {
+    $path = storage_path('app/public/profile_images/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
+});
+
+
+Route::get('storage/archive/court_orders/{filename}', function ($filename) {
+    $path = storage_path('app/public/archive/court_orders/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
+});
+
+
+Route::get('storage/court_documents/{filename}', function ($filename) {
+    $path = storage_path('app/public/court_documents/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+});
+
+
 require __DIR__ . '/auth.php';
