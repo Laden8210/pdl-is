@@ -16,6 +16,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Pdl } from '@/types';
+import { UpdateCaseStatus } from '@/features/pdl-management/update-case-status';
 
 export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
     console.log(pdl);
@@ -191,18 +192,21 @@ export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 p-2">
                   {pdl.cases.map((caseInfo, index) => (
-                    <div key={index} className="grid grid-cols-2 gap-2 text-sm">
+                    <div key={index} className="grid grid-cols-2 gap-2 text-sm border rounded-lg p-3">
                       <div>
                         <span className="text-muted-foreground">Case #:</span> {caseInfo.case_number}
                       </div>
-                      <div>
+                      <div className="flex items-center gap-2">
                         <span className="text-muted-foreground">Status:</span>
                         <Badge variant={
                           caseInfo.case_status === 'open' ? 'destructive' :
-                          caseInfo.case_status === 'closed' ? 'secondary' : 'default'
+                          caseInfo.case_status === 'pending' ? 'default' :
+                          caseInfo.case_status === 'convicted' ? 'secondary' :
+                          caseInfo.case_status === 'deceased' ? 'destructive' : 'secondary'
                         }>
                           {caseInfo.case_status}
                         </Badge>
+                        <UpdateCaseStatus caseInfo={caseInfo} />
                       </div>
                       <div>
                         <span className="text-muted-foreground">Crime:</span> {caseInfo.crime_committed}

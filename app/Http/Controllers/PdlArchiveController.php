@@ -31,12 +31,21 @@ class PdlArchiveController extends Controller
     public function archive(Request $request, Pdl $pdl)
     {
         try {
+            // Check if PDL can be archived based on case status
+            if (!$pdl->canBeArchived()) {
+                $blockingCases = $pdl->getBlockingCases();
+                $caseNumbers = $blockingCases->pluck('case_number')->join(', ');
+
+                return redirect()->back()->withErrors([
+                    'archive_error' => "Cannot archive PDL. There are still pending or open cases: {$caseNumbers}. Please update case status to 'convicted', 'deceased', or 'case closed' before archiving."
+                ]);
+            }
+
             $request->validate([
                 'archive_status' => 'required|in:' . implode(',', array_keys(Pdl::getArchiveStatusOptions())),
                 'archive_reason' => 'required|string|max:1000',
                 'archive_court_order_type' => 'required|in:' . implode(',', array_keys(Pdl::getCourtOrderTypeOptions())),
                 'archive_court_order_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
-
             ]);
 
             // Handle file upload
@@ -49,7 +58,6 @@ class PdlArchiveController extends Controller
                 'archive_reason' => $request->archive_reason,
                 'archive_court_order_type' => $request->archive_court_order_type,
                 'archive_court_order_file' => $filePath,
-
                 'archive_court_order_date' => now(),
                 'archived_at' => now(),
             ]);

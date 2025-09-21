@@ -60,6 +60,7 @@ export default function PdlArchiveForm({ pdl, archiveStatusOptions }: PageProps)
     };
 
     const isArchived = pdl.archived_at !== null;
+    const hasBlockingCases = pdl.cases?.some(c => c.case_status === 'open' || c.case_status === 'pending') || false;
 
     return (
         <AppLayout>
@@ -129,6 +130,55 @@ export default function PdlArchiveForm({ pdl, archiveStatusOptions }: PageProps)
                                 )}
                             </div>
                         </div>
+                    </CardContent>
+                </Card>
+
+                {/* Case Status Information */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Case Status Information</CardTitle>
+                        <CardDescription>
+                            Review case statuses before archiving. PDL can only be archived if all cases are closed, convicted, or deceased.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {pdl.cases && pdl.cases.length > 0 ? (
+                            <div className="space-y-3">
+                                {pdl.cases.map((caseInfo, index) => (
+                                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                                        <div className="flex-1">
+                                            <div className="font-medium">{caseInfo.case_number}</div>
+                                            <div className="text-sm text-muted-foreground">{caseInfo.crime_committed}</div>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <span className={`px-2 py-1 rounded text-sm ${
+                                                caseInfo.case_status === 'open' || caseInfo.case_status === 'pending'
+                                                    ? 'bg-red-100 text-red-800'
+                                                    : 'bg-green-100 text-green-800'
+                                            }`}>
+                                                {caseInfo.case_status}
+                                            </span>
+                                            {(caseInfo.case_status === 'open' || caseInfo.case_status === 'pending') && (
+                                                <AlertTriangle className="h-4 w-4 text-red-500" />
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                                {pdl.cases.some(c => c.case_status === 'open' || c.case_status === 'pending') && (
+                                    <Alert>
+                                        <AlertTriangle className="h-4 w-4" />
+                                        <AlertDescription>
+                                            This PDL cannot be archived because there are open or pending cases.
+                                            Please update case statuses to "convicted", "deceased", or "case closed" before archiving.
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="text-center py-4 text-muted-foreground">
+                                No case information available.
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
 
@@ -218,11 +268,16 @@ export default function PdlArchiveForm({ pdl, archiveStatusOptions }: PageProps)
                                     )}
                                 </div>
 
-                                <div className="flex space-x-2">
-                                    <Button onClick={handleArchive} disabled={processing || !data.archive_status || !data.archive_reason}>
+                                <div className="space-y-2">
+                                    <Button onClick={handleArchive} disabled={processing || !data.archive_status || !data.archive_reason || hasBlockingCases}>
                                         <Archive className="h-4 w-4 mr-2" />
                                         {processing ? 'Archiving...' : 'Archive PDL'}
                                     </Button>
+                                    {hasBlockingCases && (
+                                        <div className="text-sm text-red-600">
+                                            Cannot archive: There are open or pending cases that must be resolved first.
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ) : (

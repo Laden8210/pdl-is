@@ -2,7 +2,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
-import { router, useForm, usePage } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { useState } from 'react';
 
@@ -19,74 +19,220 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { Check, ChevronsUpDown, FileText, Image, Upload, X, Eye } from 'lucide-react';
+import { Check, ChevronsUpDown, Eye, FileText, Image, Upload, X } from 'lucide-react';
 
 // Location data for South Cotabato Province
 const locationData = {
     province: 'South Cotabato',
     cities: {
         'Koronadal City': [
-            'Assumption', 'Avanceña', 'Cacub', 'Caloocan', 'Concepcion',
-            'Esperanza', 'General Paulino Santos', 'Mabini', 'Magsaysay', 'Mambucal',
-            'Morales', 'Namnama', 'New Pangasinan', 'Paraiso', 'Rotonda',
-            'San Isidro', 'San Jose', 'San Roque', 'Santa Cruz', 'Saravia',
-            'Santo Niño', 'Topland', 'Zone I', 'Zone II', 'Zone III',
-            'Zone IV', 'Carpenter Hill'
+            'Assumption',
+            'Avanceña',
+            'Cacub',
+            'Caloocan',
+            'Concepcion',
+            'Esperanza',
+            'General Paulino Santos',
+            'Mabini',
+            'Magsaysay',
+            'Mambucal',
+            'Morales',
+            'Namnama',
+            'New Pangasinan',
+            'Paraiso',
+            'Rotonda',
+            'San Isidro',
+            'San Jose',
+            'San Roque',
+            'Santa Cruz',
+            'Saravia',
+            'Santo Niño',
+            'Topland',
+            'Zone I',
+            'Zone II',
+            'Zone III',
+            'Zone IV',
+            'Carpenter Hill',
         ],
         'General Santos City': [
-            'Apopong', 'Baluan', 'Batomelong', 'Buayan', 'Bula', 'Calumpang',
-            'City Heights', 'Dadiangas East', 'Dadiangas North', 'Dadiangas South',
-            'Dadiangas West', 'Fatima', 'Katangawan', 'Labangal', 'Lagao',
-            'Ligaya', 'Mabuhay', 'Nalum', 'Olympog', 'San Isidro',
-            'San Jose', 'Sinawal', 'Tambler', 'Tinagacan', 'Upper Labay',
-            'Conel'
+            'Apopong',
+            'Baluan',
+            'Batomelong',
+            'Buayan',
+            'Bula',
+            'Calumpang',
+            'City Heights',
+            'Dadiangas East',
+            'Dadiangas North',
+            'Dadiangas South',
+            'Dadiangas West',
+            'Fatima',
+            'Katangawan',
+            'Labangal',
+            'Lagao',
+            'Ligaya',
+            'Mabuhay',
+            'Nalum',
+            'Olympog',
+            'San Isidro',
+            'San Jose',
+            'Sinawal',
+            'Tambler',
+            'Tinagacan',
+            'Upper Labay',
+            'Conel',
         ],
-        'Polomolok': [
-            'Bentung', 'Cannery Site', 'Crossing Palkan', 'Glamang', 'Kinilis',
-            'Klinan 6', 'Koronadal Proper', 'Lam-Caliaf', 'Landan', 'Lapu',
-            'Lumakil', 'Magsaysay', 'Maligo', 'Pagalungan', 'Palkan',
-            'Poblacion', 'Polo', 'Rubber', 'Silway 7', 'Silway 8',
-            'Sulit', 'Sumbakil', 'Upper Klinan'
+        Polomolok: [
+            'Bentung',
+            'Cannery Site',
+            'Crossing Palkan',
+            'Glamang',
+            'Kinilis',
+            'Klinan 6',
+            'Koronadal Proper',
+            'Lam-Caliaf',
+            'Landan',
+            'Lapu',
+            'Lumakil',
+            'Magsaysay',
+            'Maligo',
+            'Pagalungan',
+            'Palkan',
+            'Poblacion',
+            'Polo',
+            'Rubber',
+            'Silway 7',
+            'Silway 8',
+            'Sulit',
+            'Sumbakil',
+            'Upper Klinan',
         ],
-        'Tupi': [
-            'Acmonan', 'Bololmala', 'Bunao', 'Cebuano', 'Crossing Rubber',
-            'Kalkam', 'Linan', 'Lunen', 'Miasong', 'Palian',
-            'Poblacion', 'Polonuling', 'Simbo', 'Tamayo', 'Tubeng'
+        Tupi: [
+            'Acmonan',
+            'Bololmala',
+            'Bunao',
+            'Cebuano',
+            'Crossing Rubber',
+            'Kalkam',
+            'Linan',
+            'Lunen',
+            'Miasong',
+            'Palian',
+            'Poblacion',
+            'Polonuling',
+            'Simbo',
+            'Tamayo',
+            'Tubeng',
         ],
-        'Tampakan': [
-            'Albagan', 'Buto', 'Danlag', 'Kipalbig', 'Lambayong',
-            'Lampitak', 'Liberty', 'Maltana', 'Palo', 'Poblacion',
-            'Pula-bato', 'San Isidro', 'Santa Cruz', 'Tablu'
+        Tampakan: [
+            'Albagan',
+            'Buto',
+            'Danlag',
+            'Kipalbig',
+            'Lambayong',
+            'Lampitak',
+            'Liberty',
+            'Maltana',
+            'Palo',
+            'Poblacion',
+            'Pula-bato',
+            'San Isidro',
+            'Santa Cruz',
+            'Tablu',
         ],
         'Santo Niño': [
-            'Ambalgan', 'Guinsang-an', 'Katipunan', 'Manuel Roxas', 'Panay',
-            'Poblacion', 'Sajaneba', 'San Isidro', 'San Vicente', 'Teresita'
+            'Ambalgan',
+            'Guinsang-an',
+            'Katipunan',
+            'Manuel Roxas',
+            'Panay',
+            'Poblacion',
+            'Sajaneba',
+            'San Isidro',
+            'San Vicente',
+            'Teresita',
         ],
-        'Surallah': [
-            'Ala', 'Buenavista', 'Centrala', 'Dajay', 'Duhay-Labi',
-            'Lambontong', 'Libertad', 'Littler', 'Moloy', 'Naci',
-            'Tala', 'Tibio', 'Tubi-Alla', 'Upper Sepaka', 'Columbio',
-            'Sultan Miralam', 'Lambingi'
+        Surallah: [
+            'Ala',
+            'Buenavista',
+            'Centrala',
+            'Dajay',
+            'Duhay-Labi',
+            'Lambontong',
+            'Libertad',
+            'Littler',
+            'Moloy',
+            'Naci',
+            'Tala',
+            'Tibio',
+            'Tubi-Alla',
+            'Upper Sepaka',
+            'Columbio',
+            'Sultan Miralam',
+            'Lambingi',
         ],
-        'Norala': [
-            'Benigno Aquino', 'Esperanza', 'Five Storey', 'J.P. Laurel', 'Kahilwayan',
-            'Katipunan', 'Lambontong', 'Liberty', 'Poblacion', 'Puting Bato',
-            'San Jose', 'San Miguel', 'Sto. Niño', 'Tinublaran'
+        Norala: [
+            'Benigno Aquino',
+            'Esperanza',
+            'Five Storey',
+            'J.P. Laurel',
+            'Kahilwayan',
+            'Katipunan',
+            'Lambontong',
+            'Liberty',
+            'Poblacion',
+            'Puting Bato',
+            'San Jose',
+            'San Miguel',
+            'Sto. Niño',
+            'Tinublaran',
         ],
         'Lake Sebu': [
-            'Bacdulong', 'Denlag', 'Halilan', 'Hanoon', 'Klubi',
-            'Lake Lahit', 'Lamcade', 'Lamdalag', 'Lamfugon', 'Lamlahak',
-            'Lower Maculan', 'Luhib', 'Ned', 'Poblacion', 'Siluton',
-            'Takunel', 'Talisay', 'Tasiman', 'Upper Maculan'
+            'Bacdulong',
+            'Denlag',
+            'Halilan',
+            'Hanoon',
+            'Klubi',
+            'Lake Lahit',
+            'Lamcade',
+            'Lamdalag',
+            'Lamfugon',
+            'Lamlahak',
+            'Lower Maculan',
+            'Luhib',
+            'Ned',
+            'Poblacion',
+            'Siluton',
+            'Takunel',
+            'Talisay',
+            'Tasiman',
+            'Upper Maculan',
         ],
-        'Banga': [
-            'Benitez', 'Cabudian', 'Cabuling', 'Cinco', 'Derilon',
-            'El Nonok', 'Improgo Village', 'Kusan', 'Lam-apos', 'Lamba',
-            'Lambingi', 'Lampari', 'Liwanay', 'Malaya', 'Punong Grande',
-            'Rang-ay', 'Reyes', 'Rizal', 'Rizal Poblacion', 'San Jose',
-            'San Vicente', 'Yangco Poblacion'
-        ]
-    }
+        Banga: [
+            'Benitez',
+            'Cabudian',
+            'Cabuling',
+            'Cinco',
+            'Derilon',
+            'El Nonok',
+            'Improgo Village',
+            'Kusan',
+            'Lam-apos',
+            'Lamba',
+            'Lambingi',
+            'Lampari',
+            'Liwanay',
+            'Malaya',
+            'Punong Grande',
+            'Rang-ay',
+            'Reyes',
+            'Rizal',
+            'Rizal Poblacion',
+            'San Jose',
+            'San Vicente',
+            'Yangco Poblacion',
+        ],
+    },
 };
 
 // Order type suggestions
@@ -116,31 +262,93 @@ const orderTypeSuggestions = [
     'Trial Order',
     'Sentencing Order',
     'Execution Order',
-    'Others'
+    'Others',
 ];
 
 const getSecurityClassification = (crime: string): string => {
     const highSecurityCrimes = [
-        'Murder', 'Homicide', 'Manslaughter', 'Terrorism', 'Mass Shooting',
-        'Kidnapping', 'Abduction', 'Rape', 'Sexual Assault', 'Armed Robbery',
-        'Drug Trafficking', 'Drug Manufacturing', 'Drug Distribution', 'Drug Importation',
-        'Human Trafficking', 'Weapons Trafficking', 'Espionage', 'Treason', 'Sedition',
-        'Bank Robbery', 'Organized Crime', 'Racketeering'
+        'Murder',
+        'Homicide',
+        'Manslaughter',
+        'Terrorism',
+        'Mass Shooting',
+        'Kidnapping',
+        'Abduction',
+        'Rape',
+        'Sexual Assault',
+        'Armed Robbery',
+        'Drug Trafficking',
+        'Drug Manufacturing',
+        'Drug Distribution',
+        'Drug Importation',
+        'Human Trafficking',
+        'Weapons Trafficking',
+        'Espionage',
+        'Treason',
+        'Sedition',
+        'Bank Robbery',
+        'Organized Crime',
+        'Racketeering',
     ];
 
     const mediumSecurityCrimes = [
-        'Assault', 'Battery', 'Robbery', 'Domestic Violence', 'Child Abuse', 'Elder Abuse',
-        'Hate Crime', 'Gang Violence', 'Drug Possession', 'Methamphetamine', 'Cocaine Possession',
-        'Heroin Possession', 'Fraud', 'Identity Theft', 'Credit Card Fraud', 'Insurance Fraud',
-        'Money Laundering', 'Arson', 'Vandalism', 'Auto Theft', 'Grand Theft',
-        'Corporate Fraud', 'Securities Fraud', 'Bank Fraud', 'Wire Fraud', 'Mail Fraud',
-        'Internet Fraud', 'Ponzi Scheme', 'Insider Trading', 'Bribery', 'Corruption',
-        'Extortion', 'Cybercrime', 'Forgery', 'Counterfeiting', 'DUI/DWI', 'Reckless Driving',
-        'Hit and Run', 'Vehicular Manslaughter', 'Street Racing', 'Prostitution', 'Solicitation',
-        'Public Indecency', 'Obstruction of Justice', 'Resisting Arrest', 'Escape from Custody',
-        'Escape', 'Parole Violation', 'Probation Violation', 'Bail Jumping', 'Witness Tampering',
-        'Jury Tampering', 'Election Fraud', 'Environmental Crime', 'Animal Cruelty', 'Stalking',
-        'Harassment'
+        'Assault',
+        'Battery',
+        'Robbery',
+        'Domestic Violence',
+        'Child Abuse',
+        'Elder Abuse',
+        'Hate Crime',
+        'Gang Violence',
+        'Drug Possession',
+        'Methamphetamine',
+        'Cocaine Possession',
+        'Heroin Possession',
+        'Fraud',
+        'Identity Theft',
+        'Credit Card Fraud',
+        'Insurance Fraud',
+        'Money Laundering',
+        'Arson',
+        'Vandalism',
+        'Auto Theft',
+        'Grand Theft',
+        'Corporate Fraud',
+        'Securities Fraud',
+        'Bank Fraud',
+        'Wire Fraud',
+        'Mail Fraud',
+        'Internet Fraud',
+        'Ponzi Scheme',
+        'Insider Trading',
+        'Bribery',
+        'Corruption',
+        'Extortion',
+        'Cybercrime',
+        'Forgery',
+        'Counterfeiting',
+        'DUI/DWI',
+        'Reckless Driving',
+        'Hit and Run',
+        'Vehicular Manslaughter',
+        'Street Racing',
+        'Prostitution',
+        'Solicitation',
+        'Public Indecency',
+        'Obstruction of Justice',
+        'Resisting Arrest',
+        'Escape from Custody',
+        'Escape',
+        'Parole Violation',
+        'Probation Violation',
+        'Bail Jumping',
+        'Witness Tampering',
+        'Jury Tampering',
+        'Election Fraud',
+        'Environmental Crime',
+        'Animal Cruelty',
+        'Stalking',
+        'Harassment',
     ];
 
     if (highSecurityCrimes.includes(crime)) {
@@ -717,14 +925,13 @@ export default function CreatePDLInformation() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="mname">
-                                        Middle Name <span className="text-red-500">*</span>
-                                    </Label>
+                                    <Label htmlFor="mname">Middle Name</Label>
                                     <Input id="mname" name="mname" value={data.mname} onChange={handleChange} placeholder="Enter middle name" />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="alias">Alias
+                                    <Label htmlFor="alias">
+                                        Alias
                                         <span className="text-red-500">*</span>
                                     </Label>
                                     <Input id="alias" name="alias" value={data.alias} onChange={handleChange} placeholder="Enter alias (if any)" />
@@ -755,7 +962,9 @@ export default function CreatePDLInformation() {
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="ethnic_group">Ethnic Group <span className="text-red-500">*</span></Label>
+                                    <Label htmlFor="ethnic_group">
+                                        Ethnic Group <span className="text-red-500">*</span>
+                                    </Label>
                                     <Input
                                         id="ethnic_group"
                                         name="ethnic_group"
@@ -765,7 +974,9 @@ export default function CreatePDLInformation() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Civil Status <span className="text-red-500">*</span></Label>
+                                    <Label>
+                                        Civil Status <span className="text-red-500">*</span>
+                                    </Label>
                                     <Select value={data.civil_status} onValueChange={(value) => setData('civil_status', value)}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select civil status" />
@@ -787,17 +998,12 @@ export default function CreatePDLInformation() {
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                     <div className="space-y-2">
                                         <Label htmlFor="province">Province</Label>
-                                        <Input
-                                            id="province"
-                                            name="province"
-                                            value={data.province}
-                                            disabled
-                                            className="bg-gray-100"
-                                        />
+                                        <Input id="province" name="province" value={data.province} disabled className="bg-gray-100" />
                                         <div className="text-xs text-muted-foreground">Default: South Cotabato</div>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="city">City/Municipality
+                                        <Label htmlFor="city">
+                                            City/Municipality
                                             <span className="text-red-500">*</span>
                                         </Label>
                                         <Select value={selectedCity} onValueChange={handleCityChange}>
@@ -814,12 +1020,13 @@ export default function CreatePDLInformation() {
                                         </Select>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="brgy">Barangay
+                                        <Label htmlFor="brgy">
+                                            Barangay
                                             <span className="text-red-500">*</span>
                                         </Label>
                                         <Select value={data.brgy} onValueChange={(value) => setData('brgy', value)} disabled={!selectedCity}>
                                             <SelectTrigger>
-                                                <SelectValue placeholder={selectedCity ? "Select barangay" : "Select city first"} />
+                                                <SelectValue placeholder={selectedCity ? 'Select barangay' : 'Select city first'} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {availableBarangays.map((barangay) => (
@@ -847,7 +1054,6 @@ export default function CreatePDLInformation() {
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-
                                 <div className="space-y-2">
                                     <Label htmlFor="order_type">
                                         Order Type <span className="text-red-500">*</span>
@@ -868,14 +1074,13 @@ export default function CreatePDLInformation() {
                                             <Command>
                                                 <CommandInput
                                                     placeholder="Search order types or type custom..."
-                                        value={data.order_type}
+                                                    value={data.order_type}
                                                     onValueChange={handleOrderTypeInputChange}
                                                 />
                                                 <CommandList>
                                                     <CommandEmpty>
                                                         <div className="p-2 text-sm text-muted-foreground">
-                                                            No order type found. Press Enter to add "{data.order_type}"
-                                                            as custom order type.
+                                                            No order type found. Press Enter to add "{data.order_type}" as custom order type.
                                                         </div>
                                                     </CommandEmpty>
                                                     <CommandGroup>
@@ -890,9 +1095,7 @@ export default function CreatePDLInformation() {
                                                             >
                                                                 <Check
                                                                     className={`mr-2 h-4 w-4 ${
-                                                                        data.order_type === orderType
-                                                                            ? 'opacity-100'
-                                                                            : 'opacity-0'
+                                                                        data.order_type === orderType ? 'opacity-100' : 'opacity-0'
                                                                     }`}
                                                                 />
                                                                 {orderType}
@@ -903,9 +1106,7 @@ export default function CreatePDLInformation() {
                                             </Command>
                                         </PopoverContent>
                                     </Popover>
-                                    <div className="text-xs text-muted-foreground">
-                                        Select from common order types or type a custom order type
-                                    </div>
+                                    <div className="text-xs text-muted-foreground">Select from common order types or type a custom order type</div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label>
@@ -935,11 +1136,9 @@ export default function CreatePDLInformation() {
                                                 handleDocumentPreview(file);
                                             }
                                         }}
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                     />
-                                    <div className="text-xs text-muted-foreground">
-                                        Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
-                                    </div>
+                                    <div className="text-xs text-muted-foreground">Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT</div>
 
                                     {/* Document Preview */}
                                     {documentPreview && (
@@ -951,15 +1150,9 @@ export default function CreatePDLInformation() {
                                                     <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
                                                         <div className="text-center">
                                                             <FileText className="mx-auto h-16 w-16 text-gray-400" />
-                                                            <p className="mt-2 text-sm font-medium text-gray-900">
-                                                                {data.document_type?.name}
-                                                            </p>
-                                                            <p className="text-xs text-gray-500">
-                                                                Document file - Preview not available
-                                                            </p>
-                                                            <p className="text-xs text-gray-400">
-                                                                {formatFileSize(data.document_type?.size || 0)}
-                                                            </p>
+                                                            <p className="mt-2 text-sm font-medium text-gray-900">{data.document_type?.name}</p>
+                                                            <p className="text-xs text-gray-500">Document file - Preview not available</p>
+                                                            <p className="text-xs text-gray-400">{formatFileSize(data.document_type?.size || 0)}</p>
                                                         </div>
                                                     </div>
                                                 ) : documentPreview.startsWith('data:image/') ? (
@@ -971,15 +1164,11 @@ export default function CreatePDLInformation() {
                                                     />
                                                 ) : documentPreview.startsWith('data:application/pdf') ? (
                                                     // PDF preview
-                                                    <iframe
-                                                        src={documentPreview}
-                                                        className="h-64 w-full rounded-lg border"
-                                                        title="PDF Preview"
-                                                    />
+                                                    <iframe src={documentPreview} className="h-64 w-full rounded-lg border" title="PDF Preview" />
                                                 ) : (
                                                     // Text file preview
                                                     <div className="h-64 w-full rounded-lg border bg-white p-4">
-                                                        <pre className="h-full w-full overflow-auto text-sm text-gray-900 whitespace-pre-wrap">
+                                                        <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
                                                             {documentPreview}
                                                         </pre>
                                                     </div>
@@ -1005,9 +1194,7 @@ export default function CreatePDLInformation() {
                                                     {getFileIcon(data.document_type)}
                                                     <div>
                                                         <p className="text-sm font-medium">{data.document_type.name}</p>
-                                                        <p className="text-xs text-gray-500">
-                                                            {formatFileSize(data.document_type.size)}
-                                                        </p>
+                                                        <p className="text-xs text-gray-500">{formatFileSize(data.document_type.size)}</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center space-x-2">
@@ -1228,7 +1415,7 @@ export default function CreatePDLInformation() {
                                                     <SelectValue placeholder="Select status" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-
+                                                    <SelectItem value="on trial">On Trial</SelectItem>
                                                     <SelectItem value="pending">Pending</SelectItem>
                                                     <SelectItem value="convicted">Convicted</SelectItem>
                                                     <SelectItem value="deceased">Deceased</SelectItem>
@@ -1395,18 +1582,18 @@ export default function CreatePDLInformation() {
                                         <div className="space-y-2">
                                             <h4 className="text-sm font-medium">Uploaded File</h4>
                                             <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                                                        <div className="flex items-center space-x-3">
+                                                <div className="flex items-center space-x-3">
                                                     {getFileIcon(medicalFile)}
-                                                            <div>
+                                                    <div>
                                                         <p className="text-sm font-medium text-gray-900">{medicalFile.name}</p>
                                                         <p className="text-xs text-gray-500">{formatFileSize(medicalFile.size)}</p>
-                                                            </div>
-                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <div className="flex items-center space-x-2">
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="sm"
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
                                                         onClick={() => handleDocumentPreview(medicalFile)}
                                                         className="text-blue-500 hover:text-blue-700"
                                                         title="Preview file"
@@ -1418,11 +1605,11 @@ export default function CreatePDLInformation() {
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={removeFile}
-                                                            className="text-red-500 hover:text-red-700"
-                                                        >
-                                                            <X className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
+                                                        className="text-red-500 hover:text-red-700"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </div>
                                     )}
@@ -1454,15 +1641,11 @@ export default function CreatePDLInformation() {
                                                     />
                                                 ) : documentPreview.startsWith('data:application/pdf') ? (
                                                     // PDF preview
-                                                    <iframe
-                                                        src={documentPreview}
-                                                        className="h-64 w-full rounded-lg border"
-                                                        title="PDF Preview"
-                                                    />
+                                                    <iframe src={documentPreview} className="h-64 w-full rounded-lg border" title="PDF Preview" />
                                                 ) : (
                                                     // Text file preview
                                                     <div className="h-64 w-full rounded-lg border bg-white p-4">
-                                                        <pre className="h-full w-full overflow-auto text-sm text-gray-900 whitespace-pre-wrap">
+                                                        <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
                                                             {documentPreview}
                                                         </pre>
                                                     </div>
@@ -1674,7 +1857,6 @@ export default function CreatePDLInformation() {
                                 <div className="space-y-3">
                                     <h3 className="text-lg font-semibold">Court Order</h3>
                                     <div className="space-y-2 text-sm">
-
                                         {data.order_type && (
                                             <div>
                                                 <span className="font-medium">Order Type:</span> {data.order_type}
@@ -1788,13 +1970,11 @@ export default function CreatePDLInformation() {
                         <p className="mt-2 text-muted-foreground">
                             Step {currentStep} of {steps.length}: {steps[currentStep - 1]?.description}
                         </p>
-
                     </div>
                 </div>
 
                 {/* Progress Bar */}
                 <div className="space-y-2">
-
                     <div className="flex justify-between text-sm text-muted-foreground">
                         <span>Progress</span>
                         <span>{Math.round(progressPercentage)}% Complete</span>

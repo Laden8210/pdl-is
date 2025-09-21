@@ -104,6 +104,24 @@ class CaseInformationController extends Controller
         return redirect()->back()->with('success', 'Case information updated successfully');
     }
 
+    public function updateCaseStatus(Request $request, $caseId)
+    {
+        $request->validate([
+            'case_status' => 'required|in:open,pending,convicted,deceased,case closed',
+        ]);
+
+        $case = CaseInformation::findOrFail($caseId);
+        $case->update([
+            'case_status' => $request->case_status,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Case status updated successfully.',
+            'case_status' => $case->case_status
+        ]);
+    }
+
     public function destroy(CaseInformation $case)
     {
         $case->delete();

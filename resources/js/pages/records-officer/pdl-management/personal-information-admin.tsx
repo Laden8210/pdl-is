@@ -473,19 +473,6 @@ export default function PersonalInformation() {
                                 </Alert>
                             )}
 
-                            {/* General Error Messages */}
-                            {Object.keys(errors).length > 0 && !errors.archive_status && !errors.archive_reason && !errors.error && (
-                                <Alert className="border-red-200 bg-red-50">
-                                    <AlertCircle className="h-4 w-4 text-red-600" />
-                                    <AlertDescription className="text-red-800">
-                                        <ul className="list-inside list-disc space-y-1">
-                                            {Object.entries(errors).map(([key, value]) => (
-                                                <li key={key}>{value}</li>
-                                            ))}
-                                        </ul>
-                                    </AlertDescription>
-                                </Alert>
-                            )}
 
                             <div className="space-y-2">
                                 <Label htmlFor="archive_status">Archive Status *</Label>
