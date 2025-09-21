@@ -35,7 +35,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'received_date' => 'required|date',
             'document_type' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png,txt|max:10240',
             'court_branch' => 'required|string|max:255',
-            'cod_remarks' => 'required|string',
+            'cod_remarks' => 'nullable|string',
 
             // Medical Record
             'complaint' => 'required|string',
@@ -54,7 +54,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'eye_color' => 'required|string|max:255',
             'identification_marks' => 'required|string',
             'mark_location' => 'required|string',
-            'pc_remark' => 'required|string',
+            'pc_remark' => 'nullable|string',
 
             // Cases
             'cases' => 'required|array',
