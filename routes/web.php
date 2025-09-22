@@ -109,7 +109,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     // Additional PDL Management routes for notifications
     Route::get('/pdl-management/case-information', [CaseInformationController::class, 'index'])->name('case-information.index');
-    Route::post('/pdl-management/case-information', [CaseInformationController::class, 'store'])->name('case-information.store');
+
     Route::get('/pdl-management/case-information/{case}/edit', [CaseInformationController::class, 'edit'])->name('case-information.edit');
     Route::put('/pdl-management/case-information/{case}', [CaseInformationController::class, 'update'])->name('case-information.update');
 
@@ -174,10 +174,10 @@ Route::middleware(['auth', 'record.officer'])->prefix('record-officer')->group(f
 
     // Additional PDL Management routes for notifications
     Route::get('/pdl-management/case-information', [CaseInformationController::class, 'index'])->name('case-information.index');
-    Route::post('/pdl-management/case-information', [CaseInformationController::class, 'store'])->name('case-information.store');
+
     Route::get('/pdl-management/case-information/{case}/edit', [CaseInformationController::class, 'edit'])->name('case-information.edit');
     Route::put('/pdl-management/case-information/{case}', [CaseInformationController::class, 'update'])->name('case-information.update');
-    Route::patch('/pdl-management/case-information/{caseId}/status', [CaseInformationController::class, 'updateCaseStatus'])->name('case-information.update-status');
+
     Route::delete('/pdl-management/case-information/{case}', [CaseInformationController::class, 'destroy'])->name('case-information.destroy');
     Route::get('/pdl-management/cell-assignment', [CellAssignmentController::class, 'index'])->name('cell-assignments.index');
     Route::get('/pdl-management/court-order', [PDLManagementController::class, 'court_order'])->name('pdl-management.court-order');
@@ -209,10 +209,10 @@ Route::middleware(['auth', 'law.enforcement'])->prefix('law-enforcement')->group
     Route::put('/pdl-management/court-order/{courtOrder}', [PDLManagementController::class, 'update_court_order'])->name('court-orders.update');
     Route::delete('/pdl-management/court-order/{courtOrder}', [PDLManagementController::class, 'destroy_court_order'])->name('court-orders.destroy');
     Route::get('/pdl-management/case-information', [CaseInformationController::class, 'index'])->name('case-information.index');
-    Route::post('/pdl-management/case-information', [CaseInformationController::class, 'store'])->name('case-information.store');
+
     Route::get('/pdl-management/case-information/{case}/edit', [CaseInformationController::class, 'edit'])->name('case-information.edit');
     Route::put('/pdl-management/case-information/{case}', [CaseInformationController::class, 'update'])->name('case-information.update');
-    Route::patch('/pdl-management/case-information/{caseId}/status', [CaseInformationController::class, 'updateCaseStatus'])->name('case-information.update-status');
+
     Route::delete('/pdl-management/case-information/{case}', [CaseInformationController::class, 'destroy'])->name('case-information.destroy');
 
     Route::get('/pdl-management/medical-records', [MedicalRecordController::class, 'index'])
@@ -267,14 +267,14 @@ Route::middleware(['auth', 'law.enforcement'])->prefix('law-enforcement')->group
 
 // Shared routes that require authentication but no specific role
 Route::middleware(['auth'])->group(function () {
-
+    Route::post('/pdl-management/case-information', [CaseInformationController::class, 'store'])->name('case-information.store');
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
 });
 
 // Global Search Routes - Available to all authenticated users
 Route::middleware(['auth'])->group(function () {
-    Route::patch('/pdl-management/case-information/{caseId}/status', [CaseInformationController::class, 'updateCaseStatus'])->name('case-information.update-status');
+    Route::post('/pdl-management/case-information/{caseId}/status', [CaseInformationController::class, 'updateCaseStatus'])->name('case-information.update-status');
     Route::get('/pdl-management/personal-information/create', [PDLManagementController::class, 'view_create'])->name('pdl-management.personal-information.create');
     Route::post('/pdl-management/personal-information/create', [PDLManagementController::class, 'store_create'])->name('pdl-management.personal-information.create');
     Route::get('/search', [SearchController::class, 'globalSearch'])->name('search.global');

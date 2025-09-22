@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -14,7 +14,8 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Edit, CheckCircle, XCircle, Clock, Skull, FileX } from 'lucide-react';
-import { router } from '@inertiajs/react';
+import { route } from 'ziggy-js';
+import { router, useForm } from '@inertiajs/react';
 
 interface UpdateCaseStatusProps {
     caseInfo: {
@@ -30,48 +31,31 @@ const caseStatusOptions = [
     { value: 'pending', label: 'Pending', icon: Clock, color: 'default' },
     { value: 'convicted', label: 'Convicted', icon: CheckCircle, color: 'secondary' },
     { value: 'deceased', label: 'Deceased', icon: Skull, color: 'destructive' },
-    { value: 'case closed', label: 'Case Closed', icon: FileX, color: 'secondary' },
+    { value: 'case_closed', label: 'Case Closed', icon: FileX, color: 'secondary' },
+    { value: 'on_trial', label: 'On Trial', icon: Clock, color: 'default' },
 ];
 
 export function UpdateCaseStatus({ caseInfo }: UpdateCaseStatusProps) {
     const [open, setOpen] = useState(false);
-    const [selectedStatus, setSelectedStatus] = useState(caseInfo.case_status);
-    const [isUpdating, setIsUpdating] = useState(false);
 
-    const handleUpdate = async () => {
-        if (selectedStatus === caseInfo.case_status) {
-            setOpen(false);
-            return;
-        }
+    const [isUpdating, setIsUpdating] = useState(false);
+    const { data, setData, post, processing, errors } = useForm({
+        case_status: caseInfo.case_status,
+    });
+
+    const handleUpdate = () => {
+
 
         setIsUpdating(true);
 
-        try {
-            const response = await fetch(route('case-information.update-status', caseInfo.case_id), {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-                body: JSON.stringify({
-                    case_status: selectedStatus,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
+        // Send the selected status directly in the post request
+        post(route('case-information.update-status', caseInfo.case_id), {
+            onSuccess: () => {
                 setOpen(false);
-                // Refresh the page to show updated status
-                router.reload();
-            } else {
-                console.error('Failed to update case status:', data.message);
+                setIsUpdating(false);
+
             }
-        } catch (error) {
-            console.error('Error updating case status:', error);
-        } finally {
-            setIsUpdating(false);
-        }
+        });
     };
 
     const getStatusBadge = (status: string) => {
@@ -116,7 +100,7 @@ export function UpdateCaseStatus({ caseInfo }: UpdateCaseStatusProps) {
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium">New Status</label>
-                        <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                        <Select value={data.case_status} onValueChange={(value) => setData('case_status', value)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select new status" />
                             </SelectTrigger>
@@ -136,11 +120,11 @@ export function UpdateCaseStatus({ caseInfo }: UpdateCaseStatusProps) {
                         </Select>
                     </div>
 
-                    {selectedStatus !== caseInfo.case_status && (
+                    {data.case_status !== caseInfo.case_status && (
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Preview</label>
                             <div className="flex items-center gap-2">
-                                {getStatusBadge(selectedStatus)}
+                                {getStatusBadge(data.case_status)}
                             </div>
                         </div>
                     )}
@@ -152,7 +136,7 @@ export function UpdateCaseStatus({ caseInfo }: UpdateCaseStatusProps) {
                     </Button>
                     <Button
                         onClick={handleUpdate}
-                        disabled={isUpdating || selectedStatus === caseInfo.case_status}
+
                     >
                         {isUpdating ? 'Updating...' : 'Update Status'}
                     </Button>
