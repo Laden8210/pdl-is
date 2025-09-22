@@ -194,13 +194,13 @@ class Pdl extends Model
     // Check if PDL can be archived based on case status
     public function canBeArchived()
     {
-        $pendingCases = $this->cases()->whereIn('case_status', ['open', 'pending'])->count();
+        $pendingCases = $this->cases()->whereIn('case_status', ['open', 'pending', 'on_trial'])->count();
         return $pendingCases === 0;
     }
 
     // Get cases that prevent archiving
     public function getBlockingCases()
     {
-        return $this->cases()->whereIn('case_status', ['open', 'pending'])->get();
+        return $this->cases()->whereIn('case_status', ['open', 'pending', 'on_trial'])->get();
     }
 }
