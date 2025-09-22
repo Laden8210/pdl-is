@@ -30,6 +30,9 @@ class TimeAllowanceController extends Controller
             'reviewer:id,fname,lname'
         ])
             ->where('status', '=', 'approved')
+            ->whereHas('pdl', function ($query) {
+                $query->whereNull('archive_status');
+            })
             ->latest()
             ->get();
 

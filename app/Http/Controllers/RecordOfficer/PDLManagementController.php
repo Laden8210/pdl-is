@@ -345,6 +345,19 @@ class PDLManagementController extends Controller
 
             // Fetch the PDL record
             $pdl = Pdl::findOrFail($id);
+            $validated = $request->validate([
+                'fname' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
+                'lname' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
+                'alias' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
+                'birthdate' => 'required|date',
+                'age' => 'required|integer|min:18',
+                'gender' => 'required|string|in:Male,Female',
+                'ethnic_group' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
+                'civil_status' => 'required|string|in:Single,Married,Widowed,Divorced',
+                'brgy' => 'required|string|max:255',
+                'city' => 'required|string|max:255',
+                'province' => 'required|string|max:255',
+            ]);
 
             // Update main PDL info
             $pdl->update([
@@ -362,7 +375,7 @@ class PDLManagementController extends Controller
                 'personnel_id' => $user->id,
             ]);
 
-            // Handle document upload - only if new file is provided
+
             $documentPath = null;
             $documentFilename = null;
             if ($request->hasFile('document_type')) {
@@ -376,6 +389,15 @@ class PDLManagementController extends Controller
 
             // Update or create Court Order
             if ($request->court_order_id) {
+                $validated = $request->validate([
+                    'order_type' => 'required|string|max:255',
+                    'order_date' => 'required|date',
+                    'received_date' => 'required|date',
+                    'document_type' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png,txt|max:10240',
+                    'court_branch' => 'required|string|max:255',
+
+                    'remarks' => 'nullable|string',
+                ]);
                 $courtOrderData = [
                     'order_type' => $request->order_type,
                     'order_date' => $request->order_date,
@@ -396,6 +418,15 @@ class PDLManagementController extends Controller
                     $courtOrderData
                 );
             } else {
+                $validated = $request->validate([
+                    'order_type' => 'required|string|max:255',
+                    'order_date' => 'required|date',
+                    'received_date' => 'required|date',
+                    'document_type' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png,txt|max:10240',
+                    'court_branch' => 'required|string|max:255',
+
+                    'remarks' => 'nullable|string',
+                ]);
                 $courtOrderData = [
                     'order_type' => $request->order_type,
                     'order_date' => $request->order_date,
@@ -416,6 +447,14 @@ class PDLManagementController extends Controller
 
             // Update or create Medical Record
             if ($request->medical_record_id) {
+                $validated = $request->validate([
+                    'complaint' => 'required|string',
+                    'date' => 'required|date',
+                    'prognosis' => 'required|string',
+                    'laboratory' => 'required|string',
+                    'prescription' => 'required|string',
+                    'findings' => 'required|string',
+                ]);
                 $pdl->medicalRecords()->updateOrCreate(
                     ['medical_record_id' => $request->medical_record_id],
                     [
@@ -428,6 +467,14 @@ class PDLManagementController extends Controller
                     ]
                 );
             } else {
+                $validated = $request->validate([
+                    'complaint' => 'required|string',
+                    'date' => 'required|date',
+                    'prognosis' => 'required|string',
+                    'laboratory' => 'required|string',
+                    'prescription' => 'required|string',
+                    'findings' => 'required|string',
+                ]);
                 $medicalRecord = $pdl->medicalRecords()->create([
                     'complaint' => $request->complaint,
                     'date' => $request->date,
@@ -471,6 +518,17 @@ class PDLManagementController extends Controller
 
             // Update or create Physical Characteristics
             if ($request->physical_characteristic_id) {
+                $validated = $request->validate([
+                    'height' => 'required|numeric',
+                    'weight' => 'required|numeric',
+                    'build' => 'required|string',
+                    'complexion' => 'required|string',
+                    'hair_color' => 'required|string',
+                    'eye_color' => 'required|string',
+                    'identification_marks' => 'required|string',
+                    'mark_location' => 'required|string',
+                    'pc_remark' => 'required|string',
+                ]);
                 $pdl->physicalCharacteristics()->updateOrCreate(
                     ['characteristic_id' => $request->physical_characteristic_id],
                     [
@@ -486,6 +544,17 @@ class PDLManagementController extends Controller
                     ]
                 );
             } else {
+                $validated = $request->validate([
+                    'height' => 'required|numeric',
+                    'weight' => 'required|numeric',
+                    'build' => 'required|string',
+                    'complexion' => 'required|string',
+                    'hair_color' => 'required|string',
+                    'eye_color' => 'required|string',
+                    'identification_marks' => 'required|string',
+                    'mark_location' => 'required|string',
+                    'pc_remark' => 'required|string',
+                ]);
                 $pdl->physicalCharacteristics()->create([
                     'height' => $request->height,
                     'weight' => $request->weight,
@@ -498,9 +567,17 @@ class PDLManagementController extends Controller
                     'remark' => $request->pc_remark,
                 ]);
             }
+            $validated = $request->validate([
+                'cases.*.case_number' => 'required|string|max:255',
+                'cases.*.crime_committed' => 'required|string',
+                'cases.*.date_committed' => 'required|date',
+                'cases.*.time_committed' => 'required|date_format:H:i',
+            ]);
+            $caseData = $validated;
 
             // Update or create Cases
             foreach ($request->cases as $caseData) {
+
                 if (isset($caseData['case_id']) && $caseData['case_id']) {
                     $pdl->cases()->updateOrCreate(
                         ['case_id' => $caseData['case_id']],

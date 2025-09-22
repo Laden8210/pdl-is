@@ -201,6 +201,6 @@ class Pdl extends Model
     // Get cases that prevent archiving
     public function getBlockingCases()
     {
-        return $this->cases()->whereIn('case_status', ['open', 'pending', 'on_trial'])->get();
+        return $this->cases()->whereIn('case_status', ['open', 'pending', 'on_trial', 'convicted'])->get();
     }
 }

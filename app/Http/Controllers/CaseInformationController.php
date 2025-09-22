@@ -91,7 +91,7 @@ class CaseInformationController extends Controller
             'crime_committed' => 'required|string|max:255',
             'date_committed' => 'required|date',
             'time_committed' => 'required|date_format:H:i',
-            'case_status' => 'required|in:open,pending,convicted,deceased,case closed',
+            'case_status' => 'required|in:open,pending,convicted,deceased,case_closed,on_trial',
             'case_remarks' => 'nullable|string',
             'security_classification' => 'required|in:low,medium,high,maximum',
             'drug_related' => 'required|boolean',
@@ -106,8 +106,10 @@ class CaseInformationController extends Controller
 
     public function updateCaseStatus(Request $request, $caseId)
     {
+
+
         $request->validate([
-            'case_status' => 'required|in:open,pending,convicted,deceased,case closed',
+            'case_status' => 'required|in:open,pending,convicted,deceased,case_closed,on_trial',
         ]);
 
         $case = CaseInformation::findOrFail($caseId);
@@ -115,11 +117,7 @@ class CaseInformationController extends Controller
             'case_status' => $request->case_status,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Case status updated successfully.',
-            'case_status' => $case->case_status
-        ]);
+        return redirect()->back()->with('success', 'Case status updated successfully');
     }
 
     public function destroy(CaseInformation $case)
