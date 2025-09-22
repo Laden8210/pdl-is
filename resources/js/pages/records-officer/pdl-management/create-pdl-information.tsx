@@ -232,6 +232,22 @@ const locationData = {
             'San Vicente',
             'Yangco Poblacion',
         ],
+
+        Tangtangan: [
+            'Bukay Pait',
+            'Cabuling',
+            'Dumadalig',
+            'Libas',
+            'Magon',
+            'Maibo',
+            'Mangilala',
+            'New Cuyapo',
+            'New Iloilo',
+            'New Lambunao',
+            'Poblacion',
+            'San Felipe',
+            'Tinongcop',
+        ],
     },
 };
 
