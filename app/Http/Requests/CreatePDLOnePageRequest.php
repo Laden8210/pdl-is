@@ -63,6 +63,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'cases.*.date_committed' => 'required|date',
             'cases.*.time_committed' => 'required|date_format:H:i',
             'cases.*.case_status' => 'required|string|in:open,pending,convicted,deceased,case_closed,on_trial',
+
             'cases.*.case_remarks' => 'nullable|string',
             'cases.*.security_classification' => 'required|string|in:low,medium,high,maximum',
         ];
