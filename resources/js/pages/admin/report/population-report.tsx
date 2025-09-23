@@ -112,9 +112,15 @@ export default function PopulationReport() {
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-center">
-                                <div>JAIL SERVICES</div>
-                                <div className="text-lg font-normal">as of {reportData.report_date}</div>
-                                <div className="text-lg font-normal">{reportData.title}</div>
+                                <div className="flex items-center justify-center gap-4 mb-4">
+
+                                    <div>
+                                        <div>JAIL SERVICES</div>
+                                        <div className="text-lg font-normal">as of {reportData.report_date}</div>
+                                        <div className="text-lg font-normal">{reportData.title}</div>
+                                    </div>
+
+                                </div>
                             </CardTitle>
                         </CardHeader>
                         <CardContent>

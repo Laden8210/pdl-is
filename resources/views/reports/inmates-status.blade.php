@@ -12,9 +12,27 @@
             line-height: 1.4;
         }
 
-        .header {
+        .logo-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .logo-left, .logo-right {
+            flex: 0 0 auto;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-text {
+            flex: 1;
             text-align: center;
-            margin-bottom: 30px;
+            padding: 0 20px;
         }
 
         .republic {
@@ -107,11 +125,9 @@
         }
 
         .logo-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            margin-top: 10px;
+            display: table;
+            width: 100%;
+            margin-bottom: 10px;
         }
 
         .logo {
@@ -148,44 +164,42 @@
     </style>
 </head>
 <body>
-    <div class="logo-section">
-        <div class="logo">
-            @if(file_exists(public_path('images/pgo.jpg')))
-                <img src="{{ public_path('images/pgo.jpg') }}" alt="Provincial Government Office Logo">
-            @else
-                <div class="logo-placeholder">
-                    <div>
-                        <div style="font-weight: bold;">PGO</div>
-                        <div style="margin: 2px 0;">LOGO</div>
-                        <div style="font-size: 6px;">Provincial</div>
-                        <div style="font-size: 6px;">Government</div>
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo-left">
+                @if(file_exists(public_path('rdh.jpg')))
+                    <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('rdh.jpg'))) }}" alt="Regional Director of Health" style="width: 80px; height: 80px; object-fit: contain;">
+                @else
+                    <div style="width: 80px; height: 80px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 8px; text-align: center;">
+                        <div>
+                            <div style="font-weight: bold;">RDH</div>
+                            <div style="margin: 2px 0;">LOGO</div>
+                        </div>
                     </div>
-                </div>
-            @endif
-        </div>
-        <div class="header-content">
-            <div class="republic">Republic of the Philippines</div>
-            <div class="facility-name">{{ $data['facility_name'] }}</div>
-            <div class="location">{{ $data['location'] }}</div>
-            <div class="contact">
-                Tel #: {{ $data['contact']['tel'] }}; Email Address: {{ $data['contact']['email'] }}
+                @endif
             </div>
-            <div class="title">{{ $data['title'] }}</div>
-            <div class="date">As of {{ $data['as_of_date'] }}</div>
-        </div>
-        <div class="logo">
-            @if(file_exists(public_path('images/scrdc.jpg')))
-                <img src="{{ public_path('images/scrdc.jpg') }}" alt="South Cotabato Rehabilitation and Detention Center Logo">
-            @else
-                <div class="logo-placeholder">
-                    <div>
-                        <div style="font-weight: bold;">SCRDC</div>
-                        <div style="margin: 2px 0;">LOGO</div>
-                        <div style="font-size: 6px;">Rehabilitation</div>
-                        <div style="font-size: 6px;">Center</div>
-                    </div>
+            <div class="header-text">
+                <div class="republic">Republic of the Philippines</div>
+                <div class="facility-name">{{ $data['facility_name'] }}</div>
+                <div class="location">{{ $data['location'] }}</div>
+                <div class="contact">
+                    Tel #: {{ $data['contact']['tel'] }}; Email Address: {{ $data['contact']['email'] }}
                 </div>
-            @endif
+                <div class="title">{{ $data['title'] }}</div>
+                <div class="date">As of {{ $data['as_of_date'] }}</div>
+            </div>
+            <div class="logo-right">
+                @if(file_exists(public_path('scof.jpg')))
+                    <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('scof.jpg'))) }}" alt="South Cotabato Office" style="width: 80px; height: 80px; object-fit: contain;">
+                @else
+                    <div style="width: 80px; height: 80px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 8px; text-align: center;">
+                        <div>
+                            <div style="font-weight: bold;">SCOF</div>
+                            <div style="margin: 2px 0;">LOGO</div>
+                        </div>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 
