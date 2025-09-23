@@ -27,6 +27,7 @@ class DashboardController extends Controller
             ->whereHas('verifications', function ($query) {
                 $query->where('status', 'approved');
             })
+            ->where('archive_status', '!=', null)
             ->groupBy('gender')
             ->get()
             ->map(function ($item) {
@@ -189,6 +190,7 @@ class DashboardController extends Controller
 
         // Calculate key metrics
         $totalPDL = Pdl::whereNull('deleted_at')
+        ->where('archive_status', '!=', null)
         ->whereHas('verifications', function ($query) {
             $query->where('status', 'approved');
         })
