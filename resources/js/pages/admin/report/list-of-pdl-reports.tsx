@@ -123,7 +123,8 @@ export default function ListOfPdlReports() {
                                     <TableHead>Crime Committed</TableHead>
                                     <TableHead>Date of Birth</TableHead>
                                     <TableHead>Date Committed</TableHead>
-                                    <TableHead>No. of Cases</TableHead>
+                                    <TableHead>Age</TableHead>
+                                    <TableHead>Address</TableHead>
                                     <TableHead>Tribe</TableHead>
                                     <TableHead>Years</TableHead>
                                     <TableHead>Case Status</TableHead>
@@ -139,16 +140,17 @@ export default function ListOfPdlReports() {
                                             <TableCell>{pdl.crime_committed}</TableCell>
                                             <TableCell>{pdl.date_of_birth ? format(new Date(pdl.date_of_birth), 'MMM dd, yyyy') : 'N/A'}</TableCell>
                                             <TableCell>{pdl.date_committed ? format(new Date(pdl.date_committed), 'MMM dd, yyyy') : 'N/A'}</TableCell>
-                                            <TableCell>{pdl.no_of_cases}</TableCell>
+                                            <TableCell>{pdl.age ? Math.floor(pdl.age) : 'N/A'}</TableCell>
+                                            <TableCell>{pdl.address || 'N/A'}</TableCell>
                                             <TableCell>{pdl.tribe}</TableCell>
-                                            <TableCell>{pdl.years}</TableCell>
+                                            <TableCell>{pdl.years ? Math.floor(pdl.years) : 'N/A'}</TableCell>
                                             <TableCell>{pdl.case_status}</TableCell>
                                             <TableCell>{pdl.rtc}</TableCell>
                                         </TableRow>
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={10} className="py-4 text-center">
+                                        <TableCell colSpan={11} className="py-4 text-center">
                                             No records found for the selected date range.
                                         </TableCell>
                                     </TableRow>

@@ -31,6 +31,46 @@
             font-size: 12px;
             font-weight: normal;
         }
+
+        .logo-section {
+            display: table;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .logo-left, .logo-right {
+            display: table-cell;
+            width: 15%;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .header-text {
+            display: table-cell;
+            width: 70%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .logo-container img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        .logo-placeholder {
+            width: 60px;
+            height: 60px;
+            border: 1px solid #ccc;
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 6px;
+            line-height: 1.2;
+            padding: 15px 0;
+            box-sizing: border-box;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -62,32 +102,34 @@
 </head>
 <body>
     <div class="header">
-        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-            @if(file_exists(public_path('rdh.jpg')))
-                <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('rdh.jpg'))) }}" alt="Regional Director of Health" style="width: 60px; height: 60px; object-fit: contain; margin-right: 20px;">
-            @else
-                <div style="width: 60px; height: 60px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 6px; text-align: center; margin-right: 20px;">
-                    <div>
+        <div class="logo-section">
+            <div class="logo-left">
+                @if(file_exists(public_path('rdh.jpg')))
+                    <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('rdh.jpg'))) }}" alt="Regional Director of Health" style="width: 60px; height: 60px; object-fit: contain;">
+                @else
+                    <div class="logo-placeholder">
                         <div style="font-weight: bold;">RDH</div>
                         <div style="margin: 1px 0;">LOGO</div>
                     </div>
-                </div>
-            @endif
-            <div style="text-align: center;">
+                @endif
+            </div>
+
+            <div class="header-text">
                 <h1>JAIL SERVICES</h1>
                 <h2>as of {{ $data['report_date'] }}</h2>
                 <h3>{{ $data['title'] }}</h3>
             </div>
-            @if(file_exists(public_path('scof.jpg')))
-                <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('scof.jpg'))) }}" alt="South Cotabato Office" style="width: 60px; height: 60px; object-fit: contain; margin-left: 20px;">
-            @else
-                <div style="width: 60px; height: 60px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 6px; text-align: center; margin-left: 20px;">
-                    <div>
+
+            <div class="logo-right">
+                @if(file_exists(public_path('scof.jpg')))
+                    <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('scof.jpg'))) }}" alt="South Cotabato Office" style="width: 60px; height: 60px; object-fit: contain;">
+                @else
+                    <div class="logo-placeholder">
                         <div style="font-weight: bold;">SCOF</div>
                         <div style="margin: 1px 0;">LOGO</div>
                     </div>
-                </div>
-            @endif
+                @endif
+            </div>
         </div>
     </div>
 
