@@ -968,15 +968,15 @@ export default function UpdatePDLInformation() {
                                 <div className="flex items-center gap-2">
                                     Case Information
                                     {data.cases[activeCaseIndex]?.case_status && (
-                                        <Badge variant={getCaseStatusBadgeVariant(data.cases[activeCaseIndex].case_status)}>
-                                            {data.cases[activeCaseIndex].case_status.charAt(0).toUpperCase() +
-                                                data.cases[activeCaseIndex].case_status.slice(1)}
+                                        <Badge variant={getCaseStatusBadgeVariant(data.cases[activeCaseIndex]?.case_status || '')}>
+                                            {(data.cases[activeCaseIndex]?.case_status || '').charAt(0).toUpperCase() +
+                                                (data.cases[activeCaseIndex]?.case_status || '').slice(1)}
                                         </Badge>
                                     )}
                                     {data.cases[activeCaseIndex]?.security_classification && (
-                                        <Badge variant={getSecurityBadgeVariant(data.cases[activeCaseIndex].security_classification)}>
-                                            {data.cases[activeCaseIndex].security_classification.charAt(0).toUpperCase() +
-                                                data.cases[activeCaseIndex].security_classification.slice(1)}{' '}
+                                        <Badge variant={getSecurityBadgeVariant(data.cases[activeCaseIndex]?.security_classification || '')}>
+                                            {(data.cases[activeCaseIndex]?.security_classification || '').charAt(0).toUpperCase() +
+                                                (data.cases[activeCaseIndex]?.security_classification || '').slice(1)}{' '}
                                             Security
                                         </Badge>
                                     )}
@@ -1041,7 +1041,7 @@ export default function UpdatePDLInformation() {
                                                         aria-expanded={crimeCommittedOpen}
                                                         className="w-full justify-between"
                                                     >
-                                                        {data.cases[activeCaseIndex].crime_committed || 'Select or type crime committed...'}
+                                                        {data.cases[activeCaseIndex]?.crime_committed || 'Select or type crime committed...'}
                                                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                     </Button>
                                                 </PopoverTrigger>
@@ -1049,13 +1049,13 @@ export default function UpdatePDLInformation() {
                                                     <Command>
                                                         <CommandInput
                                                             placeholder="Search crimes or type custom..."
-                                                            value={data.cases[activeCaseIndex].crime_committed}
+                                                            value={data.cases[activeCaseIndex]?.crime_committed || ''}
                                                             onValueChange={(value) => handleCaseChange(activeCaseIndex, 'crime_committed', value)}
                                                         />
                                                         <CommandList>
                                                             <CommandEmpty>
                                                                 <div className="p-2 text-sm text-muted-foreground">
-                                                                    No crime found. Press Enter to add "{data.cases[activeCaseIndex].crime_committed}"
+                                                                    No crime found. Press Enter to add "{data.cases[activeCaseIndex]?.crime_committed || ''}"
                                                                     as custom crime.
                                                                 </div>
                                                             </CommandEmpty>
@@ -1072,7 +1072,7 @@ export default function UpdatePDLInformation() {
                                                                         >
                                                                             <Check
                                                                                 className={`mr-2 h-4 w-4 ${
-                                                                                    data.cases[activeCaseIndex].crime_committed === crime
+                                                                                    data.cases[activeCaseIndex]?.crime_committed === crime
                                                                                         ? 'opacity-100'
                                                                                         : 'opacity-0'
                                                                                 }`}
@@ -1093,7 +1093,7 @@ export default function UpdatePDLInformation() {
                                             </Label>
                                             <Input
                                                 type="date"
-                                                value={data.cases[activeCaseIndex].date_committed}
+                                                value={data.cases[activeCaseIndex]?.date_committed || ''}
                                                 onChange={(e) => handleCaseChange(activeCaseIndex, 'date_committed', e.target.value)}
                                             />
                                         </div>
@@ -1103,7 +1103,7 @@ export default function UpdatePDLInformation() {
                                             </Label>
                                             <Input
                                                 type="time"
-                                                value={data.cases[activeCaseIndex].time_committed}
+                                                value={data.cases[activeCaseIndex]?.time_committed || ''}
                                                 onChange={(e) => handleCaseChange(activeCaseIndex, 'time_committed', e.target.value)}
                                             />
                                         </div>
@@ -1112,7 +1112,7 @@ export default function UpdatePDLInformation() {
                                                 Case Status <span className="text-red-500">*</span>
                                             </Label>
                                             <Select
-                                                value={data.cases[activeCaseIndex].case_status}
+                                                value={data.cases[activeCaseIndex]?.case_status || ''}
                                                 onValueChange={(value) => handleCaseChange(activeCaseIndex, 'case_status', value)}
                                             >
                                                 <SelectTrigger>
@@ -1132,7 +1132,7 @@ export default function UpdatePDLInformation() {
                                                 Security Classification <span className="text-red-500">*</span>
                                             </Label>
                                             <Select
-                                                value={data.cases[activeCaseIndex].security_classification}
+                                                value={data.cases[activeCaseIndex]?.security_classification || ''}
                                                 onValueChange={(value) => handleCaseChange(activeCaseIndex, 'security_classification', value)}
                                             >
                                                 <SelectTrigger>
@@ -1149,7 +1149,7 @@ export default function UpdatePDLInformation() {
                                         <div className="space-y-2">
                                             <Label>Drug Related</Label>
                                             <RadioGroup
-                                                value={data.cases[activeCaseIndex].drug_related ? 'yes' : 'no'}
+                                                value={data.cases[activeCaseIndex]?.drug_related ? 'yes' : 'no'}
                                                 onValueChange={(value) => handleCaseChange(activeCaseIndex, 'drug_related', value === 'yes')}
                                             >
                                                 <div className="flex items-center space-x-2">
