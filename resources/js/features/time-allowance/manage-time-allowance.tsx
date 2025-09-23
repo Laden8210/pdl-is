@@ -122,14 +122,14 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
                                 ? pdl.years_served.formatted
                                 : `${pdl?.years_served || 0} years`}
                         </p>
-                        <div className="mt-2 text-xs text-gray-600">
+                        {/* <div className="mt-2 text-xs text-gray-600">
                             <p><strong>GCTA Default:</strong> {getGctaDays()} days per month (based on {typeof pdl?.years_served === 'object' ? pdl.years_served.years : pdl?.years_served || 0} years served)</p>
                             <p><strong>TASTM Default:</strong> 15 days per month (fixed)</p>
-                        </div>
+                        </div> */}
                     </div>
 
                     <div className="grid gap-4 py-2">
-                        <div className="grid gap-2">
+                        {/* <div className="grid gap-2">
                             <Label htmlFor="type">Allowance Type</Label>
                             <Select
                                 value={data.type}
@@ -144,8 +144,8 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
                                     <SelectItem value="tastm">Time Allowance for Study, Teaching & Mentoring (TASTM)</SelectItem>
                                 </SelectContent>
                             </Select>
-                        </div>
-
+                        </div> */}
+{/*
                         <div className="grid gap-2">
                             <Label htmlFor="days">Days to Add</Label>
                             <Select
@@ -181,24 +181,25 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
                                 placeholder="Enter the reason for adding time allowance"
                                 required
                             />
-                        </div>
+                        </div> */}
                     </div>
 
                     <DialogFooter>
                         <div className="flex items-center justify-between w-full">
-                            <TimeAllowanceRecords pdl={pdl} records={records} />
+
                             <div className="flex gap-2">
                                 <DialogClose asChild>
                                     <Button variant="secondary">Cancel</Button>
                                 </DialogClose>
-                                <Button
+                                <TimeAllowanceRecords pdl={pdl} records={records} />
+                                {/* <Button
                                     type="submit"
                                     form="time-allowance-form"
                                     className="bg-blue-500 hover:bg-blue-600"
                                     disabled={processing}
                                 >
                                     {processing ? 'Adding...' : 'Add Allowance'}
-                                </Button>
+                                </Button> */}
                             </div>
                         </div>
                     </DialogFooter>

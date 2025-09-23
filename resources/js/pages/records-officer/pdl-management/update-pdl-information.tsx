@@ -293,7 +293,7 @@ export default function UpdatePDLInformation() {
         city: string;
         province: string;
         court_order_id: number;
-        court_order_number: string;
+
         order_type: string;
         order_date: string;
         received_date: string;
@@ -345,10 +345,10 @@ export default function UpdatePDLInformation() {
         city: pdl.city || '',
         province: pdl.province || '',
         court_order_id: pdl.court_orders?.[0]?.court_order_id || 0,
-        court_order_number: pdl.court_orders?.[0]?.court_order_number || '',
+
         order_type: pdl.court_orders?.[0]?.order_type || '',
-        order_date: pdl.court_orders?.[0]?.order_date || '',
-        received_date: pdl.court_orders?.[0]?.received_date || '',
+        order_date: format(new Date(pdl.court_orders?.[0]?.order_date), 'yyyy-MM-dd') || '',
+        received_date: format(new Date(pdl.court_orders?.[0]?.received_date), 'yyyy-MM-dd') || '',
         document_type: null,
         document_path: pdl.court_orders?.[0]?.document_path || '',
         original_filename: pdl.court_orders?.[0]?.original_filename || '',
@@ -378,7 +378,7 @@ export default function UpdatePDLInformation() {
                       case_id: c?.case_id || 0,
                       case_number: c?.case_number || '',
                       crime_committed: c?.crime_committed || '',
-                      date_committed: c?.date_committed || '',
+                      date_committed: format(new Date(c?.date_committed), 'yyyy-MM-dd') || '',
                       time_committed: c?.time_committed || '',
                       case_status: c?.case_status || 'open',
                       case_remarks: c?.case_remarks || '',
@@ -756,18 +756,7 @@ export default function UpdatePDLInformation() {
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <Label htmlFor="court_order_number">
-                                        Court Order Number <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input
-                                        id="court_order_number"
-                                        name="court_order_number"
-                                        value={data.court_order_number}
-                                        onChange={handleChange}
-                                        placeholder="Enter court order number"
-                                    />
-                                </div>
+
                                 <div className="space-y-2">
                                     <Label htmlFor="order_type">
                                         Order Type <span className="text-red-500">*</span>
@@ -1119,11 +1108,11 @@ export default function UpdatePDLInformation() {
                                                     <SelectValue placeholder="Select status" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="on trial">On Trial</SelectItem>
+                                                    <SelectItem value="on_trial">On Trial</SelectItem>
                                                     <SelectItem value="pending">Pending</SelectItem>
                                                     <SelectItem value="convicted">Convicted</SelectItem>
                                                     <SelectItem value="deceased">Deceased</SelectItem>
-                                                    <SelectItem value="case closed">Case Closed</SelectItem>
+                                                    <SelectItem value="case_closed">Case Closed</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -1695,7 +1684,7 @@ export default function UpdatePDLInformation() {
                                 <div className="space-y-3">
                                     <h3 className="font-semibold text-lg">Court Order</h3>
                                     <div className="space-y-2 text-sm">
-                                        {data.court_order_number && <div><span className="font-medium">Order Number:</span> {data.court_order_number}</div>}
+
                                         {data.order_type && <div><span className="font-medium">Order Type:</span> {data.order_type}</div>}
                                         {data.court_branch && <div><span className="font-medium">Court Branch:</span> {data.court_branch}</div>}
                                         {data.order_date && <div><span className="font-medium">Order Date:</span> {data.order_date}</div>}
