@@ -18,7 +18,7 @@ class ReportController extends Controller
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
-        $pdls = Pdl::with(['cases', 'personnel'])
+        $pdls = Pdl::with(['cases', 'personnel', 'courtOrders'])
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
                 return $query->whereHas('cases', function ($q) use ($startDate, $endDate) {
                     $q->whereBetween('date_committed', [
@@ -27,10 +27,40 @@ class ReportController extends Controller
                     ]);
                 });
             })
+            ->whereHas('verifications', function ($query) {
+                $query->where('status', 'approved');
+            })
+            ->where('archive_status', '=', null)
             ->orderBy('lname')
             ->get()
             ->map(function ($pdl) {
-                $mainCase = $pdl->cases->first();
+                $mainCase = $pdl
+
+                ->cases->first();
+                $courtOrder = $pdl->courtOrders->first();
+
+                // Calculate age
+                $age = $pdl->birthdate ? $pdl->birthdate->diffInYears(now()) : 'N/A';
+
+                // Build address
+                $address = trim(($pdl->brgy ?? '') . ', ' . ($pdl->city ?? '') . ', ' . ($pdl->province ?? ''));
+                $address = $address === ', , ' ? 'N/A' : $address;
+
+                // Map case status to proper terminology
+                $caseStatus = $mainCase->case_status ?? 'N/A';
+                $caseStatusMap = [
+                    'open' => 'On-Trial',
+                    'closed' => 'Convicted',
+                    'dismissed' => 'Dismissed',
+                    'deceased' => 'Deceased',
+                    'convicted' => 'Convicted',
+                    'on-trial' => 'On-Trial',
+                    'dismissed' => 'Dismissed',
+                    'deceased' => 'Deceased'
+                ];
+                $caseStatus = $caseStatusMap[strtolower($caseStatus)] ?? $caseStatus;
+                $totalYear = $courtOrder->admission_date->diffInYears($courtOrder->release_date);
+
 
                 return [
                     'id' => $pdl->id,
@@ -39,11 +69,12 @@ class ReportController extends Controller
                     'crime_committed' => $mainCase->crime_committed ?? 'N/A',
                     'date_of_birth' => $pdl->birthdate?->format('Y-m-d'),
                     'date_committed' => ($mainCase && $mainCase->date_committed) ? Carbon::parse($mainCase->date_committed)->format('Y-m-d') : '',
-                    'no_of_cases' => $pdl->cases->count(),
+                    'age' => $age,
+                    'address' => $address,
                     'tribe' => $pdl->ethnic_group ?? 'N/A',
-                    'years' => $mainCase ? $this->calculateYears($mainCase->date_committed) : 'N/A',
-                    'case_status' => $mainCase->case_status ?? 'N/A',
-                    'rtc' => $mainCase ? ($mainCase->security_classification ?? 'N/A') : 'N/A'
+                    'years' => $totalYear,
+                    'case_status' => $caseStatus,
+                    'rtc' => $courtOrder->court_branch ?? 'N/A'
                 ];
             });
 
@@ -219,7 +250,7 @@ class ReportController extends Controller
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
-        $pdls = Pdl::with(['cases', 'personnel'])
+        $pdls = Pdl::with(['cases', 'personnel', 'courtOrders'])
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
                 return $query->whereHas('cases', function ($q) use ($startDate, $endDate) {
                     $q->whereBetween('date_committed', [
@@ -228,10 +259,37 @@ class ReportController extends Controller
                     ]);
                 });
             })
+            ->whereHas('verifications', function ($query) {
+                $query->where('status', 'approved');
+            })
+            ->where('archive_status', '=', null)
             ->orderBy('lname')
             ->get()
             ->map(function ($pdl) {
                 $mainCase = $pdl->cases->first();
+                $courtOrder = $pdl->courtOrders->first();
+
+                // Calculate age
+                $age = $pdl->birthdate ? $pdl->birthdate->diffInYears(now()) : 'N/A';
+
+                // Build address
+                $address = trim(($pdl->brgy ?? '') . ', ' . ($pdl->city ?? '') . ', ' . ($pdl->province ?? ''));
+                $address = $address === ', , ' ? 'N/A' : $address;
+
+                // Map case status to proper terminology
+                $caseStatus = $mainCase->case_status ?? 'N/A';
+                $caseStatusMap = [
+                    'open' => 'On-Trial',
+                    'closed' => 'Convicted',
+                    'dismissed' => 'Dismissed',
+                    'deceased' => 'Deceased',
+                    'convicted' => 'Convicted',
+                    'on-trial' => 'On-Trial',
+                    'dismissed' => 'Dismissed',
+                    'deceased' => 'Deceased'
+                ];
+                $caseStatus = $caseStatusMap[strtolower($caseStatus)] ?? $caseStatus;
+                $totalYear = $courtOrder->admission_date->diffInYears($courtOrder->release_date);
 
                 return [
                     'Name' => $pdl->fname . ' ' . $pdl->lname,
@@ -239,11 +297,12 @@ class ReportController extends Controller
                     'CrimeCommitted' => $mainCase->crime_committed ?? 'N/A',
                     'Date of Birth' => $pdl->birthdate?->format('Y-m-d'),
                     'Date Committed' => ($mainCase && $mainCase->date_committed) ? Carbon::parse($mainCase->date_committed)->format('Y-m-d') : '',
-                    'NoOfCases' => $pdl->cases->count(),
+                    'Age' => $age,
+                    'Address' => $address,
                     'Tribe' => $pdl->ethnic_group ?? 'N/A',
-                    'Years' => $mainCase ? $this->calculateYears($mainCase->date_committed) : 'N/A',
-                    'CaseStatus' => $mainCase->case_status ?? 'N/A',
-                    'RTC' => $mainCase ? ($mainCase->security_classification ?? 'N/A') : 'N/A'
+                    'Years' => $totalYear,
+                    'CaseStatus' => $caseStatus,
+                    'RTC' => $courtOrder->court_branch ?? 'N/A'
                 ];
             });
 
@@ -540,7 +599,10 @@ class ReportController extends Controller
             },
             'reviewer:id,fname,lname'
         ])
-            ->where('status', '=', 'approved');
+            ->where('status', '=', 'approved')
+            ->whereHas('pdl', function ($query) {
+                $query->whereNull('archive_status');
+            });
 
         if ($request->has('search')) {
             $searchTerm = $request->search;
@@ -629,62 +691,37 @@ class ReportController extends Controller
 
         $pdl = $verification->pdl;
 
-        // Calculate GCTA and TASTM days
-        $gcta = 0;
-        $tastm = 0;
-
-        if ($pdl && $pdl->timeAllowances) {
-            foreach ($pdl->timeAllowances as $allowance) {
-                if ($allowance->type === 'gcta') {
-                    $gcta += $allowance->days;
-                } elseif ($allowance->type === 'tastm') {
-                    $tastm += $allowance->days;
-                }
-            }
-        }
-
-        // Calculate time served (this would need your actual logic)
-        $commitmentDate = $pdl->created_at; // This should be replaced with actual commitment date
+        // Get commitment date from the first case
+        $commitmentDate = $pdl->cases->first()?->date_committed ?? $pdl->created_at;
         $currentDate = now();
+
+        // Generate year-by-year computation
+        $computationData = $this->generateGCTATASTMComputation($commitmentDate, $currentDate);
+
+        // Calculate total GCTA and TASTM
+        $totalGCTA = array_sum(array_column($computationData, 'gcta_total'));
+        $totalTASTM = array_sum(array_column($computationData, 'tastm_total'));
+
+        // Calculate time served
         $timeServed = $commitmentDate->diff($currentDate);
-
-        // Convert days to years, months, days
-        function convertDaysToYMD($days)
-        {
-            $years = floor($days / 365);
-            $remainingDays = $days % 365;
-            $months = floor($remainingDays / 30);
-            $days = $remainingDays % 30;
-
-            return [
-                'years' => $years,
-                'months' => $months,
-                'days' => $days
-            ];
-        }
-
-        $gctaYMD = convertDaysToYMD($gcta);
-        $tastmYMD = convertDaysToYMD($tastm);
-
-        $totalDaysServed = $commitmentDate->diffInDays($currentDate);
-        $totalWithAllowances = $totalDaysServed + $gcta + $tastm;
-        $totalYMD = convertDaysToYMD($totalWithAllowances);
 
         $data = [
             'verification' => $verification,
             'pdl' => $pdl,
-            'gcta_days' => $gcta,
-            'tastm_days' => $tastm,
-            'gcta_ymd' => $gctaYMD,
-            'tastm_ymd' => $tastmYMD,
             'commitment_date' => $commitmentDate->format('F j, Y'),
             'current_date' => $currentDate->format('F j, Y'),
+            'commitmentDate' => $commitmentDate,
+            'currentDate' => $currentDate,
             'time_served' => [
                 'years' => $timeServed->y,
                 'months' => $timeServed->m,
                 'days' => $timeServed->d
             ],
-            'total_with_allowances' => $totalYMD
+            'computation_data' => $computationData,
+            'total_gcta' => $totalGCTA,
+            'total_tastm' => $totalTASTM,
+            'total_allowances' => $totalGCTA + $totalTASTM,
+            'convertDaysToYMD' => [$this, 'convertDaysToYMD']
         ];
 
         $html = view('reports.gcta-tastm', $data)->render();
@@ -697,6 +734,109 @@ class ReportController extends Controller
         return response($dompdf->output(), 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'inline; filename="gcta-tastm-report-' . $pdl->id . '.pdf"');
+    }
+
+    private function generateGCTATASTMComputation($commitmentDate, $currentDate)
+    {
+        $data = [];
+        $commitmentYear = $commitmentDate->year;
+        $commitmentMonth = $commitmentDate->month;
+        $commitmentDay = $commitmentDate->day;
+
+        $currentYear = $currentDate->year;
+        $currentMonth = $currentDate->month;
+        $currentDay = $currentDate->day;
+
+        // Calculate total years from commitment to current date
+        $totalYears = $currentYear - $commitmentYear;
+
+        // If we haven't reached the anniversary date this year, subtract 1
+        if ($currentMonth < $commitmentMonth || ($currentMonth == $commitmentMonth && $currentDay < $commitmentDay)) {
+            $totalYears = $totalYears - 1;
+        }
+
+        // Generate rows for each year from commitment to current
+        for ($yearOffset = 0; $yearOffset <= $totalYears; $yearOffset++) {
+            $currentYearDate = $commitmentYear + $yearOffset;
+
+            // First column: commitment date for this year
+            $firstColumnDate = Carbon::create($currentYearDate, $commitmentMonth, $commitmentDay);
+
+            // Second column: one year after commitment date for this year
+            $secondColumnDate = Carbon::create($currentYearDate + 1, $commitmentMonth, $commitmentDay);
+
+            // For the last year, use current date if we've reached it
+            if ($yearOffset == $totalYears) {
+                $secondColumnDate = $currentDate;
+            }
+
+            // Calculate years served to determine GCTA rate
+            $yearsServed = $yearOffset + 1;
+
+            // Determine GCTA rate based on years served
+            $gctaRate = 20; // Default for 1-2 years
+            if ($yearsServed >= 3 && $yearsServed <= 5) {
+                $gctaRate = 23;
+            } elseif ($yearsServed >= 6 && $yearsServed <= 10) {
+                $gctaRate = 25;
+            } elseif ($yearsServed >= 11) {
+                $gctaRate = 30;
+            }
+
+            // Calculate months for the year
+            $months = 12;
+            if ($yearOffset == $totalYears) {
+                // Calculate partial year for the current year
+                $startOfYear = Carbon::create($currentYearDate, $commitmentMonth, $commitmentDay);
+                $months = $startOfYear->diffInMonths($currentDate);
+
+                // Add partial month calculation
+                $lastMonthStart = $startOfYear->copy()->addMonths($months);
+                $daysInLastMonth = $currentDate->diffInDays($lastMonthStart);
+                $partialMonth = $daysInLastMonth / 30;
+                $months += $partialMonth;
+            }
+
+            $gctaTotal = $gctaRate * $months;
+            $tastmTotal = 15 * 12; // TASTM is always 15 days per month
+
+            $data[] = [
+                'year' => $currentYearDate,
+                'first_column_date' => $firstColumnDate->format('Y n j'),
+                'second_column_date' => $secondColumnDate->format('Y n j'),
+                'gcta_rate' => $gctaRate,
+                'months' => $months,
+                'gcta_calculation' => $gctaRate . 'X' . number_format($months, 1),
+                'gcta_total' => round($gctaTotal),
+                'tastm_calculation' => '15X12',
+                'tastm_total' => $tastmTotal
+            ];
+        }
+
+        return $data;
+    }
+
+    public function convertDaysToYMD($days)
+    {
+        $years = floor($days / 365);
+        $remainingDays = $days % 365;
+        $months = floor($remainingDays / 30);
+        $days = $remainingDays % 30;
+
+        $result = '';
+        if ($years > 0) {
+            $result .= $years . ' year' . ($years > 1 ? 's' : '');
+        }
+        if ($months > 0) {
+            if ($result) $result .= ', ';
+            $result .= $months . ' month' . ($months > 1 ? 's' : '');
+        }
+        if ($days > 0) {
+            if ($result) $result .= ', and ';
+            $result .= $days . ' day' . ($days > 1 ? 's' : '');
+        }
+
+        return $result ?: '0 days';
     }
 
     public function generatePDLReport(Request $request, Pdl $pdl, $type)
@@ -785,31 +925,44 @@ class ReportController extends Controller
             $startDate = Carbon::create($year, $monthNumber, 1)->startOfMonth();
             $endDate = Carbon::create($year, $monthNumber, 1)->endOfMonth();
 
-            // Get detainees count for the month (filter for drug-related through case information)
-            $detainees = Pdl::with('cases')
-                ->whereBetween('created_at', [$startDate, $endDate])
-
+            // Get all PDLs with drug-related cases (not just those committed in this month)
+            $drugRelatedPdls = Pdl::with(['cases' => function($query) {
+                    $query->where('drug_related', true);
+                }])
+                ->whereHas('cases', function($query) {
+                    $query->where('drug_related', true);
+                })
+                ->where('created_at', '<=', $endDate) // PDLs created up to this month
                 ->get();
 
-            $maleDetainees = $detainees->where('gender', 'Male')->count();
-            $femaleDetainees = $detainees->where('gender', 'Female')->count();
+            // Filter for active PDLs (not archived) as of this month
+            $activeDrugPdls = $drugRelatedPdls->filter(function($pdl) use ($endDate) {
+                return $pdl->archive_status === null ||
+                       ($pdl->archived_at && $pdl->archived_at->gt($endDate));
+            });
+
+            $maleDetainees = $activeDrugPdls->where('gender', 'Male')->count();
+            $femaleDetainees = $activeDrugPdls->where('gender', 'Female')->count();
             $totalDetainees = $maleDetainees + $femaleDetainees;
 
             // Get committed count (drug-related PDLs created in this month)
-            $committed = Pdl::whereBetween('created_at', [$startDate, $endDate])
+            $committed = $drugRelatedPdls->filter(function($pdl) use ($startDate, $endDate) {
+                return $pdl->created_at->between($startDate, $endDate);
+            })->count();
 
-                ->count();
+            // Get discharged count (drug-related PDLs with discharge status in this month)
+            $discharged = $drugRelatedPdls->filter(function($pdl) use ($startDate, $endDate) {
+                return $pdl->archive_status !== null &&
+                       $pdl->archived_at &&
+                       $pdl->archived_at->between($startDate, $endDate);
+            })->count();
 
-            // Get discharged count (drug-related PDLs with discharge status)
-            $discharged = Pdl::whereBetween('updated_at', [$startDate, $endDate])
-                ->where('archive_status', '!=', null)
-
-                ->count();
-
-            // Get drug-related cases for the month
+            // Get drug-related cases for the month (for discharge status breakdown)
             $drugCases = CaseInformation::with(['pdl'])
                 ->where('drug_related', true)
-                ->whereBetween('date_committed', [$startDate, $endDate])
+                ->whereHas('pdl', function($query) use ($endDate) {
+                    $query->where('created_at', '<=', $endDate);
+                })
                 ->get();
 
             $bonded = $drugCases->filter(function ($case) {
@@ -848,7 +1001,7 @@ class ReportController extends Controller
 
             // Calculate percentage of drug offenders from total population
             $totalPopulation = Pdl::where('created_at', '<=', $endDate)->count();
-            $drugOffendersPercentage = $totalPopulation > 0 ? round(($drugCases->count() / $totalPopulation) * 100, 2) : 0;
+            $drugOffendersPercentage = $totalPopulation > 0 ? round(($totalDetainees / $totalPopulation) * 100, 2) : 0;
 
             $monthlyData[] = [
                 'month' => $monthName,
@@ -867,7 +1020,7 @@ class ReportController extends Controller
                 'acquitted' => $acquitted,
                 'total_discharged_drug' => $totalDischargedDrug,
                 'drug_offenders_percentage' => $drugOffendersPercentage,
-                'total_drug_cases' => $drugCases->count()
+                'total_drug_cases' => $totalDetainees
             ];
 
             // Add to yearly totals
@@ -885,7 +1038,7 @@ class ReportController extends Controller
             $yearlyTotals['deceased'] += $deceased;
             $yearlyTotals['acquitted'] += $acquitted;
             $yearlyTotals['total_discharged_drug'] += $totalDischargedDrug;
-            $yearlyTotals['total_drug_cases'] += $drugCases->count();
+            $yearlyTotals['total_drug_cases'] += $totalDetainees;
         }
 
         // Add total row
@@ -1015,7 +1168,7 @@ class ReportController extends Controller
 
             // Calculate percentage of drug offenders from total population
             $totalPopulation = Pdl::where('created_at', '<=', $endDate)->count();
-            $drugOffendersPercentage = $totalPopulation > 0 ? round(($drugCases->count() / $totalPopulation) * 100, 2) : 0;
+            $drugOffendersPercentage = $totalPopulation > 0 ? round(($totalDetainees / $totalPopulation) * 100, 2) : 0;
 
             $monthlyData[] = [
                 'month' => $monthName,
@@ -1034,7 +1187,7 @@ class ReportController extends Controller
                 'acquitted' => $acquitted,
                 'total_discharged_drug' => $totalDischargedDrug,
                 'drug_offenders_percentage' => $drugOffendersPercentage,
-                'total_drug_cases' => $drugCases->count()
+                'total_drug_cases' => $totalDetainees
             ];
 
             // Add to yearly totals
@@ -1052,7 +1205,7 @@ class ReportController extends Controller
             $yearlyTotals['deceased'] += $deceased;
             $yearlyTotals['acquitted'] += $acquitted;
             $yearlyTotals['total_discharged_drug'] += $totalDischargedDrug;
-            $yearlyTotals['total_drug_cases'] += $drugCases->count();
+            $yearlyTotals['total_drug_cases'] += $totalDetainees;
         }
 
         // Add total row

@@ -12,27 +12,49 @@
             line-height: 1.4;
         }
 
+        .header {
+            margin-bottom: 20px;
+        }
+
         .logo-section {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: table;
             width: 100%;
             margin-bottom: 15px;
         }
 
         .logo-left, .logo-right {
-            flex: 0 0 auto;
-            width: 80px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: table-cell;
+            width: 15%;
+            vertical-align: middle;
+            text-align: center;
         }
 
         .header-text {
-            flex: 1;
+            display: table-cell;
+            width: 70%;
             text-align: center;
-            padding: 0 20px;
+            vertical-align: middle;
+        }
+
+        .logo-container img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+
+        .logo-placeholder {
+            width: 80px;
+            height: 80px;
+            border: 1px solid #ccc;
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 8px;
+            line-height: 1.2;
+            padding: 20px 0;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+            color: #666;
         }
 
         .republic {
@@ -106,59 +128,27 @@
 
         .signature-section {
             margin-top: 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
+            display: table;
+            width: 100%;
+        }
+
+        .signature-left, .signature-right {
+            display: table-cell;
+            width: 50%;
+            text-align: center;
+            vertical-align: bottom;
         }
 
         .signature-line {
             border-bottom: 1px solid #000;
             width: 200px;
-            margin-bottom: 5px;
+            margin: 0 auto 5px auto;
             height: 20px;
         }
 
         .signature-label {
             font-size: 10px;
             font-weight: bold;
-            text-align: center;
-        }
-
-        .logo-section {
-            display: table;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .logo-placeholder {
-            width: 80px;
-            height: 80px;
-            border: 2px solid #ccc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 8px;
-            text-align: center;
-            background-color: #f9f9f9;
-            color: #666;
-        }
-
-        .header-content {
-            flex: 1;
             text-align: center;
         }
     </style>
@@ -170,11 +160,9 @@
                 @if(file_exists(public_path('rdh.jpg')))
                     <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('rdh.jpg'))) }}" alt="Regional Director of Health" style="width: 80px; height: 80px; object-fit: contain;">
                 @else
-                    <div style="width: 80px; height: 80px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 8px; text-align: center;">
-                        <div>
-                            <div style="font-weight: bold;">RDH</div>
-                            <div style="margin: 2px 0;">LOGO</div>
-                        </div>
+                    <div class="logo-placeholder">
+                        <div style="font-weight: bold;">RDH</div>
+                        <div style="margin: 2px 0;">LOGO</div>
                     </div>
                 @endif
             </div>
@@ -192,11 +180,9 @@
                 @if(file_exists(public_path('scof.jpg')))
                     <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('scof.jpg'))) }}" alt="South Cotabato Office" style="width: 80px; height: 80px; object-fit: contain;">
                 @else
-                    <div style="width: 80px; height: 80px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 8px; text-align: center;">
-                        <div>
-                            <div style="font-weight: bold;">SCOF</div>
-                            <div style="margin: 2px 0;">LOGO</div>
-                        </div>
+                    <div class="logo-placeholder">
+                        <div style="font-weight: bold;">SCOF</div>
+                        <div style="margin: 2px 0;">LOGO</div>
                     </div>
                 @endif
             </div>
@@ -258,11 +244,11 @@
     </table>
 
     <div class="signature-section">
-        <div>
+        <div class="signature-left">
             <div class="signature-line"></div>
             <div class="signature-label">Prepared by:</div>
         </div>
-        <div>
+        <div class="signature-right">
             <div class="signature-line"></div>
             <div class="signature-label">Noted by:</div>
         </div>
