@@ -4,7 +4,7 @@ import { Head } from '@inertiajs/react';
 
 import { useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -306,7 +306,6 @@ export default function UpdatePDLInformation() {
         complaint: string;
         date: string;
         prognosis: string;
-        laboratory: string;
         prescription: string;
         findings: string;
         physical_characteristic_id: number;
@@ -358,7 +357,7 @@ export default function UpdatePDLInformation() {
         complaint: pdl.medical_records?.[0]?.complaint || '',
         date: pdl.medical_records?.[0]?.date || new Date().toISOString().split('T')[0],
         prognosis: pdl.medical_records?.[0]?.prognosis || '',
-        laboratory: pdl.medical_records?.[0]?.laboratory || '',
+
         prescription: pdl.medical_records?.[0]?.prescription || '',
         findings: pdl.medical_records?.[0]?.findings || '',
         physical_characteristic_id: pdl.physical_characteristics?.[0]?.characteristic_id || 0,
@@ -1485,19 +1484,7 @@ export default function UpdatePDLInformation() {
                                     <Label htmlFor="medical_records_preview">Medical Records Preview</Label>
 
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="laboratory">
-                                        Laboratory Results <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Textarea
-                                        id="laboratory"
-                                        name="laboratory"
-                                        value={data.laboratory}
-                                        onChange={handleChange}
-                                        rows={3}
-                                        placeholder="Enter laboratory test results..."
-                                    />
-                                </div>
+
                                 <div className="space-y-2">
                                     <Label htmlFor="prescription">
                                         Prescription <span className="text-red-500">*</span>

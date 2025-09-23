@@ -1469,7 +1469,7 @@ export default function CreatePDLInformation() {
                                                     <SelectItem value="pending">Pending</SelectItem>
                                                     <SelectItem value="convicted">Convicted</SelectItem>
                                                     <SelectItem value="deceased">Deceased</SelectItem>
-                                                        <SelectItem value="case_closed">Case Closed</SelectItem>
+                                                    <SelectItem value="case_closed">Case Closed</SelectItem>
                                                     <SelectItem value="open">Open</SelectItem>
                                                 </SelectContent>
                                             </Select>
@@ -1607,7 +1607,10 @@ export default function CreatePDLInformation() {
                             {/* Medical Documents Upload Section */}
                             <Separator />
                             <div className="space-y-4">
-                                <h3 className="text-lg font-medium">Medical Documents & Images</h3>
+                                <h3 className="text-lg font-medium">
+                                    Medical Documents & Images
+                                    <span className="text-red-500"> *</span>
+                                </h3>
                                 <div className="space-y-4">
                                     {/* File Upload Area */}
                                     <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-gray-400">
