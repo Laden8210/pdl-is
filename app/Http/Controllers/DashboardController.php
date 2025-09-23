@@ -190,11 +190,12 @@ class DashboardController extends Controller
 
         // Calculate key metrics
         $totalPDL = Pdl::whereNull('deleted_at')
-        ->where('archive_status', '==', null)
-        ->whereHas('verifications', function ($query) {
-            $query->where('status', 'approved');
-        })
-        ->count();
+            ->where('archive_status', '=', '')
+            ->whereHas('verifications', function ($query) {
+                $query->where('status', 'approved');
+            })
+            ->count();
+
         $activeCases = CaseInformation::where('case_status', 'Active')->count();
         $totalCapacity = Cells::where('status', 'active')->sum('capacity');
         $totalOccupied = CellAssignment::whereHas('pdl', function ($query) {
@@ -458,10 +459,10 @@ class DashboardController extends Controller
 
         // Calculate key metrics for law enforcement
         $totalPDL = Pdl::whereNull('deleted_at')
-        ->whereDoesntHave('verifications', function ($q) {
-            $q->where('status', 'approved'); // exclude those with approved verification
-        })
-        ->count();
+            ->whereDoesntHave('verifications', function ($q) {
+                $q->where('status', 'approved'); // exclude those with approved verification
+            })
+            ->count();
         $activeCases = CaseInformation::where('case_status', 'Active')->count();
         $totalCases = CaseInformation::count();
         $pendingCourtOrdersCount = CourtOrder::where('order_date', '>=', now()->subDays(30))->count();
@@ -724,7 +725,7 @@ class DashboardController extends Controller
             ->whereHas('verifications', function ($query) {
                 $query->where('status', 'approved');
             })
-        ->count();
+            ->count();
         $pendingVerificationsCount = Verifications::where('status', 'pending')->count();
         $approvedVerificationsCount = Verifications::where('status', 'approved')->count();
         $rejectedVerificationsCount = Verifications::where('status', 'rejected')->count();
