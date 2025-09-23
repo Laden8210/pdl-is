@@ -11,9 +11,27 @@
             padding: 20px;
         }
 
-        .header {
+        .logo-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .logo-left, .logo-right {
+            flex: 0 0 auto;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-text {
+            flex: 1;
             text-align: center;
-            margin-bottom: 20px;
+            padding: 0 20px;
         }
 
         .title {
@@ -89,9 +107,37 @@
 </head>
 <body>
     <div class="header">
-        <div class="title">{{ $data['title'] }}</div>
-        <div class="subtitle">{{ $data['subtitle'] }}</div>
-        <div class="year">Year: {{ $data['year'] }}</div>
+        <div class="logo-section">
+            <div class="logo-left">
+                @if(file_exists(public_path('rdh.jpg')))
+                    <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('rdh.jpg'))) }}" alt="Regional Director of Health" style="width: 80px; height: 80px; object-fit: contain;">
+                @else
+                    <div style="width: 80px; height: 80px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 8px; text-align: center;">
+                        <div>
+                            <div style="font-weight: bold;">RDH</div>
+                            <div style="margin: 2px 0;">LOGO</div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            <div class="header-text">
+                <div class="title">{{ $data['title'] }}</div>
+                <div class="subtitle">{{ $data['subtitle'] }}</div>
+                <div class="year">Year: {{ $data['year'] }}</div>
+            </div>
+            <div class="logo-right">
+                @if(file_exists(public_path('scof.jpg')))
+                    <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('scof.jpg'))) }}" alt="South Cotabato Office" style="width: 80px; height: 80px; object-fit: contain;">
+                @else
+                    <div style="width: 80px; height: 80px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 8px; text-align: center;">
+                        <div>
+                            <div style="font-weight: bold;">SCOF</div>
+                            <div style="margin: 2px 0;">LOGO</div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
 
     <table>

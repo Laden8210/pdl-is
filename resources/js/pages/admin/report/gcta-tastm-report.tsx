@@ -104,7 +104,16 @@ export default function GCTATASTMReport() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>PDL List</CardTitle>
+                        <CardTitle className="text-center">
+                            <div className="flex items-center justify-center gap-4 mb-4">
+
+                                <div>
+                                    <div className="text-xl font-bold">GCTA & TASTM Reports</div>
+                                    <div className="text-sm text-gray-600">South Cotabato Rehabilitation and Detention Center</div>
+                                </div>
+
+                            </div>
+                        </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <Table>

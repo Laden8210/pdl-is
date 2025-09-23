@@ -54,36 +54,27 @@
             margin-bottom: 15px;
         }
 
-        .seal-left {
-            position: absolute;
-            left: 50px;
-            top: 20px;
-            width: 80px;
-            height: 80px;
-            border: 2px solid #000;
-            border-radius: 50%;
+        .logo-section {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 8px;
-            text-align: center;
-            line-height: 1.2;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 15px;
         }
 
-        .seal-right {
-            position: absolute;
-            right: 50px;
-            top: 20px;
+        .logo-left, .logo-right {
+            flex: 0 0 auto;
             width: 80px;
             height: 80px;
-            border: 2px solid #000;
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 8px;
+        }
+
+        .header-text {
+            flex: 1;
             text-align: center;
-            line-height: 1.2;
+            padding: 0 20px;
         }
 
         .separator {
@@ -144,19 +135,42 @@
 </head>
 <body>
     <div class="header">
-
-
-
-        <div class="republic">Republic of the Philippines</div>
-        <div class="province">Province of South Cotabato</div>
-        <div class="office">Office of the Provincial Governor</div>
-        <div class="unit">Provincial Jail Management Unit</div>
-        <div class="location">Koronadal City</div>
-
-        <div class="separator"></div>
-
-        <div class="contact">
-            Tel #: (083) 228-2445; Email Address: socot.scrdcjail@gmail.com
+        <div class="logo-section">
+            <div class="logo-left">
+                @if(file_exists(public_path('rdh.jpg')))
+                    <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('rdh.jpg'))) }}" alt="Regional Director of Health" style="width: 80px; height: 80px; object-fit: contain;">
+                @else
+                    <div style="width: 80px; height: 80px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 8px; text-align: center;">
+                        <div>
+                            <div style="font-weight: bold;">RDH</div>
+                            <div style="margin: 2px 0;">LOGO</div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            <div class="header-text">
+                <div class="republic">Republic of the Philippines</div>
+                <div class="province">Province of South Cotabato</div>
+                <div class="office">Office of the Provincial Governor</div>
+                <div class="unit">Provincial Jail Management Unit</div>
+                <div class="location">Koronadal City</div>
+                <div class="separator"></div>
+                <div class="contact">
+                    Tel #: (083) 228-2445; Email Address: socot.scrdcjail@gmail.com
+                </div>
+            </div>
+            <div class="logo-right">
+                @if(file_exists(public_path('scof.jpg')))
+                    <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('scof.jpg'))) }}" alt="South Cotabato Office" style="width: 80px; height: 80px; object-fit: contain;">
+                @else
+                    <div style="width: 80px; height: 80px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 8px; text-align: center;">
+                        <div>
+                            <div style="font-weight: bold;">SCOF</div>
+                            <div style="margin: 2px 0;">LOGO</div>
+                        </div>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 
