@@ -190,7 +190,7 @@ class DashboardController extends Controller
 
         // Calculate key metrics
         $totalPDL = Pdl::whereNull('deleted_at')
-            ->where('archive_status', '=', '')
+            ->where('archive_status', '=', null)
             ->whereHas('verifications', function ($query) {
                 $query->where('status', 'approved');
             })
