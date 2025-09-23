@@ -46,6 +46,9 @@ class CustodyController extends Controller
                 'admission_date' => $request->admission_date,
                 'release_date' => $request->release_date,
             ]);
+
+            // record the point for gcta and tastm
+
         }
 
         return redirect()->back()->with('success', 'Custody dates updated successfully.');

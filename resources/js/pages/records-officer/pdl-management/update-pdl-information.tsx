@@ -243,8 +243,9 @@ export default function UpdatePDLInformation() {
     const { pdl } = props;
 
     const handleAddNewCase = () => {
+        const currentCases = data.cases || [];
         setData('cases', [
-            ...data.cases,
+            ...currentCases,
             {
                 case_id: 0,
                 case_number: '',
@@ -257,20 +258,25 @@ export default function UpdatePDLInformation() {
                 drug_related: false,
             },
         ]);
-        setActiveCaseIndex(data.cases.length);
+        setActiveCaseIndex(currentCases.length);
     };
 
     const handleRemoveCase = (index: number) => {
-        if (data.cases.length <= 1) return;
+        if (!data.cases || !Array.isArray(data.cases) || data.cases.length <= 1) return;
         const newCases = data.cases.filter((_, i) => i !== index);
         setData('cases', newCases);
         setActiveCaseIndex(Math.min(activeCaseIndex, newCases.length - 1));
     };
 
     const handleCaseChange = (index: number, field: string, value: string | boolean) => {
+        if (!data.cases || !Array.isArray(data.cases) || index < 0 || index >= data.cases.length) {
+            return;
+        }
         const newCases = [...data.cases];
-        newCases[index] = { ...newCases[index], [field]: value };
-        setData('cases', newCases);
+        if (newCases[index]) {
+            newCases[index] = { ...newCases[index], [field]: value };
+            setData('cases', newCases);
+        }
     };
 
     const { data, setData, put, processing, errors, reset } = useForm<{
@@ -369,15 +375,15 @@ export default function UpdatePDLInformation() {
         cases:
             Array.isArray(pdl.cases) && pdl.cases.length > 0
                 ? pdl.cases.map((c: any) => ({
-                      case_id: c.case_id,
-                      case_number: c.case_number || '',
-                      crime_committed: c.crime_committed || '',
-                      date_committed: c.date_committed || '',
-                      time_committed: c.time_committed || '',
-                      case_status: c.case_status || 'open',
-                      case_remarks: c.case_remarks || '',
-                      security_classification: c.security_classification || 'medium',
-                      drug_related: c.drug_related || false,
+                      case_id: c?.case_id || 0,
+                      case_number: c?.case_number || '',
+                      crime_committed: c?.crime_committed || '',
+                      date_committed: c?.date_committed || '',
+                      time_committed: c?.time_committed || '',
+                      case_status: c?.case_status || 'open',
+                      case_remarks: c?.case_remarks || '',
+                      security_classification: c?.security_classification || 'medium',
+                      drug_related: c?.drug_related || false,
                   }))
                 : [
                       {
@@ -1009,7 +1015,7 @@ export default function UpdatePDLInformation() {
                             </div>
 
                             {/* Case Form Fields */}
-                            {data.cases.length > 0 && (
+                            {data.cases && Array.isArray(data.cases) && data.cases.length > 0 && (
                                 <>
                                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                         <div className="space-y-2">
@@ -1018,7 +1024,7 @@ export default function UpdatePDLInformation() {
                                             </Label>
                                             <Input
                                                 id="case_number"
-                                                value={data.cases[activeCaseIndex].case_number}
+                                                value={data.cases[activeCaseIndex]?.case_number || ''}
                                                 onChange={(e) => handleCaseChange(activeCaseIndex, 'case_number', e.target.value)}
                                                 placeholder="Enter case number"
                                             />
