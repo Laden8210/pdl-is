@@ -451,7 +451,7 @@ class PDLManagementController extends Controller
                     'complaint' => 'required|string',
                     'date' => 'required|date',
                     'prognosis' => 'required|string',
-                    'laboratory' => 'required|string',
+
                     'prescription' => 'required|string',
                     'findings' => 'required|string',
                 ]);
@@ -461,7 +461,7 @@ class PDLManagementController extends Controller
                         'complaint' => $request->complaint,
                         'date' => $request->date,
                         'prognosis' => $request->prognosis,
-                        'laboratory' => $request->laboratory,
+
                         'prescription' => $request->prescription,
                         'findings' => $request->findings,
                     ]
@@ -471,7 +471,7 @@ class PDLManagementController extends Controller
                     'complaint' => 'required|string',
                     'date' => 'required|date',
                     'prognosis' => 'required|string',
-                    'laboratory' => 'required|string',
+
                     'prescription' => 'required|string',
                     'findings' => 'required|string',
                 ]);
@@ -479,7 +479,7 @@ class PDLManagementController extends Controller
                     'complaint' => $request->complaint,
                     'date' => $request->date,
                     'prognosis' => $request->prognosis,
-                    'laboratory' => $request->laboratory,
+
                     'prescription' => $request->prescription,
                     'findings' => $request->findings,
                 ]);
@@ -527,7 +527,7 @@ class PDLManagementController extends Controller
                     'eye_color' => 'required|string',
                     'identification_marks' => 'required|string',
                     'mark_location' => 'required|string',
-                    'pc_remark' => 'required|string',
+                    'pc_remark' => 'nullable|string',
                 ]);
                 $pdl->physicalCharacteristics()->updateOrCreate(
                     ['characteristic_id' => $request->physical_characteristic_id],
@@ -571,7 +571,7 @@ class PDLManagementController extends Controller
                 'cases.*.case_number' => 'required|string|max:255',
                 'cases.*.crime_committed' => 'required|string',
                 'cases.*.date_committed' => 'required|date',
-                'cases.*.time_committed' => 'required|date_format:H:i',
+                'cases.*.time_committed' => 'required',
             ]);
             $caseData = $validated;
 
