@@ -14,12 +14,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 import { PageProps } from '@/types';
 import { format } from 'date-fns';
 
-
+import { Button } from '@/components/ui/button';
 import { TransferPDL } from '@/features/pdl-management/transfer-pdl';
 import { ViewPdlInformation } from '@/features/pdl-management/view-pdl-information';
-import { Button } from '@/components/ui/button';
 import { usePage } from '@inertiajs/react';
-import { Archive, Calendar } from 'lucide-react';
 
 export default function PersonalInformation() {
     const { props } = usePage<PageProps>();
@@ -49,7 +47,6 @@ export default function PersonalInformation() {
                                 <span>Personal Information List</span>
 
                                 <div className="flex gap-2">
-
                                     <Link
                                         href="/pdl-management/personal-information/create"
                                         className="flex items-center gap-2 rounded-sm bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
@@ -83,7 +80,12 @@ export default function PersonalInformation() {
                                 {pdls.map((pdl) => (
                                     <TableRow key={pdl.id}>
                                         <TableCell>{pdl.id}</TableCell>
-                                        <TableCell>{`${pdl.fname} ${pdl.lname}`}</TableCell>
+                                        <TableCell>
+                                            {`${pdl.fname} ${pdl.mname} ${pdl.lname}`
+                                                .split(' ')
+                                                .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                                                .join(' ')}
+                                        </TableCell>
                                         <TableCell>{pdl.alias ?? '-'}</TableCell>
                                         <TableCell>{pdl.gender ?? '-'}</TableCell>
                                         <TableCell>{pdl.ethnic_group ?? '-'}</TableCell>
@@ -99,11 +101,11 @@ export default function PersonalInformation() {
                                         </TableCell>
                                         <TableCell>
                                             {pdl.archived_at ? (
-                                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800">
                                                     Archived
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
                                                     Active
                                                 </span>
                                             )}
@@ -123,8 +125,6 @@ export default function PersonalInformation() {
                                                     Edit
                                                 </Button>
                                                 <TransferPDL pdl={pdl} />
-
-
                                             </div>
                                         </TableCell>
                                     </TableRow>

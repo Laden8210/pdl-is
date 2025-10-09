@@ -28,6 +28,7 @@ export default function ProfileManagement() {
         position: user?.position || '',
         status: (user as any)?.status || 'active',
         password: '',
+        cpassword: '',
         profileImage: null as File | null,
     });
 
@@ -117,13 +118,23 @@ export default function ProfileManagement() {
                                 />
                             </div>
                             <div>
-                                <Label htmlFor="password">Password</Label>
+                                <Label htmlFor="password">New password</Label>
                                 <Input
                                     id="password"
                                     type="password"
                                     placeholder="Enter your password"
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="password">Confirm password</Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    placeholder="Enter your password"
+                                    value={data.cpassword}
+                                    onChange={(e) => setData('cpassword', e.target.value)}
                                 />
                             </div>
                         </div>

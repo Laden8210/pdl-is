@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { useForm, usePage } from '@inertiajs/react';
 import { Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface Pdl {
     id: number;
@@ -106,9 +107,11 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                 });
                 setSearchTerm('');
                 setShowActivitySuggestions(false);
+                toast.success('Event created successfully');
             },
             onError: (errors) => {
                 console.error('Form submission errors:', errors);
+                toast.error('Unable to process request');
             },
         });
     };
@@ -190,10 +193,9 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                                 <AlertTitle>Unable to process request</AlertTitle>
                                 <AlertDescription>
                                     <ul className="list-inside list-disc space-y-1">
-                                        {Object.values(errors).map((error, index) => (
-                                            <li key={index} className="text-sm">
-                                                {String(error)}
-                                            </li>
+                                        {Object.entries(errors).map(([key, value]) => (
+                                            // use toast.error to show the error
+                                            toast.error(value as string)
                                         ))}
                                     </ul>
                                 </AlertDescription>

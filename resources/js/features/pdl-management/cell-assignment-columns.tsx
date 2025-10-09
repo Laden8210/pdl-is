@@ -8,8 +8,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, ArrowRightLeft } from "lucide-react";
 import type { CellAssignment } from "@/types";
+import { TransferCell } from "./transfer-cell";
 
 export const cell_assignment_columns: ColumnDef<CellAssignment>[] = [
   {
@@ -44,27 +45,9 @@ export const cell_assignment_columns: ColumnDef<CellAssignment>[] = [
       const assignment = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => console.log("Edit assignment", assignment.assignment_id)}
-            >
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => console.log("Delete assignment", assignment.assignment_id)}
-            >
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center space-x-2">
+          <TransferCell assignment={assignment} />
+        </div>
       );
     },
   },

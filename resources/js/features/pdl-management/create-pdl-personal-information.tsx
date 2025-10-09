@@ -157,7 +157,7 @@ export function CreatePersonalInformation() {
                                     <SelectItem value="Single">Single</SelectItem>
                                     <SelectItem value="Married">Married</SelectItem>
                                     <SelectItem value="Widowed">Widowed</SelectItem>
-                                    <SelectItem value="Divorced">Divorced</SelectItem>
+                                    <SelectItem value="Annulment">Annulment</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

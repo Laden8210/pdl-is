@@ -18,7 +18,25 @@ class JailEventsController extends Controller
         })
         ->latest()
         ->get();
-        $activities = Activity::with('pdl:id,fname,lname')->latest()->get();
+
+        // Load activities with their associated PDLs
+        $activities = Activity::latest()
+            ->get()
+            ->map(function ($activity) {
+                // Load PDLs from pdl_ids
+                if ($activity->pdl_ids) {
+                    // Handle both array and JSON string cases
+                    $pdlIds = is_array($activity->pdl_ids) ? $activity->pdl_ids : json_decode($activity->pdl_ids, true);
+                    if (is_array($pdlIds) && !empty($pdlIds)) {
+                        $activity->pdls = Pdl::whereIn('id', $pdlIds)->get(['id', 'fname', 'lname']);
+                    } else {
+                        $activity->pdls = collect();
+                    }
+                } else {
+                    $activity->pdls = collect();
+                }
+                return $activity;
+            });
 
         return Inertia::render('records-officer/jail-events/jail-events', [
             'pdls' => $pdls,
@@ -28,7 +46,6 @@ class JailEventsController extends Controller
 
     public function store(Request $request)
     {
-
         $validated = $request->validate([
             'activity_name' => 'required|string|max:255',
             'activity_date' => [
@@ -45,22 +62,74 @@ class JailEventsController extends Controller
             'pdl_ids.required' => 'Please select at least one PDL.',
         ]);
 
+        // Check for conflicting events
+        $conflictingEvents = $this->checkForConflictingEvents($validated['activity_date'], $validated['activity_time'], $validated['pdl_ids']);
 
-
-        // Create an activity for each selected PDL
-        $createdActivities = [];
-        foreach ($validated['pdl_ids'] as $pdlId) {
-            $activity = Activity::create([
-                'activity_name' => $validated['activity_name'],
-                'activity_date' => $validated['activity_date'],
-                'activity_time' => $validated['activity_time'],
-                'category' => $validated['category'],
-                'pdl_id' => $pdlId,
+        if (!empty($conflictingEvents)) {
+            return back()->withErrors([
+                'conflict' => 'Some PDLs have conflicting events at this time. Please check the schedule.',
+                'conflicting_events' => $conflictingEvents
             ]);
-            $createdActivities[] = $activity;
         }
 
+        // Create a single activity record with all PDLs
+        $activity = Activity::create([
+            'activity_name' => $validated['activity_name'],
+            'activity_date' => $validated['activity_date'],
+            'activity_time' => $validated['activity_time'],
+            'category' => $validated['category'],
+            'pdl_ids' => $validated['pdl_ids'], // Store PDL IDs as array (casting will handle JSON)
+        ]);
+
+        // Create notifications for upcoming events
+        $this->createUpcomingEventNotifications($activity, $validated['pdl_ids']);
 
         return redirect()->back()->with('success', 'Event created successfully for ' . count($validated['pdl_ids']) . ' PDL(s).');
+    }
+
+    private function checkForConflictingEvents($date, $time, $pdlIds)
+    {
+        $conflictingEvents = [];
+
+        foreach ($pdlIds as $pdlId) {
+            $existingEvents = Activity::where('activity_date', $date)
+                ->where('activity_time', $time)
+                ->whereJsonContains('pdl_ids', $pdlId)
+                ->get();
+
+            if ($existingEvents->count() > 0) {
+                $pdl = Pdl::find($pdlId);
+                $conflictingEvents[] = [
+                    'pdl_name' => $pdl->fname . ' ' . $pdl->lname,
+                    'events' => $existingEvents->map(function($event) {
+                        return [
+                            'activity_name' => $event->activity_name,
+                            'time' => $event->activity_time
+                        ];
+                    })
+                ];
+            }
+        }
+
+        return $conflictingEvents;
+    }
+
+    private function createUpcomingEventNotifications($activity, $pdlIds)
+    {
+        $eventDate = \Carbon\Carbon::parse($activity->activity_date . ' ' . $activity->activity_time);
+        $now = \Carbon\Carbon::now();
+
+        // Create notifications for events happening in the next 24 hours
+        if ($eventDate->diffInHours($now) <= 24) {
+            foreach ($pdlIds as $pdlId) {
+                $pdl = Pdl::find($pdlId);
+                \App\Services\NotificationService::createNotification(
+                    'Upcoming Event',
+                    "Event '{$activity->activity_name}' for PDL {$pdl->fname} {$pdl->lname} is scheduled for {$eventDate->format('M d, Y \a\t g:i A')}",
+                    'upcoming_event',
+                    $pdlId
+                );
+            }
+        }
     }
 }

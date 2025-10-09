@@ -294,7 +294,7 @@ class PDLManagementController extends Controller
             'courtOrders',
             'medicalRecords',
             'cases',
-            'personnel:id,fname,lname'
+            'personnel:id,fname,lname,mname'
         ])->findOrFail($pdl_id);
 
         // Process medical records to include file information
@@ -348,6 +348,7 @@ class PDLManagementController extends Controller
             $validated = $request->validate([
                 'fname' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
                 'lname' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
+                'mname' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
                 'alias' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
                 'birthdate' => 'required|date',
                 'age' => 'required|integer|min:18',
@@ -363,6 +364,7 @@ class PDLManagementController extends Controller
             $pdl->update([
                 'fname' => $request->fname,
                 'lname' => $request->lname,
+                'mname' => $request->mname ?? "",
                 'alias' => $request->alias,
                 'birthdate' => $request->birthdate,
                 'age' => $request->age,

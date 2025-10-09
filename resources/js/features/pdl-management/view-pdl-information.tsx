@@ -128,8 +128,9 @@ export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
                                             <div>
                                                 <span className="text-muted-foreground">Court Branch:</span> {order.court_branch}
                                             </div>
-                                            <div>
-                                                <span className="text-muted-foreground">Document Type:</span> {order.document_type}
+
+                                            <div className="">
+                                                <span className="text-muted-foreground">Document:</span> <Button variant="outline" onClick={() => window.open(`/storage/${order.document_path}`, '_blank')}>Preview</Button>
                                             </div>
                                             {order.remarks && (
                                                 <div className="col-span-2">
@@ -155,18 +156,20 @@ export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
                                             <div>
                                                 <span className="text-muted-foreground">Complaint:</span> {record.complaint}
                                             </div>
-                                            <div className="col-span-2">
+                                            <div className="">
                                                 <span className="text-muted-foreground">Findings:</span> {record.findings}
                                             </div>
-                                            <div className="col-span-2">
+                                            <div className="">
                                                 <span className="text-muted-foreground">Prognosis:</span> {record.prognosis}
                                             </div>
-                                            <div className="col-span-2">
+                                            <div className="">
                                                 <span className="text-muted-foreground">Laboratory Results:</span> {record.laboratory}
                                             </div>
-                                            <div className="col-span-2">
-                                                <span className="text-muted-foreground">Prescription:</span> {record.prescription}
+
+                                            <div className="">
+                                                <span className="text-muted-foreground">Document:</span> <Button variant="outline" onClick={() => window.open(`/storage/${record.file_path}`, '_blank')}>Preview</Button>
                                             </div>
+
                                         </div>
                                     ))}
                                 </AccordionContent>

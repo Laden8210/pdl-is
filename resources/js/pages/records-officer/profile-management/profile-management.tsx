@@ -116,7 +116,7 @@ export default function ProfileManagement() {
                                 />
                             </div>
                             <div>
-                                <Label htmlFor="password">Password</Label>
+                                <Label htmlFor="password">New password</Label>
                                 <Input
                                     id="password"
                                     type="password"

@@ -707,7 +707,7 @@ export function AppSidebarHeader({ breadcrumbs = [], notifications = [], auth }:
                   </div>
 
                   <div className="space-y-3">
-                    {selectedNotification?.pdl && (
+                    {selectedNotification?.pdl && selectedNotification?.notification_type !== 'upcoming_event' && (
                       <div>
                         <h4 className="font-medium text-gray-500 text-xs uppercase tracking-wide">Related PDL</h4>
                         <p className="text-sm text-gray-900 mt-1">{selectedNotification.pdl.name}</p>
@@ -728,7 +728,9 @@ export function AppSidebarHeader({ breadcrumbs = [], notifications = [], auth }:
                 {/* Action Buttons */}
                 <div className="flex justify-between pt-4 border-t">
                   <div className="flex gap-2">
-                    {selectedNotification?.pdl_id && (
+                    {/* hide if the type is upcoming_event */}
+
+                    {selectedNotification?.pdl_id && selectedNotification?.notification_type !== 'upcoming_event' && (
                       <Button
                         onClick={() => {
                           setSelectedNotification(null);
@@ -741,7 +743,7 @@ export function AppSidebarHeader({ breadcrumbs = [], notifications = [], auth }:
                       </Button>
                     )}
 
-                    {selectedNotification?.action_url && (
+                    {selectedNotification?.action_url && selectedNotification?.notification_type !== 'upcoming_event' && (
                       <Button
                         onClick={() => {
                           setSelectedNotification(null);

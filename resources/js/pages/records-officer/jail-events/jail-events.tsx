@@ -31,21 +31,32 @@ export default function Calendar() {
     const { props } = usePage<PageProps>();
     const { pdls = [], activities = [] } = props;
 
-    const events = activities.map((activity) => ({
-        id: activity.activity_id,
-        title: activity.activity_name,
-        start: `${activity.activity_date}T${activity.activity_time}`,
-        extendedProps: {
-            description: activity.description || 'No description provided',
-            pdl: activity.pdl,
-            category: activity.category,
-            location: activity.location || 'Not specified',
-        },
-        backgroundColor: getEventColor(activity.category),
-        borderColor: getEventColor(activity.category),
-        textColor: '#ffffff',
-        className: 'hover:shadow-md transition-shadow duration-200',
-    }));
+    const events = activities.map((activity) => {
+        // Get PDL names for display
+        const pdlNames = activity.pdls
+            ? activity.pdls.map((pdl: any) => `${pdl.fname} ${pdl.lname}`).join(', ')
+            : activity.pdl
+              ? `${activity.pdl.fname} ${activity.pdl.lname}`
+              : 'Unknown PDL';
+
+        return {
+            id: activity.activity_id,
+            title: `${activity.activity_name} (${activity.pdls?.length || 1} PDL${(activity.pdls?.length || 1) > 1 ? 's' : ''})`,
+            start: `${activity.activity_date}T${activity.activity_time}`,
+            extendedProps: {
+                description: activity.description || 'No description provided',
+                pdl: activity.pdl,
+                pdls: activity.pdls || [],
+                pdlNames: pdlNames,
+                category: activity.category,
+                location: activity.location || 'Not specified',
+            },
+            backgroundColor: getEventColor(activity.category),
+            borderColor: getEventColor(activity.category),
+            textColor: '#ffffff',
+            className: 'hover:shadow-md transition-shadow duration-200',
+        };
+    });
 
     const [selectedEvent, setSelectedEvent] = useState<any>(null);
     const [showCreateEvent, setShowCreateEvent] = useState(false);
@@ -144,6 +155,8 @@ export default function Calendar() {
                                 start: info.event.start,
                                 description: info.event.extendedProps.description,
                                 pdl: info.event.extendedProps.pdl,
+                                pdls: info.event.extendedProps.pdls,
+                                pdlNames: info.event.extendedProps.pdlNames,
                                 category: info.event.extendedProps.category,
                                 location: info.event.extendedProps.location,
                             });
@@ -188,32 +201,23 @@ export default function Calendar() {
                             </div>
                         </div>
 
-                        <div>
-                            <h3 className="text-sm font-medium text-muted-foreground">Location</h3>
-                            <p>{selectedEvent?.location || 'Not specified'}</p>
-                        </div>
-
-                        {selectedEvent?.pdl && (
+                        {selectedEvent?.pdls && selectedEvent.pdls.length > 0 && (
                             <div>
-                                <h3 className="text-sm font-medium text-muted-foreground">Person Deprived of Liberty</h3>
-                                <p>
-                                    {selectedEvent.pdl.fname} {selectedEvent.pdl.lname}
-                                </p>
+                                <h3 className="mb-2 text-sm font-medium text-muted-foreground">
+                                    Person{selectedEvent.pdls.length > 1 ? 's' : ''} Deprived of Liberty
+                                </h3>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {selectedEvent.pdls.map((pdl: any, index: number) => (
+                                        <div key={index} className="flex items-center space-x-2 text-sm">
+                                            <span className="text-muted-foreground">•</span>
+                                            <span>
+                                                {pdl.fname} {pdl.lname}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
-
-                        <div>
-                            <h3 className="text-sm font-medium text-muted-foreground">Description</h3>
-                            <p
-                                className="rounded-md p-2 whitespace-pre-line"
-                                style={{
-                                    backgroundColor: `${getEventColor(selectedEvent?.category || '')}20`,
-                                    borderLeft: `4px solid ${getEventColor(selectedEvent?.category || '')}`,
-                                }}
-                            >
-                                {selectedEvent?.description || 'No description provided'}
-                            </p>
-                        </div>
                     </div>
                 </DialogContent>
             </Dialog>
@@ -242,20 +246,11 @@ import { useEffect } from 'react';
 function SimpleEventForm({ pdls, preselectedDate, onSuccess }: { pdls: any[]; preselectedDate: string; onSuccess: () => void }) {
     const [showSuggestions, setShowSuggestions] = useState(false);
 
-    const activitySuggestions = [
-        'Court Hearing',
-        'Medical',
-        'Visitation',
-        'Rehabilitation',
-        'Jail Activity/Transfer',
-        'Other'
-    ];
+    const activitySuggestions = ['Court Hearing', 'Medical', 'Visitation', 'Rehabilitation', 'Jail Activity/Transfer', 'Other'];
 
     const getFilteredSuggestions = () => {
         if (!data.activity_name || data.activity_name.trim() === '') return [];
-        return activitySuggestions.filter(suggestion =>
-            suggestion.toLowerCase().includes(data.activity_name.toLowerCase())
-        );
+        return activitySuggestions.filter((suggestion) => suggestion.toLowerCase().includes(data.activity_name.toLowerCase()));
     };
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -285,7 +280,10 @@ function SimpleEventForm({ pdls, preselectedDate, onSuccess }: { pdls: any[]; pr
 
         // If all filtered are already selected, deselect all
         if (filteredIds.every((id) => currentIds.includes(id))) {
-            setData('pdl_ids', currentIds.filter((id) => !filteredIds.includes(id)));
+            setData(
+                'pdl_ids',
+                currentIds.filter((id) => !filteredIds.includes(id)),
+            );
         } else {
             // Otherwise, add all filtered that aren't already selected
             setData('pdl_ids', [...new Set([...currentIds, ...filteredIds])]);
@@ -350,11 +348,11 @@ function SimpleEventForm({ pdls, preselectedDate, onSuccess }: { pdls: any[]; pr
                             required
                         />
                         {showSuggestions && (
-                            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                            <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-300 bg-white shadow-lg">
                                 {getFilteredSuggestions().map((suggestion, index) => (
                                     <div
                                         key={index}
-                                        className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                        className="cursor-pointer px-3 py-2 text-sm hover:bg-gray-100"
                                         onClick={() => {
                                             setData('activity_name', suggestion);
                                             setShowSuggestions(false);
@@ -364,9 +362,7 @@ function SimpleEventForm({ pdls, preselectedDate, onSuccess }: { pdls: any[]; pr
                                     </div>
                                 ))}
                                 {getFilteredSuggestions().length === 0 && data.activity_name && (
-                                    <div className="px-3 py-2 text-sm text-gray-500">
-                                        No suggestions found
-                                    </div>
+                                    <div className="px-3 py-2 text-sm text-gray-500">No suggestions found</div>
                                 )}
                             </div>
                         )}
@@ -427,11 +423,7 @@ function SimpleEventForm({ pdls, preselectedDate, onSuccess }: { pdls: any[]; pr
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
                     <Label>Persons Involved (PDLs)</Label>
-                    <button
-                        type="button"
-                        onClick={selectAllFiltered}
-                        className="text-sm text-blue-600 hover:text-blue-800 underline"
-                    >
+                    <button type="button" onClick={selectAllFiltered} className="text-sm text-blue-600 underline hover:text-blue-800">
                         {filteredPdls.every((pdl) => Array.isArray(data.pdl_ids) && data.pdl_ids.includes(pdl.id)) ? 'Deselect All' : 'Select All'}
                     </button>
                 </div>
@@ -453,7 +445,10 @@ function SimpleEventForm({ pdls, preselectedDate, onSuccess }: { pdls: any[]; pr
                         <div className="divide-y">
                             {filteredPdls.map((pdl) => (
                                 <label key={pdl.id} className="flex cursor-pointer items-center gap-3 p-3 hover:bg-muted/50">
-                                    <Checkbox checked={Array.isArray(data.pdl_ids) && data.pdl_ids.includes(pdl.id)} onCheckedChange={() => togglePdlSelection(pdl.id)} />
+                                    <Checkbox
+                                        checked={Array.isArray(data.pdl_ids) && data.pdl_ids.includes(pdl.id)}
+                                        onCheckedChange={() => togglePdlSelection(pdl.id)}
+                                    />
                                     <div>
                                         <div className="font-medium">
                                             {pdl.fname} {pdl.lname}

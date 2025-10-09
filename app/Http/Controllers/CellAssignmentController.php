@@ -7,11 +7,13 @@ use Inertia\Inertia;
 use App\Models\Pdl;
 use App\Models\Cells;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\CreateCellRequest;
 use App\Http\Requests\EditCellRequest;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\StoreCellAssignmentRequest;
 use App\Models\CellAssignment;
+use App\Models\CellTransferLog;
 
 class CellAssignmentController extends Controller
 {
@@ -35,10 +37,10 @@ class CellAssignmentController extends Controller
 
         $cells = Cells::all();
         $pdls = Pdl::whereDoesntHave('assignments')
-        ->whereHas('verifications', function ($query) {
-            $query->where('status', 'approved');
-        })
-        ->get();
+            ->whereHas('verifications', function ($query) {
+                $query->where('status', 'approved');
+            })
+            ->get();
 
 
 
@@ -158,5 +160,121 @@ class CellAssignmentController extends Controller
         $cell->update($validated);
 
         return redirect()->back()->with('success', 'Cell updated successfully.');
+    }
+
+    public function transfer(Request $request)
+    {
+        $validated = $request->validate([
+            'assignment_id' => 'required|exists:cell_assignments,assignment_id',
+            'to_cell_id' => 'required|exists:cells,cell_id',
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        $assignment = CellAssignment::with(['cell', 'pdl'])->findOrFail($validated['assignment_id']);
+        $toCell = Cells::findOrFail($validated['to_cell_id']);
+
+        // Check if transferring to the same cell
+        if ($assignment->cell_id === $validated['to_cell_id']) {
+            return back()->withErrors(['to_cell_id' => 'Cannot transfer PDL to the same cell.']);
+        }
+
+        // Check capacity of destination cell
+        $currentOccupancy = CellAssignment::where('cell_id', $validated['to_cell_id'])->count();
+        if ($currentOccupancy >= $toCell->capacity) {
+            return back()->withErrors(['to_cell_id' => 'Destination cell is at full capacity.']);
+        }
+
+        // Check gender compatibility
+        if (strtolower($assignment->pdl->gender) !== strtolower($toCell->gender)) {
+            return back()->withErrors(['to_cell_id' => "PDL gender ({$assignment->pdl->gender}) does not match destination cell gender ({$toCell->gender})."]);
+        }
+
+        // Start database transaction
+        DB::beginTransaction();
+        try {
+            // Log the transfer before updating assignment
+            CellTransferLog::create([
+                'assignment_id' => $assignment->assignment_id,
+                'pdl_id' => $assignment->pdl_id,
+                'from_cell_id' => $assignment->cell_id,
+                'to_cell_id' => $validated['to_cell_id'],
+                'transferred_by' => Auth::id(),
+                'reason' => $validated['reason'],
+                'transferred_at' => now(),
+            ]);
+
+            // Update the assignment
+            $assignment->update(['cell_id' => $validated['to_cell_id']]);
+
+            DB::commit();
+
+            return redirect()->back()
+                ->with('success', "PDL {$assignment->pdl->fname} {$assignment->pdl->lname} has been successfully transferred from {$assignment->cell->cell_name} to {$toCell->cell_name}.");
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->withErrors(['error' => 'Transfer failed. Please try again.']);
+        }
+    }
+
+    public function activityLog(Request $request)
+    {
+        $search = $request->input('search');
+        $cellId = $request->input('cell_id');
+        $perPage = $request->input('perPage', 10);
+
+        $query = CellTransferLog::with([
+            'pdl',
+            'fromCell',
+            'toCell',
+            'transferredBy'
+        ]);
+
+        // Filter by specific cell if cell_id is provided
+        if ($cellId) {
+            $query->where(function ($q) use ($cellId) {
+                $q->where('from_cell_id', $cellId)
+                  ->orWhere('to_cell_id', $cellId);
+            });
+        }
+
+        // Apply search filter
+        $query->when($search, function ($query, $search) {
+            $query->whereHas('pdl', function ($q) use ($search) {
+                $q->where('fname', 'like', "%{$search}%")
+                  ->orWhere('lname', 'like', "%{$search}%");
+            })
+            ->orWhereHas('fromCell', function ($q) use ($search) {
+                $q->where('cell_name', 'like', "%{$search}%");
+            })
+            ->orWhereHas('toCell', function ($q) use ($search) {
+                $q->where('cell_name', 'like', "%{$search}%");
+            })
+            ->orWhereHas('transferredBy', function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%");
+            });
+        });
+
+        $transferLogs = $query->latest('transferred_at')->paginate($perPage);
+
+        // Get cell information if filtering by specific cell
+        $cell = null;
+        if ($cellId) {
+            $cell = Cells::find($cellId);
+        }
+
+        return Inertia::render('records-officer/pdl-management/cell-activity-log', [
+            'transferLogs' => $transferLogs->items(),
+            'cell' => $cell,
+            'filters' => [
+                'search' => $search,
+                'cell_id' => $cellId,
+            ],
+            'pagination' => [
+                'current_page' => $transferLogs->currentPage(),
+                'last_page' => $transferLogs->lastPage(),
+                'total' => $transferLogs->total(),
+            ]
+        ]);
     }
 }
