@@ -15,11 +15,28 @@ class Activity extends Model
         'activity_name',
         'activity_date',
         'activity_time',
-        'pdl_id',
+
+        'pdl_ids',
     ];
 
-    public function pdl()
+    protected $casts = [
+        'pdl_ids' => 'array',
+    ];
+
+    public function pdls()
     {
-        return $this->belongsTo(\App\Models\Pdl::class, 'pdl_id', 'id');
+        if ($this->pdl_ids) {
+            // Handle both array and JSON string cases
+            $pdlIds = is_array($this->pdl_ids) ? $this->pdl_ids : json_decode($this->pdl_ids, true);
+            if (is_array($pdlIds) && !empty($pdlIds)) {
+                return Pdl::whereIn('id', $pdlIds)->get();
+            }
+        }
+        return collect();
+    }
+
+    public function getPdlsAttribute()
+    {
+        return $this->pdls();
     }
 }

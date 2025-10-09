@@ -204,8 +204,8 @@
         </p>
 
         <div class="person-list">
-            @foreach($data['person_names'] as $index => $name)
-                <div>{{ $index + 1 }}. {{ $name }}</div>
+            @foreach($data['persons'] as $index => $person)
+                <div>{{ $index + 1 }}. {{ $person['fname'] }} {{ $person['mname'] }} {{ $person['lname'] }}</div>
             @endforeach
         </div>
 

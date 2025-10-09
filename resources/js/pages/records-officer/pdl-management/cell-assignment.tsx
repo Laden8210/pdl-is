@@ -12,6 +12,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
 import { cell_assignment_columns } from '@/features/pdl-management/cell-assignment-columns';
 import { CreateCellAssignment } from '@/features/pdl-management/create-cell-assignment';
+import { TransferCell } from '@/features/pdl-management/transfer-cell';
 import { Cells, Pdl } from '@/types';
 
 interface PageProps {
@@ -54,6 +55,7 @@ export default function CellAssignment() {
     assigned_date: assignment.created_at
   }));
 
+
   // Filter assignments based on search and gender
   const filteredAssignmentData = useMemo(() => {
     let filtered = assignmentData;
@@ -73,6 +75,7 @@ export default function CellAssignment() {
 
     return filtered;
   }, [assignmentData, searchInput, genderFilter]);
+
 
   const handleSearch = () => {
     router.get('/admin/pdl-management/cell-assignment', {
@@ -102,7 +105,15 @@ export default function CellAssignment() {
             <CardTitle>
               <div className="flex items-center justify-between">
                 <span>Cell Assignment List</span>
-                <CreateCellAssignment cells={cells} pdls={pdls} />
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => router.get('/admin/pdl-management/cell-activity-log')}
+                  >
+                    View Activity Log
+                  </Button>
+                  <CreateCellAssignment cells={cells} pdls={pdls} />
+                </div>
               </div>
             </CardTitle>
           </CardHeader>
@@ -140,7 +151,18 @@ export default function CellAssignment() {
               </Select>
             </div>
 
-            <DataTable columns={cell_assignment_columns} data={filteredAssignmentData} />
+            <DataTable
+              columns={cell_assignment_columns.map(col =>
+                col.id === 'actions'
+                  ? { ...col, cell: ({ row }) => (
+                      <div className="flex items-center space-x-2">
+                        <TransferCell assignment={row.original} cells={cells} />
+                      </div>
+                    )}
+                  : col
+              )}
+              data={filteredAssignmentData}
+            />
           </CardContent>
         </Card>
       </div>

@@ -231,7 +231,7 @@ const steps = [
 ];
 
 interface UpdatePDLInformationProps {
-    pdl: any; // TODO: Define proper PDL type
+    pdl: any;
     [key: string]: any;
 }
 
@@ -283,6 +283,7 @@ export default function UpdatePDLInformation() {
         id: number;
         fname: string;
         lname: string;
+        mname: string;
         alias: string;
         birthdate: string;
         age: string;
@@ -335,6 +336,7 @@ export default function UpdatePDLInformation() {
         fname: pdl.fname || '',
         lname: pdl.lname || '',
         alias: pdl.alias || '',
+        mname: pdl.mname || '',
         birthdate: pdl.birthdate || '',
         age: pdl.age ? pdl.age.toString() : '',
         gender: pdl.gender || '',
@@ -657,6 +659,13 @@ export default function UpdatePDLInformation() {
                                         placeholder="Enter last name"
                                     />
                                 </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="mname">Middle Name</Label>
+                                    <Input id="mname" name="mname" value={data.mname} onChange={handleChange} placeholder="Enter middle name" />
+                                </div>
+
+
                                 <div className="space-y-2">
                                     <Label htmlFor="alias">Alias</Label>
                                     <Input
@@ -712,7 +721,7 @@ export default function UpdatePDLInformation() {
                                             <SelectItem value="Single">Single</SelectItem>
                                             <SelectItem value="Married">Married</SelectItem>
                                             <SelectItem value="Widowed">Widowed</SelectItem>
-                                            <SelectItem value="Divorced">Divorced</SelectItem>
+                                            <SelectItem value="Annulment">Annulment</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>

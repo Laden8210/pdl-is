@@ -27,7 +27,7 @@ class DashboardController extends Controller
             ->whereHas('verifications', function ($query) {
                 $query->where('status', 'approved');
             })
-            ->where('archive_status', '==', null)
+            ->where('archive_status', '=', null)
             ->groupBy('gender')
             ->get()
             ->map(function ($item) {

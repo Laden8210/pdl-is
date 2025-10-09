@@ -9,6 +9,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Download, FileText, User, Plus, X, Building } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 
+interface Person {
+    fname: string;
+    mname: string;
+    lname: string;
+    [key: string]: any;
+}
+
 interface CertificateData {
     title: string;
     facility_name: string;
@@ -19,7 +26,7 @@ interface CertificateData {
         tel: string;
         email: string;
     };
-    person_names: string[];
+    persons: Person[];
     requested_by: string;
     requesting_agency: string;
     issue_date: string;
@@ -33,7 +40,7 @@ interface CertificateData {
 interface PageProps {
     certificateData?: CertificateData;
     filters?: {
-        person_names?: string[];
+        persons?: Person[];
         requested_by?: string;
         requesting_agency?: string;
     };
@@ -41,32 +48,32 @@ interface PageProps {
 
 export default function NoRecordsCertificate({ certificateData, filters }: PageProps) {
     const { data, setData, post, processing } = useForm<{
-        person_names: string[];
+        persons: Person[];
         requested_by: string;
         requesting_agency: string;
         export_pdf: boolean;
     }>({
-        person_names: filters?.person_names || [''],
+        persons: filters?.persons || [{ fname: '', mname: '', lname: '' }],
         requested_by: filters?.requested_by || '',
         requesting_agency: filters?.requesting_agency || '',
         export_pdf: false,
     });
 
     const handleAddPerson = () => {
-        setData('person_names', [...data.person_names, '']);
+        setData('persons', [...data.persons, { fname: '', mname: '', lname: '' }]);
     };
 
     const handleRemovePerson = (index: number) => {
-        if (data.person_names.length > 1) {
-            const newNames = data.person_names.filter((_, i) => i !== index);
-            setData('person_names', newNames);
+        if (data.persons.length > 1) {
+            const newPersons = data.persons.filter((_, i) => i !== index);
+            setData('persons', newPersons);
         }
     };
 
-    const handlePersonNameChange = (index: number, value: string) => {
-        const newNames = [...data.person_names];
-        newNames[index] = value;
-        setData('person_names', newNames);
+    const handlePersonFieldChange = (index: number, field: keyof Person, value: string) => {
+        const newPersons = [...data.persons];
+        newPersons[index] = { ...newPersons[index], [field]: value };
+        setData('persons', newPersons);
     };
 
     const handleGenerate = (exportPdf: boolean = false) => {
@@ -76,14 +83,25 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
 
     const handleExport = () => {
         const params = new URLSearchParams();
-        data.person_names.forEach(name => {
-            params.append('person_names[]', name);
+        data.persons.forEach((person, index) => {
+            params.append(`persons[${index}][fname]`, person.fname || '');
+            params.append(`persons[${index}][mname]`, person.mname || '');
+            params.append(`persons[${index}][lname]`, person.lname || '');
         });
+
         params.append('requested_by', data.requested_by);
         params.append('requesting_agency', data.requesting_agency);
 
-        window.location.href = route('reports.no-records-certificate.export') + '?' + params.toString();
+        console.log(params.toString());
+        console.log(route('reports.no-records-certificate.export') + '?' + params.toString());
+
+        // open in new tab
+        window.open(route('reports.no-records-certificate.export') + '?' + params.toString(), '_blank');
+
+        //window.location.href = route('reports.no-records-certificate.export') + '?' + params.toString();
     };
+
+
 
     return (
         <AppLayout>
@@ -119,25 +137,50 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                             {/* Person Names */}
                             <div className="space-y-4">
                                 <Label className="text-base font-semibold">Person Names</Label>
-                                {data.person_names.map((name, index) => (
-                                    <div key={index} className="flex items-center space-x-2">
-                                        <div className="flex-1">
-                                            <Input
-                                                placeholder={`Person ${index + 1} Name`}
-                                                value={name}
-                                                onChange={(e) => handlePersonNameChange(index, e.target.value)}
-                                            />
+                                {data.persons.map((person, index) => (
+                                    <div key={index} className="space-y-3 p-4 border rounded-lg">
+                                        <div className="flex items-center justify-between">
+                                            <Label className="text-sm font-medium">Person {index + 1}</Label>
+                                            {data.persons.length > 1 && (
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => handleRemovePerson(index)}
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                         </div>
-                                        {data.person_names.length > 1 && (
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handleRemovePerson(index)}
-                                            >
-                                                <X className="h-4 w-4" />
-                                            </Button>
-                                        )}
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                            <div className="space-y-1">
+                                                <Label htmlFor={`fname-${index}`} className="text-xs">First Name</Label>
+                                                <Input
+                                                    id={`fname-${index}`}
+                                                    placeholder="First Name"
+                                                    value={person.fname}
+                                                    onChange={(e) => handlePersonFieldChange(index, 'fname', e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label htmlFor={`mname-${index}`} className="text-xs">Middle Name</Label>
+                                                <Input
+                                                    id={`mname-${index}`}
+                                                    placeholder="Middle Name"
+                                                    value={person.mname}
+                                                    onChange={(e) => handlePersonFieldChange(index, 'mname', e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label htmlFor={`lname-${index}`} className="text-xs">Last Name</Label>
+                                                <Input
+                                                    id={`lname-${index}`}
+                                                    placeholder="Last Name"
+                                                    value={person.lname}
+                                                    onChange={(e) => handlePersonFieldChange(index, 'lname', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
                                 ))}
                                 <Button
@@ -177,7 +220,7 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                             <div className="flex space-x-2">
                                 <Button
                                     onClick={() => handleGenerate(false)}
-                                    disabled={processing || !data.person_names.some(name => name.trim()) || !data.requested_by || !data.requesting_agency}
+                                    disabled={processing || !data.persons.some(person => person.fname.trim() || person.lname.trim()) || !data.requested_by || !data.requesting_agency}
                                     className="flex-1"
                                 >
                                     <FileText className="h-4 w-4 mr-2" />
@@ -185,7 +228,7 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                                 </Button>
                                 <Button
                                     onClick={() => handleExport()}
-                                    disabled={processing || !data.person_names.some(name => name.trim()) || !data.requested_by || !data.requesting_agency}
+                                    disabled={processing || !data.persons.some(person => person.fname.trim() || person.lname.trim()) || !data.requested_by || !data.requesting_agency}
                                     variant="outline"
                                 >
                                     <Download className="h-4 w-4 mr-2" />
@@ -229,25 +272,25 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
 
                                     <div className="space-y-3">
                                         <div className="font-bold underline">TO WHOM IT MAY CONCERN:</div>
-                                        
+
                                         <div className="text-sm leading-relaxed">
                                             <p>
-                                                <strong>THIS IS TO CERTIFY</strong> that this office has no records, 
+                                                <strong>THIS IS TO CERTIFY</strong> that this office has no records,
                                                 whatsoever affecting the following persons:
                                             </p>
                                         </div>
 
                                         <div className="text-sm ml-4">
-                                            {certificateData.person_names.map((name, index) => (
+                                            {certificateData.persons.map((person, index) => (
                                                 <div key={index} className="mb-1">
-                                                    {index + 1}. {name}
+                                                    {index + 1}. {person.fname} {person.mname} {person.lname}
                                                 </div>
                                             ))}
                                         </div>
 
                                         <div className="text-sm leading-relaxed">
                                             <p>
-                                                This certification is issued upon the request of {certificateData.requested_by}, 
+                                                This certification is issued upon the request of {certificateData.requested_by},
                                                 {certificateData.requesting_agency} for whatever legal purpose it may serve him best.
                                             </p>
                                         </div>
@@ -279,7 +322,7 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                                         <div className="flex items-center space-x-2">
                                             <User className="h-4 w-4 text-blue-600" />
                                             <span className="font-medium">Persons Listed:</span>
-                                            <span>{certificateData.person_names.length}</span>
+                                            <span>{certificateData.persons.length}</span>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <Building className="h-4 w-4 text-green-600" />

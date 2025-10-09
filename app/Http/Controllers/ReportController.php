@@ -1947,15 +1947,32 @@ class ReportController extends Controller
 
     public function generateNoRecordsCertificate(Request $request)
     {
-        $request->validate([
-            'person_names' => 'required|array|min:1',
-            'person_names.*' => 'required|string|max:255',
-            'requested_by' => 'required|string|max:255',
-            'requesting_agency' => 'required|string|max:255',
-            'export_pdf' => 'boolean'
-        ]);
+        // $request->validate([
+        //     'persons' => 'required|array|min:1',
+        //     'persons.*.fname' => 'required|string|max:255',
+        //     'persons.*.mname' => 'nullable|string|max:255',
+        //     'persons.*.lname' => 'required|string|max:255',
+        //     'requested_by' => 'required|string|max:255',
+        //     'requesting_agency' => 'required|string|max:255',
+        //     'export_pdf' => 'boolean'
+        // ]);
 
         $currentDate = now();
+
+        // Format person names for display
+        $formattedPersons = collect($request->persons)->map(function ($person) {
+            $name = trim($person['fname']);
+            if (!empty($person['mname'])) {
+                $name .= ' ' . trim($person['mname']);
+            }
+            $name .= ' ' . trim($person['lname']);
+            return [
+                'fname' => $person['fname'],
+                'mname' => $person['mname'],
+                'lname' => $person['lname'],
+                'full_name' => trim($name)
+            ];
+        });
 
         $data = [
             'title' => 'CERTIFICATE OF NO RECORDS',
@@ -1967,7 +1984,7 @@ class ReportController extends Controller
                 'tel' => '(083) 228-2445',
                 'email' => 'socot.scrdcjail@gmail.com'
             ],
-            'person_names' => $request->person_names,
+            'persons' => $formattedPersons->toArray(),
             'requested_by' => $request->requested_by,
             'requesting_agency' => $request->requesting_agency,
             'issue_date' => $currentDate->format('F d, Y'),
@@ -1985,7 +2002,7 @@ class ReportController extends Controller
         return Inertia::render('admin/report/no-records-certificate', [
             'certificateData' => $data,
             'filters' => [
-                'person_names' => $request->person_names,
+                'persons' => $request->persons,
                 'requested_by' => $request->requested_by,
                 'requesting_agency' => $request->requesting_agency
             ]
@@ -1995,13 +2012,30 @@ class ReportController extends Controller
     public function exportNoRecordsCertificatePdf(Request $request)
     {
         $request->validate([
-            'person_names' => 'required|array|min:1',
-            'person_names.*' => 'required|string|max:255',
+            'persons' => 'required|array|min:1',
+            'persons.*.fname' => 'required|string|max:255',
+            'persons.*.mname' => 'nullable|string|max:255',
+            'persons.*.lname' => 'required|string|max:255',
             'requested_by' => 'required|string|max:255',
             'requesting_agency' => 'required|string|max:255'
         ]);
 
         $currentDate = now();
+
+        // Format person names for display
+        $formattedPersons = collect($request->persons)->map(function ($person) {
+            $name = trim($person['fname']);
+            if (!empty($person['mname'])) {
+                $name .= ' ' . trim($person['mname']);
+            }
+            $name .= ' ' . trim($person['lname']);
+            return [
+                'fname' => $person['fname'],
+                'mname' => $person['mname'],
+                'lname' => $person['lname'],
+                'full_name' => trim($name)
+            ];
+        });
 
         $data = [
             'title' => 'CERTIFICATE OF NO RECORDS',
@@ -2013,7 +2047,7 @@ class ReportController extends Controller
                 'tel' => '(083) 228-2445',
                 'email' => 'socot.scrdcjail@gmail.com'
             ],
-            'person_names' => $request->person_names,
+            'persons' => $formattedPersons->toArray(),
             'requested_by' => $request->requested_by,
             'requesting_agency' => $request->requesting_agency,
             'issue_date' => $currentDate->format('F d, Y'),

@@ -30,6 +30,9 @@ class ProfileManagementController extends Controller
 
 
         if ($request->filled('password')) {
+            if ($request->input('password') !== $request->input('cpassword')) {
+                return redirect()->back()->with('error', 'Password and confirm password do not match.');
+            }
             $user->password = Hash::make($request->input('password'));
         }
 

@@ -13,7 +13,7 @@ import { getAge } from '@/lib/dateUtils';
 import { PageProps, type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { AlertCircle, Archive, Edit } from 'lucide-react';
+import { Archive, Edit } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -34,7 +34,7 @@ interface PersonalInformationProps extends PageProps {
 
 export default function PersonalInformation() {
     const { props } = usePage<PersonalInformationProps>();
-    const { verifications, flash, } = props;
+    const { verifications, flash } = props;
     console.log('Verifications:', verifications);
 
     const { auth, errors } = props;
@@ -80,7 +80,6 @@ export default function PersonalInformation() {
         archive_reason: '',
         archive_court_order_type: '',
         archive_court_order_file: null as File | null,
-
     });
 
     const handleCustodyDates = (pdl: any) => {
@@ -115,7 +114,6 @@ export default function PersonalInformation() {
             archive_reason: '',
             archive_court_order_type: '',
             archive_court_order_file: null,
-
         });
         setArchiveDialogOpen(true);
     };
@@ -175,7 +173,6 @@ export default function PersonalInformation() {
                         archive_reason: '',
                         archive_court_order_type: '',
                         archive_court_order_file: null,
-
                     });
                 },
                 onError: (errors) => {
@@ -189,7 +186,6 @@ export default function PersonalInformation() {
         }
     };
     const successMessage = props.success;
-
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -205,10 +201,10 @@ export default function PersonalInformation() {
 
                                 <div className="flex gap-2">
                                     {!isAdmin && (
-                                    <Link
-                                    href="/pdl-management/personal-information/create"
-                                        className="flex items-center gap-2 rounded-sm bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
-                                            >
+                                        <Link
+                                            href="/pdl-management/personal-information/create"
+                                            className="flex items-center gap-2 rounded-sm bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
+                                        >
                                             Add PDL Information
                                         </Link>
                                     )}
@@ -240,7 +236,12 @@ export default function PersonalInformation() {
                                         verification.pdl && (
                                             <TableRow key={verification.pdl.id}>
                                                 <TableCell>{verification.pdl.id}</TableCell>
-                                                <TableCell>{`${verification.pdl.fname} ${verification.pdl.lname}`}</TableCell>
+                                                <TableCell>
+                                                    {`${verification.pdl.fname} ${verification.pdl.mname} ${verification.pdl.lname}`
+                                                        .split(' ')
+                                                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                                                        .join(' ')}
+                                                </TableCell>
                                                 <TableCell>{verification.pdl.alias ?? '-'}</TableCell>
                                                 <TableCell>{verification.pdl.gender ?? '-'}</TableCell>
                                                 <TableCell>{verification.pdl.ethnic_group ?? '-'}</TableCell>
@@ -257,11 +258,10 @@ export default function PersonalInformation() {
                                                 <TableCell className="space-x-1">
                                                     <ViewPdlInformation pdl={verification.pdl} />
                                                     {!isAdmin && (
-
-                                                    <Button variant="outline" size="sm" onClick={() => handleArchive(verification.pdl)}>
-                                                        <Archive className="mr-1 h-4 w-4" />
-                                                        Archive
-                                                    </Button>
+                                                        <Button variant="outline" size="sm" onClick={() => handleArchive(verification.pdl)}>
+                                                            <Archive className="mr-1 h-4 w-4" />
+                                                            Archive
+                                                        </Button>
                                                     )}
 
                                                     {!isAdmin && (
@@ -473,7 +473,6 @@ export default function PersonalInformation() {
                                 </Alert>
                             )}
 
-
                             <div className="space-y-2">
                                 <Label htmlFor="archive_status">Archive Status *</Label>
                                 <Select value={archiveData.archive_status} onValueChange={(value) => setArchiveData('archive_status', value)}>
@@ -538,7 +537,6 @@ export default function PersonalInformation() {
                                 />
                                 <p className="text-sm text-gray-500">Upload PDF, JPG, JPEG, or PNG file (max 10MB)</p>
                             </div>
-
 
                             <div className="flex justify-end space-x-2">
                                 <Button variant="outline" onClick={() => setArchiveDialogOpen(false)}>

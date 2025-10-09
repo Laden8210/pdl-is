@@ -1,14 +1,6 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { ViewCellActivityLog } from "@/features/pdl-management/view-cell-activity-log";
 import { Badge } from "@/components/ui/badge";
 import { UpdateCellInformation } from "@/features/pdl-management/edit-cell-information";
 import { Cells } from "@/types";
@@ -62,13 +54,7 @@ export const cell_management_columns: ColumnDef<Cells>[] = [
                 ...cell,
                 description: cell.description ?? ""
             }} />
-            <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => console.log("Delete cell", cell.cell_id)}
-            >
-                Delete
-            </Button>
+            <ViewCellActivityLog cell={cell} />
         </div>
     );
     },

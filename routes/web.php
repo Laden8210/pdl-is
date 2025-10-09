@@ -104,6 +104,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     Route::get('/pdl-management/cell-assignment', [CellAssignmentController::class, 'index'])->name('cell-assignments.index');
     Route::post('/pdl-management/cell-assignment', [CellAssignmentController::class, 'assign'])->name('cell-assignments.store');
+    Route::post('/pdl-management/cell-assignment/transfer', [CellAssignmentController::class, 'transfer'])->name('cell-assignments.transfer');
+    Route::get('/pdl-management/cell-activity-log', [CellAssignmentController::class, 'activityLog'])->name('cell-assignments.activity-log');
     Route::post('/pdl-management/create', [PDLManagementController::class, 'create'])->name('pdl-management.create');
     Route::put('/pdl-management/{pdl}', [PDLManagementController::class, 'update'])->name('pdl-management.update');
 
@@ -180,6 +182,8 @@ Route::middleware(['auth', 'record.officer'])->prefix('record-officer')->group(f
 
     Route::delete('/pdl-management/case-information/{case}', [CaseInformationController::class, 'destroy'])->name('case-information.destroy');
     Route::get('/pdl-management/cell-assignment', [CellAssignmentController::class, 'index'])->name('cell-assignments.index');
+
+    Route::get('/pdl-management/cell-activity-log', [CellAssignmentController::class, 'activityLog'])->name('cell-assignments.activity-log');
     Route::get('/pdl-management/court-order', [PDLManagementController::class, 'court_order'])->name('pdl-management.court-order');
     Route::post('/pdl-management/court-order', [PDLManagementController::class, 'store_court_order'])->name('court-orders.store');
     Route::get('/pdl-management/court-order/{courtOrder}/edit', [PDLManagementController::class, 'edit_court_order'])->name('court-orders.edit');
@@ -304,6 +308,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/jail-events', [JailEventsController::class, 'store'])->name('admin.jail-events.store');
     Route::post('/jail-events', [JailEventsController::class, 'store'])->name('record-officer.jail-events.store');
+    Route::post('/pdl-management/cell-assignment/transfer', [CellAssignmentController::class, 'transfer'])->name('cell-assignments.transfer');
 });
 
 Route::get('storage/profile_images/{filename}', function ($filename) {
