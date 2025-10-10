@@ -189,7 +189,7 @@ export function AppSidebarHeader({ breadcrumbs = [], notifications = [], auth }:
 
   // Search functions
   const performSearch = async (query: string) => {
-    if (!query || query.length < 2) {
+    if (!query || query.length < 1) {
       setSearchResults(null);
       return;
     }
@@ -242,7 +242,7 @@ export function AppSidebarHeader({ breadcrumbs = [], notifications = [], auth }:
     }
 
     // Set new timeout for search (only if query is long enough)
-    if (query.length >= 2) {
+    if (query.length >= 1) {
       searchTimeoutRef.current = setTimeout(() => {
         performSearch(query);
       }, 300);

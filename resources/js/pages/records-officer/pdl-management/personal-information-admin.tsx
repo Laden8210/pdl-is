@@ -453,25 +453,7 @@ export default function PersonalInformation() {
                             </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4">
-                            {Object.keys(errors).length > 0 && (
-                                <Alert variant="destructive" className="mt-4 mb-4">
-                                    <AlertTitle>Unable to process request</AlertTitle>
-                                    <AlertDescription>
-                                        {Object.values(errors).map((error, index) => (
-                                            <ul className="list-inside list-disc text-sm" key={index}>
-                                                <li>{error}</li>
-                                            </ul>
-                                        ))}
-                                    </AlertDescription>
-                                </Alert>
-                            )}
-
-                            {successMessage && (
-                                <Alert variant="default" className="mb-4">
-                                    <AlertTitle>Success</AlertTitle>
-                                    <AlertDescription>{successMessage}</AlertDescription>
-                                </Alert>
-                            )}
+                     
 
                             <div className="space-y-2">
                                 <Label htmlFor="archive_status">Archive Status *</Label>

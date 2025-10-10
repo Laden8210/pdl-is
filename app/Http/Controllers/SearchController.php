@@ -22,21 +22,80 @@ class SearchController extends Controller
     {
         $query = $request->get('q', '');
 
-        if (empty($query) || strlen($query) < 2) {
+        if (empty($query) || strlen($query) < 1) {
             return response()->json([
                 'results' => [],
                 'total' => 0,
-                'message' => 'Please enter at least 2 characters to search'
+                'message' => 'Please enter at least 1 characters to search'
             ]);
         }
 
         $searchTerm = '%' . $query . '%';
         $results = [];
 
+        $query = strtolower($query);
+
+        if($query == 'pdl') {
+            $results = Pdl::whereNull('deleted_at')
+            ->limit(10)
+            ->get()
+            ->map(function ($pdl) use ($query) {
+                return [
+                    'type' => 'pdl',
+                    'id' => $pdl->id,
+                    'title' => "{$pdl->fname} {$pdl->lname}",
+                    'subtitle' => "PDL #{$pdl->id} • {$pdl->gender} • Age: {$pdl->age}",
+                    'description' => "{$pdl->brgy}, {$pdl->city}, {$pdl->province}",
+                    'url' => route('search.results', ['q' => $query, 'category' => 'pdl', 'type' => 'pdl', 'id' => $pdl->id]),
+                    'icon' => 'users',
+                    'category' => 'Persons Deprived of Liberty'
+                ];
+            });
+
+            $groupedResults = $results->groupBy('category');
+            $allResults = $results->count();
+            return response()->json([
+                'results' => $groupedResults,
+                'total' => $allResults,
+                'query' => $query,
+                'categories' => $groupedResults->keys()->toArray()
+            ]);
+        }
+
+    
+
+        if($query == 'court order') {
+            $results = CourtOrder::with('pdl')
+            ->limit(10)
+            ->get()
+            ->map(function ($courtOrder) use ($query) {
+                return [
+                    'type' => 'court_order',
+                    'id' => $courtOrder->court_order_id,
+                    'title' => $courtOrder->order_type,
+                    'subtitle' => $courtOrder->pdl ? "{$courtOrder->pdl->fname} {$courtOrder->pdl->lname}" : 'Unknown PDL',
+                    'description' => "{$courtOrder->court_branch} • " . ($courtOrder->order_date ? $courtOrder->order_date->format('M d, Y') : 'No date'),
+                    'url' => route('search.results', ['q' => $query, 'category' => 'court_order', 'type' => 'court_order', 'id' => $courtOrder->court_order_id]),
+                    'icon' => 'gavel',
+                    'category' => 'Court Orders'
+                ];
+            });
+
+            $groupedResults = $results->groupBy('category');
+            $allResults = $results->count();
+            return response()->json([
+                'results' => $groupedResults,
+                'total' => $allResults,
+                'query' => $query,
+                'categories' => $groupedResults->keys()->toArray()
+            ]);
+        }
+
         // Search PDL (Persons Deprived of Liberty)
         $pdlResults = Pdl::whereNull('deleted_at')
             ->where(function ($q) use ($searchTerm) {
-                $q->where('fname', 'LIKE', $searchTerm)
+                $q->where('id', 'LIKE', $searchTerm)
+                    ->orWhere('fname', 'LIKE', $searchTerm)
                   ->orWhere('lname', 'LIKE', $searchTerm)
                   ->orWhere('alias', 'LIKE', $searchTerm)
                   ->orWhere(DB::raw("CONCAT(fname, ' ', lname)"), 'LIKE', $searchTerm)
@@ -63,7 +122,8 @@ class SearchController extends Controller
         $personnelResults = Personnel::whereNull('deleted_at')
             ->where('status', 'active')
             ->where(function ($q) use ($searchTerm) {
-                $q->where('fname', 'LIKE', $searchTerm)
+                $q->where('id', 'LIKE', $searchTerm)
+                ->orWhere('fname', 'LIKE', $searchTerm)
                   ->orWhere('lname', 'LIKE', $searchTerm)
                   ->orWhere('username', 'LIKE', $searchTerm)
                   ->orWhere(DB::raw("CONCAT(fname, ' ', lname)"), 'LIKE', $searchTerm)
@@ -88,7 +148,8 @@ class SearchController extends Controller
         // Search Case Information
         $caseResults = CaseInformation::with('pdl')
             ->where(function ($q) use ($searchTerm) {
-                $q->where('case_number', 'LIKE', $searchTerm)
+                $q->where('case_id', 'LIKE', $searchTerm)
+                    ->orWhere('case_number', 'LIKE', $searchTerm)
                   ->orWhere('crime_committed', 'LIKE', $searchTerm)
                   ->orWhere('case_status', 'LIKE', $searchTerm)
                   ->orWhere('security_classification', 'LIKE', $searchTerm)
@@ -116,7 +177,8 @@ class SearchController extends Controller
         // Search Court Orders
         $courtOrderResults = CourtOrder::with('pdl')
             ->where(function ($q) use ($searchTerm) {
-                $q->where('order_type', 'LIKE', $searchTerm)
+                $q->where('court_order_id', 'LIKE', $searchTerm)
+                ->orWhere('order_type', 'LIKE', $searchTerm)
                   ->orWhere('court_branch', 'LIKE', $searchTerm)
                   ->orWhere('remarks', 'LIKE', $searchTerm)
                   ->orWhereHas('pdl', function ($pdlQuery) use ($searchTerm) {
@@ -143,7 +205,8 @@ class SearchController extends Controller
         // Search Medical Records
         $medicalResults = MedicalRecord::with('pdl')
             ->where(function ($q) use ($searchTerm) {
-                $q->where('complaint', 'LIKE', $searchTerm)
+                $q->where('medical_record_id', 'LIKE', $searchTerm)
+                ->orWhere('complaint', 'LIKE', $searchTerm)
                   ->orWhere('prognosis', 'LIKE', $searchTerm)
                   ->orWhere('findings', 'LIKE', $searchTerm)
                   ->orWhere('prescription', 'LIKE', $searchTerm)
@@ -171,7 +234,8 @@ class SearchController extends Controller
         // Search Physical Characteristics
         $physicalResults = PhysicalCharacteristic::with('pdl')
             ->where(function ($q) use ($searchTerm) {
-                $q->where('identification_marks', 'LIKE', $searchTerm)
+                $q->where('characteristic_id', 'LIKE', $searchTerm)
+                ->orWhere('identification_marks', 'LIKE', $searchTerm)
                   ->orWhere('mark_location', 'LIKE', $searchTerm)
                   ->orWhere('remark', 'LIKE', $searchTerm)
                   ->orWhereHas('pdl', function ($pdlQuery) use ($searchTerm) {
@@ -215,6 +279,8 @@ class SearchController extends Controller
                     'category' => 'Cells'
                 ];
             });
+
+
 
         // Combine all results
         $allResults = collect()
