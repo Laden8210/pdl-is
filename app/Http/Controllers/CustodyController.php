@@ -92,6 +92,16 @@ class CustodyController extends Controller
                 'awarded_at' => $currentMonth->copy()->endOfMonth(), // Award at end of month
             ]);
 
+            // Create TASTM record for this month
+            TimeAllowance::create([
+                'pdl_id' => $pdl->id,
+                'type' => 'TASTM',
+                'days' => $tastmDays,
+                'reason' => "TASTM for " . $currentMonth->format('F Y'),
+                'awarded_by' => auth()->id() ?? 1,
+                'awarded_at' => $currentMonth->copy()->endOfMonth(),
+            ]);
+
 
 
             // Move to next month

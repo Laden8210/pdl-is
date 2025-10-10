@@ -19,237 +19,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { Check, ChevronsUpDown, Eye, FileText, Image, Upload, X } from 'lucide-react';
+import { Check, ChevronsUpDown, Eye, FileText, Image, Upload, X, Loader2 } from 'lucide-react';
+import { usePSGCLocation } from '@/hooks/usePSGCLocation';
 
-// Location data for South Cotabato Province
-const locationData = {
-    province: 'South Cotabato',
-    cities: {
-        'Koronadal City': [
-            'Assumption',
-            'Avanceña',
-            'Cacub',
-            'Caloocan',
-            'Concepcion',
-            'Esperanza',
-            'General Paulino Santos',
-            'Mabini',
-            'Magsaysay',
-            'Mambucal',
-            'Morales',
-            'Namnama',
-            'New Pangasinan',
-            'Paraiso',
-            'Rotonda',
-            'San Isidro',
-            'San Jose',
-            'San Roque',
-            'Santa Cruz',
-            'Saravia',
-            'Santo Niño',
-            'Topland',
-            'Zone I',
-            'Zone II',
-            'Zone III',
-            'Zone IV',
-            'Carpenter Hill',
-        ],
-        'General Santos City': [
-            'Apopong',
-            'Baluan',
-            'Batomelong',
-            'Buayan',
-            'Bula',
-            'Calumpang',
-            'City Heights',
-            'Dadiangas East',
-            'Dadiangas North',
-            'Dadiangas South',
-            'Dadiangas West',
-            'Fatima',
-            'Katangawan',
-            'Labangal',
-            'Lagao',
-            'Ligaya',
-            'Mabuhay',
-            'Nalum',
-            'Olympog',
-            'San Isidro',
-            'San Jose',
-            'Sinawal',
-            'Tambler',
-            'Tinagacan',
-            'Upper Labay',
-            'Conel',
-        ],
-        Polomolok: [
-            'Bentung',
-            'Cannery Site',
-            'Crossing Palkan',
-            'Glamang',
-            'Kinilis',
-            'Klinan 6',
-            'Koronadal Proper',
-            'Lam-Caliaf',
-            'Landan',
-            'Lapu',
-            'Lumakil',
-            'Magsaysay',
-            'Maligo',
-            'Pagalungan',
-            'Palkan',
-            'Poblacion',
-            'Polo',
-            'Rubber',
-            'Silway 7',
-            'Silway 8',
-            'Sulit',
-            'Sumbakil',
-            'Upper Klinan',
-        ],
-        Tupi: [
-            'Acmonan',
-            'Bololmala',
-            'Bunao',
-            'Cebuano',
-            'Crossing Rubber',
-            'Kalkam',
-            'Linan',
-            'Lunen',
-            'Miasong',
-            'Palian',
-            'Poblacion',
-            'Polonuling',
-            'Simbo',
-            'Tamayo',
-            'Tubeng',
-        ],
-        Tampakan: [
-            'Albagan',
-            'Buto',
-            'Danlag',
-            'Kipalbig',
-            'Lambayong',
-            'Lampitak',
-            'Liberty',
-            'Maltana',
-            'Palo',
-            'Poblacion',
-            'Pula-bato',
-            'San Isidro',
-            'Santa Cruz',
-            'Tablu',
-        ],
-        'Santo Niño': [
-            'Ambalgan',
-            'Guinsang-an',
-            'Katipunan',
-            'Manuel Roxas',
-            'Panay',
-            'Poblacion',
-            'Sajaneba',
-            'San Isidro',
-            'San Vicente',
-            'Teresita',
-        ],
-        Surallah: [
-            'Ala',
-            'Buenavista',
-            'Centrala',
-            'Dajay',
-            'Duhay-Labi',
-            'Lambontong',
-            'Libertad',
-            'Littler',
-            'Moloy',
-            'Naci',
-            'Tala',
-            'Tibio',
-            'Tubi-Alla',
-            'Upper Sepaka',
-            'Columbio',
-            'Sultan Miralam',
-            'Lambingi',
-        ],
-        Norala: [
-            'Benigno Aquino',
-            'Esperanza',
-            'Five Storey',
-            'J.P. Laurel',
-            'Kahilwayan',
-            'Katipunan',
-            'Lambontong',
-            'Liberty',
-            'Poblacion',
-            'Puting Bato',
-            'San Jose',
-            'San Miguel',
-            'Sto. Niño',
-            'Tinublaran',
-        ],
-        'Lake Sebu': [
-            'Bacdulong',
-            'Denlag',
-            'Halilan',
-            'Hanoon',
-            'Klubi',
-            'Lake Lahit',
-            'Lamcade',
-            'Lamdalag',
-            'Lamfugon',
-            'Lamlahak',
-            'Lower Maculan',
-            'Luhib',
-            'Ned',
-            'Poblacion',
-            'Siluton',
-            'Takunel',
-            'Talisay',
-            'Tasiman',
-            'Upper Maculan',
-        ],
-        Banga: [
-            'Benitez',
-            'Cabudian',
-            'Cabuling',
-            'Cinco',
-            'Derilon',
-            'El Nonok',
-            'Improgo Village',
-            'Kusan',
-            'Lam-apos',
-            'Lamba',
-            'Lambingi',
-            'Lampari',
-            'Liwanay',
-            'Malaya',
-            'Punong Grande',
-            'Rang-ay',
-            'Reyes',
-            'Rizal',
-            'Rizal Poblacion',
-            'San Jose',
-            'San Vicente',
-            'Yangco Poblacion',
-        ],
-
-        Tangtangan: [
-            'Bukay Pait',
-            'Cabuling',
-            'Dumadalig',
-            'Libas',
-            'Magon',
-            'Maibo',
-            'Mangilala',
-            'New Cuyapo',
-            'New Iloilo',
-            'New Lambunao',
-            'Poblacion',
-            'San Felipe',
-            'Tinongcop',
-        ],
-    },
-};
 
 // Order type suggestions
 const orderTypeSuggestions = [
@@ -590,12 +362,27 @@ export default function CreatePDLInformation() {
     const [activeCaseIndex, setActiveCaseIndex] = useState(0);
     const [crimeCommittedOpen, setCrimeCommittedOpen] = useState(false);
     const [medicalFile, setMedicalFile] = useState<File | null>(null);
-    const [selectedCity, setSelectedCity] = useState<string>('');
-    const [availableBarangays, setAvailableBarangays] = useState<string[]>([]);
     const [documentPreview, setDocumentPreview] = useState<string | null>(null);
     const [medicalPreview, setMedicalPreview] = useState<string | null>(null);
     const [isCustomOrderType, setIsCustomOrderType] = useState<boolean>(false);
     const [orderTypeOpen, setOrderTypeOpen] = useState(false);
+
+    // PSGC Location hook
+    const {
+        provinces,
+        citiesMunicipalities,
+        barangays,
+        selectedProvince,
+        selectedCityMunicipality,
+        selectedBarangay,
+        loading,
+        error: locationError,
+        handleProvinceChange,
+        handleCityMunicipalityChange,
+        handleBarangayChange,
+        getSelectedLocationNames,
+        resetSelections,
+    } = usePSGCLocation();
 
     // Helper function to get all crime types as a flat array
     const getAllCrimeTypes = () => {
@@ -618,17 +405,24 @@ export default function CreatePDLInformation() {
         setData('order_type', value);
     };
 
-    // Handle city selection and update barangays
-    const handleCityChange = (city: string) => {
-        setSelectedCity(city);
-        setData('city', city);
-        if (city && locationData.cities[city as keyof typeof locationData.cities]) {
-            setAvailableBarangays(locationData.cities[city as keyof typeof locationData.cities]);
-        } else {
-            setAvailableBarangays([]);
+    // Handle location changes
+    const handleLocationChange = (type: 'province' | 'city' | 'barangay', code: string) => {
+        if (type === 'province') {
+            const province = provinces.find(p => p.code === code);
+            handleProvinceChange(code);
+            setData('province', province?.name || '');
+            setData('city', '');
+            setData('brgy', '');
+        } else if (type === 'city') {
+            const city = citiesMunicipalities.find(c => c.code === code);
+            handleCityMunicipalityChange(code);
+            setData('city', city?.name || '');
+            setData('brgy', '');
+        } else if (type === 'barangay') {
+            const barangay = barangays.find(b => b.code === code);
+            handleBarangayChange(code);
+            setData('brgy', barangay?.name || '');
         }
-        // Clear barangay selection when city changes
-        setData('brgy', '');
     };
 
     // Handle document preview for all supported formats
@@ -822,7 +616,7 @@ export default function CreatePDLInformation() {
         civil_status: '',
         brgy: '',
         city: '',
-        province: locationData.province,
+        province: '',
         order_type: '',
         order_date: '',
         received_date: '',
@@ -897,8 +691,7 @@ export default function CreatePDLInformation() {
                 setActiveCaseIndex(0);
                 setCurrentStep(1);
                 setMedicalFile(null);
-                setSelectedCity('');
-                setAvailableBarangays([]);
+                resetSelections();
                 setDocumentPreview(null);
                 setMedicalPreview(null);
                 setIsCustomOrderType(false);
@@ -1045,48 +838,119 @@ export default function CreatePDLInformation() {
 
                             <div>
                                 <h3 className="mb-4 text-lg font-medium">Address Information</h3>
+                                
+                                {/* Location Error Alert */}
+                                {locationError && (
+                                    <Alert variant="destructive" className="mb-4">
+                                        <AlertTitle>Location Service Error</AlertTitle>
+                                        <AlertDescription>
+                                            {locationError}. Please refresh the page or try again later.
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
+
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                     <div className="space-y-2">
-                                        <Label htmlFor="province">Province</Label>
-                                        <Input id="province" name="province" value={data.province} disabled className="bg-gray-100" />
-                                        <div className="text-xs text-muted-foreground">Default: South Cotabato</div>
+                                        <Label htmlFor="province">
+                                            Province
+                                            <span className="text-red-500">*</span>
+                                        </Label>
+                                        <Select 
+                                            value={selectedProvince} 
+                                            onValueChange={(value) => handleLocationChange('province', value)}
+                                            disabled={loading.provinces}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder={loading.provinces ? "Loading provinces..." : "Select province"} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {provinces.map((province) => (
+                                                    <SelectItem key={province.code} value={province.code}>
+                                                        {province.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {loading.provinces && (
+                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                <Loader2 className="h-3 w-3 animate-spin" />
+                                                Loading provinces...
+                                            </div>
+                                        )}
                                     </div>
+                                    
                                     <div className="space-y-2">
                                         <Label htmlFor="city">
                                             City/Municipality
                                             <span className="text-red-500">*</span>
                                         </Label>
-                                        <Select value={selectedCity} onValueChange={handleCityChange}>
+                                        <Select 
+                                            value={selectedCityMunicipality} 
+                                            onValueChange={(value) => handleLocationChange('city', value)}
+                                            disabled={!selectedProvince || loading.citiesMunicipalities}
+                                        >
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select city/municipality" />
+                                                <SelectValue placeholder={
+                                                    !selectedProvince 
+                                                        ? "Select province first" 
+                                                        : loading.citiesMunicipalities 
+                                                            ? "Loading cities/municipalities..." 
+                                                            : "Select city/municipality"
+                                                } />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {Object.keys(locationData.cities).map((city) => (
-                                                    <SelectItem key={city} value={city}>
-                                                        {city}
+                                                {citiesMunicipalities.map((city) => (
+                                                    <SelectItem key={city.code} value={city.code}>
+                                                        {city.name}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
+                                        {loading.citiesMunicipalities && (
+                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                <Loader2 className="h-3 w-3 animate-spin" />
+                                                Loading cities/municipalities...
+                                            </div>
+                                        )}
+                                        {!selectedProvince && (
+                                            <div className="text-xs text-muted-foreground">Please select a province first</div>
+                                        )}
                                     </div>
+                                    
                                     <div className="space-y-2">
                                         <Label htmlFor="brgy">
                                             Barangay
                                             <span className="text-red-500">*</span>
                                         </Label>
-                                        <Select value={data.brgy} onValueChange={(value) => setData('brgy', value)} disabled={!selectedCity}>
+                                        <Select 
+                                            value={selectedBarangay} 
+                                            onValueChange={(value) => handleLocationChange('barangay', value)}
+                                            disabled={!selectedCityMunicipality || loading.barangays}
+                                        >
                                             <SelectTrigger>
-                                                <SelectValue placeholder={selectedCity ? 'Select barangay' : 'Select city first'} />
+                                                <SelectValue placeholder={
+                                                    !selectedCityMunicipality 
+                                                        ? "Select city/municipality first" 
+                                                        : loading.barangays 
+                                                            ? "Loading barangays..." 
+                                                            : "Select barangay"
+                                                } />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {availableBarangays.map((barangay) => (
-                                                    <SelectItem key={barangay} value={barangay}>
-                                                        {barangay}
+                                                {barangays.map((barangay) => (
+                                                    <SelectItem key={barangay.code} value={barangay.code}>
+                                                        {barangay.name}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
-                                        {!selectedCity && (
+                                        {loading.barangays && (
+                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                <Loader2 className="h-3 w-3 animate-spin" />
+                                                Loading barangays...
+                                            </div>
+                                        )}
+                                        {!selectedCityMunicipality && (
                                             <div className="text-xs text-muted-foreground">Please select a city/municipality first</div>
                                         )}
                                     </div>
@@ -1469,7 +1333,7 @@ export default function CreatePDLInformation() {
                                                     <SelectItem value="pending">Pending</SelectItem>
                                                     <SelectItem value="convicted">Convicted</SelectItem>
                                                     <SelectItem value="deceased">Deceased</SelectItem>
-                                                    <SelectItem value="case_closed">Case Closed</SelectItem>
+                                                    <SelectItem value="dismissed">Dismissed</SelectItem>
                                                     <SelectItem value="open">Open</SelectItem>
                                                 </SelectContent>
                                             </Select>
@@ -1898,12 +1762,16 @@ export default function CreatePDLInformation() {
                                                 <span className="font-medium">Civil Status:</span> {data.civil_status}
                                             </div>
                                         )}
-                                        {(data.brgy || data.city || data.province) && (
-                                            <div>
-                                                <span className="font-medium">Address:</span>{' '}
-                                                {[data.brgy, data.city, data.province].filter(Boolean).join(', ')}
-                                            </div>
-                                        )}
+                                        {(() => {
+                                            const locationNames = getSelectedLocationNames();
+                                            const addressParts = [locationNames.barangay, locationNames.cityMunicipality, locationNames.province].filter(Boolean);
+                                            return addressParts.length > 0 && (
+                                                <div>
+                                                    <span className="font-medium">Address:</span>{' '}
+                                                    {addressParts.join(', ')}
+                                                </div>
+                                            );
+                                        })()}
                                     </div>
                                 </div>
 
@@ -2053,72 +1921,7 @@ export default function CreatePDLInformation() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Error Alert */}
-                    {(Object.keys(errors).length > 0 || errorMessage) && (
-                        <div data-alert-container className="relative">
-                            <Alert variant="destructive">
-                                <button
-                                    type="button"
-                                    aria-label="Close"
-                                    onClick={(e) => {
-                                        const container = (e.currentTarget.closest('[data-alert-container]') as HTMLElement) || undefined;
-                                        if (container) container.style.display = 'none';
-                                    }}
-                                    className="absolute top-2 right-2 rounded p-1 text-lg leading-none hover:bg-muted"
-                                >
-                                    ×
-                                </button>
-                                <AlertTitle>Unable to process request</AlertTitle>
-                                <AlertDescription>
-                                    {errorMessage ? (
-                                        <div className="text-sm">{errorMessage}</div>
-                                    ) : (
-                                        <ul className="list-inside list-disc space-y-1">
-                                            {Object.values(errors).map((error, index) => (
-                                                <li key={index} className="text-sm">
-                                                    {error}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </AlertDescription>
-                            </Alert>
-                        </div>
-                    )}
-
-                    {/* Success Alert (auto-dismiss in 3s, closable) */}
-                    {successMessage && (
-                        <div
-                            data-alert-container
-                            className="relative"
-                            ref={(el) => {
-                                if (!el) return;
-                                el.style.display = '';
-                                const anyEl = el as any;
-                                if (anyEl._timer) clearTimeout(anyEl._timer);
-                                anyEl._timer = setTimeout(() => {
-                                    el.style.display = 'none';
-                                }, 3000);
-                            }}
-                        >
-                            <Alert>
-                                <button
-                                    type="button"
-                                    aria-label="Close"
-                                    onClick={(e) => {
-                                        const container = (e.currentTarget.closest('[data-alert-container]') as HTMLElement) || undefined;
-                                        if (container) container.style.display = 'none';
-                                    }}
-                                    className="absolute top-2 right-2 rounded p-1 text-sm leading-none hover:bg-muted"
-                                >
-                                    ×
-                                </button>
-                                <AlertTitle>Success</AlertTitle>
-                                <AlertDescription>{successMessage}</AlertDescription>
-                            </Alert>
-                        </div>
-                    )}
-
+         
                     {/* Step Content */}
                     {renderStepContent()}
 
@@ -2144,8 +1947,7 @@ export default function CreatePDLInformation() {
                                     reset();
                                     setDate(undefined);
                                     setCurrentStep(1);
-                                    setSelectedCity('');
-                                    setAvailableBarangays([]);
+                                    resetSelections();
                                     setDocumentPreview(null);
                                     setMedicalPreview(null);
                                     setMedicalFile(null);

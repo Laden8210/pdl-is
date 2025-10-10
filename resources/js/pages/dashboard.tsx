@@ -116,6 +116,24 @@ export default function PDLDashboard() {
   const { auth } = props;
   const isAdmin = auth?.user?.position === 'admin';
   return (
+
+//     •	Total PDL - Active PDL records under SCRDC custody.
+// •	Active Cases - Ongoing legal cases under due process.
+// •	Facility Utilization - Monitored cell occupancy as per SCRDC standards.
+// •	Pending PDL Verifications - PDL records awaiting lawful validation.
+// •	GCTA Awards - Good Conduct Time Allowance rewards under R.A. 10592.
+// •	TASTM Awards - Rehabilitation awards for study and mentoring.
+// •	Court Orders - Processed judicial directives and rulings.
+// •	Medical Records - Health records in compliance with SCRDC policy.
+// •	Active Personnel - Registered jail staff members.
+// •	PDL Demographics - Gender-based PDL distribution report.
+// •	Case Status Distribution - Overview of active and closed legal cases.
+// •	Security Classification - Categorization of PDLs pursuant to SCRDC security level standards.
+// •	Cell Occupancy Status - Current facility cells utilization in accordance with R.A. 6975.
+// •	Personnel Distribution - Active staff categorized by government role.
+// •	GCTA Time Allowances - Good Conduct rewards granted under R.A. 10592 (GCTA Law).
+// •	TASTM Time Allowances - Time allowances for Study, Teaching, and Mentoring under R.A. 10592.
+
     <>
       <AppLayout breadcrumbs={breadcrumbs}>
         <Head title="PDL Management Dashboard" />
@@ -142,7 +160,7 @@ export default function PDLDashboard() {
                   <div className="text-2xl font-bold text-gray-900">{totalPDL}</div>
                   <div className="flex items-center gap-1 text-sm text-gray-500">
                     <TrendingUp className="h-4 w-4 text-green-500" />
-                    <span>Active records</span>
+                    <span>Active PDL records under SCRDC custody</span>
                   </div>
                 </CardContent>
               </Card>
@@ -154,7 +172,7 @@ export default function PDLDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-gray-900">{activeCases}</div>
-                  <p className="text-sm text-gray-500">Out of {totalCases} total cases</p>
+                  <p className="text-sm text-gray-500">Ongoing legal cases under due process.</p>
                 </CardContent>
               </Card>
 
@@ -165,7 +183,7 @@ export default function PDLDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-gray-900">{overallUtilization}%</div>
-                  <p className="text-sm text-gray-500">{totalOccupied}/{totalCapacity} beds occupied</p>
+                  <p className="text-sm text-gray-500">Monitored cell occupancy as per SCRDC standards.</p>
                 </CardContent>
               </Card>
 
@@ -176,7 +194,7 @@ export default function PDLDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-gray-900">{pendingVerifications}</div>
-                  <p className="text-sm text-gray-500">Awaiting review</p>
+                  <p className="text-sm text-gray-500">PDL records awaiting lawful validation.</p>
                 </CardContent>
               </Card>
             </div>
@@ -192,7 +210,7 @@ export default function PDLDashboard() {
                   <div className="text-2xl font-bold text-gray-900">
                     {timeAllowanceData.find(item => item.type === 'GCTA')?.count || 0}
                   </div>
-                  <p className="text-sm text-gray-500">Good Conduct Time Allowance</p>
+                  <p className="text-sm text-gray-500">Good Conduct Time Allowance rewards under R.A. 10592.</p>
                 </CardContent>
               </Card>
 
@@ -205,7 +223,7 @@ export default function PDLDashboard() {
                   <div className="text-2xl font-bold text-gray-900">
                     {timeAllowanceData.find(item => item.type === 'TASTM')?.count || 0}
                   </div>
-                  <p className="text-sm text-gray-500">Study, Teaching & Mentoring</p>
+                  <p className="text-sm text-gray-500">Rehabilitation awards for study and mentoring.</p>
                 </CardContent>
               </Card>
 
@@ -216,7 +234,7 @@ export default function PDLDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-gray-900">{totalCourtOrders}</div>
-                  <p className="text-sm text-gray-500">Total processed</p>
+                  <p className="text-sm text-gray-500">Processed judicial directives and rulings.</p>
                 </CardContent>
               </Card>
 
@@ -227,7 +245,7 @@ export default function PDLDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-gray-900">{totalMedicalRecords}</div>
-                  <p className="text-sm text-gray-500">Total records</p>
+                  <p className="text-sm text-gray-500">Health records in compliance with SCRDC policy.</p>
                 </CardContent>
               </Card>
 
@@ -238,7 +256,7 @@ export default function PDLDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-gray-900">{activePersonnel}</div>
-                  <p className="text-sm text-gray-500">Staff members</p>
+                  <p className="text-sm text-gray-500">Registered jail staff members.</p>
                 </CardContent>
               </Card>
             </div>

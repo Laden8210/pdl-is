@@ -109,7 +109,7 @@ class CaseInformationController extends Controller
 
 
         $request->validate([
-            'case_status' => 'required|in:open,pending,convicted,deceased,case_closed,on_trial',
+            'case_status' => 'required|in:open,pending,convicted,deceased,dismissed,on_trial,arraignment',
         ]);
 
         $case = CaseInformation::findOrFail($caseId);

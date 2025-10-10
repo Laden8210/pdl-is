@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Edit, CheckCircle, XCircle, Clock, Skull, FileX } from 'lucide-react';
+import { Edit, CheckCircle, XCircle, Clock, Skull, FileX, User } from 'lucide-react';
 import { route } from 'ziggy-js';
 import { router, useForm } from '@inertiajs/react';
 
@@ -31,8 +31,9 @@ const caseStatusOptions = [
     { value: 'pending', label: 'Pending', icon: Clock, color: 'default' },
     { value: 'convicted', label: 'Convicted', icon: CheckCircle, color: 'secondary' },
     { value: 'deceased', label: 'Deceased', icon: Skull, color: 'destructive' },
-    { value: 'case_closed', label: 'Case Closed', icon: FileX, color: 'secondary' },
+    { value: 'dismissed', label: 'Dismissed', icon: FileX, color: 'secondary' },
     { value: 'on_trial', label: 'On Trial', icon: Clock, color: 'default' },
+    { value: 'arraignment', label: 'Arraignment', icon: User, color: 'destructive' },
 ];
 
 export function UpdateCaseStatus({ caseInfo }: UpdateCaseStatusProps) {

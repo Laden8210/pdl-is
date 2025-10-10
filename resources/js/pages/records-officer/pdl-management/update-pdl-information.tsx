@@ -4,7 +4,7 @@ import { Head } from '@inertiajs/react';
 
 import { useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +19,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { Check, ChevronsUpDown, Eye, FileText, Image, Upload, X } from 'lucide-react';
+import { Check, ChevronsUpDown, Eye, FileText, Image, Upload, X, Loader2 } from 'lucide-react';
+import { usePSGCLocation } from '@/hooks/usePSGCLocation';
 
 // Criminal case types for dropdown
 const criminalCaseTypes = [
@@ -241,6 +242,71 @@ export default function UpdatePDLInformation() {
 
     const { props } = usePage<UpdatePDLInformationProps>();
     const { pdl } = props;
+
+    // PSGC Location hook
+    const {
+        provinces,
+        citiesMunicipalities,
+        barangays,
+        selectedProvince,
+        selectedCityMunicipality,
+        selectedBarangay,
+        loading,
+        error: locationError,
+        handleProvinceChange,
+        handleCityMunicipalityChange,
+        handleBarangayChange,
+        getSelectedLocationNames,
+        resetSelections,
+    } = usePSGCLocation();
+
+    // Handle location changes
+    const handleLocationChange = (type: 'province' | 'city' | 'barangay', code: string) => {
+        if (type === 'province') {
+            const province = provinces.find(p => p.code === code);
+            handleProvinceChange(code);
+            setData('province', province?.name || '');
+            setData('city', '');
+            setData('brgy', '');
+        } else if (type === 'city') {
+            const city = citiesMunicipalities.find(c => c.code === code);
+            handleCityMunicipalityChange(code);
+            setData('city', city?.name || '');
+            setData('brgy', '');
+        } else if (type === 'barangay') {
+            const barangay = barangays.find(b => b.code === code);
+            handleBarangayChange(code);
+            setData('brgy', barangay?.name || '');
+        }
+    };
+
+    // Initialize location selections based on existing data
+    useEffect(() => {
+        if (pdl.province && provinces.length > 0) {
+            const province = provinces.find(p => p.name === pdl.province);
+            if (province) {
+                handleProvinceChange(province.code);
+            }
+        }
+    }, [provinces, pdl.province, handleProvinceChange]);
+
+    useEffect(() => {
+        if (pdl.city && citiesMunicipalities.length > 0) {
+            const city = citiesMunicipalities.find(c => c.name === pdl.city);
+            if (city) {
+                handleCityMunicipalityChange(city.code);
+            }
+        }
+    }, [citiesMunicipalities, pdl.city, handleCityMunicipalityChange]);
+
+    useEffect(() => {
+        if (pdl.brgy && barangays.length > 0) {
+            const barangay = barangays.find(b => b.name === pdl.brgy);
+            if (barangay) {
+                handleBarangayChange(barangay.code);
+            }
+        }
+    }, [barangays, pdl.brgy, handleBarangayChange]);
 
     const handleAddNewCase = () => {
         const currentCases = data.cases || [];
@@ -731,24 +797,121 @@ export default function UpdatePDLInformation() {
 
                             <div>
                                 <h3 className="mb-4 text-lg font-medium">Address Information</h3>
+                                
+                                {/* Location Error Alert */}
+                                {locationError && (
+                                    <Alert variant="destructive" className="mb-4">
+                                        <AlertTitle>Location Service Error</AlertTitle>
+                                        <AlertDescription>
+                                            {locationError}. Please refresh the page or try again later.
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
+
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                     <div className="space-y-2">
-                                        <Label htmlFor="brgy">Barangay</Label>
-                                        <Input id="brgy" name="brgy" value={data.brgy} onChange={handleChange} placeholder="Enter barangay" />
+                                        <Label htmlFor="province">
+                                            Province
+                                            <span className="text-red-500">*</span>
+                                        </Label>
+                                        <Select 
+                                            value={selectedProvince} 
+                                            onValueChange={(value) => handleLocationChange('province', value)}
+                                            disabled={loading.provinces}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder={loading.provinces ? "Loading provinces..." : "Select province"} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {provinces.map((province) => (
+                                                    <SelectItem key={province.code} value={province.code}>
+                                                        {province.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {loading.provinces && (
+                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                <Loader2 className="h-3 w-3 animate-spin" />
+                                                Loading provinces...
+                                            </div>
+                                        )}
                                     </div>
+                                    
                                     <div className="space-y-2">
-                                        <Label htmlFor="city">City</Label>
-                                        <Input id="city" name="city" value={data.city} onChange={handleChange} placeholder="Enter city" />
+                                        <Label htmlFor="city">
+                                            City/Municipality
+                                            <span className="text-red-500">*</span>
+                                        </Label>
+                                        <Select 
+                                            value={selectedCityMunicipality} 
+                                            onValueChange={(value) => handleLocationChange('city', value)}
+                                            disabled={!selectedProvince || loading.citiesMunicipalities}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder={
+                                                    !selectedProvince 
+                                                        ? "Select province first" 
+                                                        : loading.citiesMunicipalities 
+                                                            ? "Loading cities/municipalities..." 
+                                                            : "Select city/municipality"
+                                                } />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {citiesMunicipalities.map((city) => (
+                                                    <SelectItem key={city.code} value={city.code}>
+                                                        {city.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {loading.citiesMunicipalities && (
+                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                <Loader2 className="h-3 w-3 animate-spin" />
+                                                Loading cities/municipalities...
+                                            </div>
+                                        )}
+                                        {!selectedProvince && (
+                                            <div className="text-xs text-muted-foreground">Please select a province first</div>
+                                        )}
                                     </div>
+                                    
                                     <div className="space-y-2">
-                                        <Label htmlFor="province">Province</Label>
-                                        <Input
-                                            id="province"
-                                            name="province"
-                                            value={data.province}
-                                            onChange={handleChange}
-                                            placeholder="Enter province"
-                                        />
+                                        <Label htmlFor="brgy">
+                                            Barangay
+                                            <span className="text-red-500">*</span>
+                                        </Label>
+                                        <Select 
+                                            value={selectedBarangay} 
+                                            onValueChange={(value) => handleLocationChange('barangay', value)}
+                                            disabled={!selectedCityMunicipality || loading.barangays}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder={
+                                                    !selectedCityMunicipality 
+                                                        ? "Select city/municipality first" 
+                                                        : loading.barangays 
+                                                            ? "Loading barangays..." 
+                                                            : "Select barangay"
+                                                } />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {barangays.map((barangay) => (
+                                                    <SelectItem key={barangay.code} value={barangay.code}>
+                                                        {barangay.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {loading.barangays && (
+                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                <Loader2 className="h-3 w-3 animate-spin" />
+                                                Loading barangays...
+                                            </div>
+                                        )}
+                                        {!selectedCityMunicipality && (
+                                            <div className="text-xs text-muted-foreground">Please select a city/municipality first</div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -1670,9 +1833,13 @@ export default function UpdatePDLInformation() {
                                         {data.age && <div><span className="font-medium">Age:</span> {data.age} years</div>}
                                         {data.gender && <div><span className="font-medium">Gender:</span> {data.gender}</div>}
                                         {data.civil_status && <div><span className="font-medium">Civil Status:</span> {data.civil_status}</div>}
-                                        {(data.brgy || data.city || data.province) && (
-                                            <div><span className="font-medium">Address:</span> {[data.brgy, data.city, data.province].filter(Boolean).join(', ')}</div>
-                                        )}
+                                        {(() => {
+                                            const locationNames = getSelectedLocationNames();
+                                            const addressParts = [locationNames.barangay, locationNames.cityMunicipality, locationNames.province].filter(Boolean);
+                                            return addressParts.length > 0 && (
+                                                <div><span className="font-medium">Address:</span> {addressParts.join(', ')}</div>
+                                            );
+                                        })()}
                                     </div>
                                 </div>
 

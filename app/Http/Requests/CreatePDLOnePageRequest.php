@@ -62,7 +62,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'cases.*.crime_committed' => 'required|string',
             'cases.*.date_committed' => 'required|date',
             'cases.*.time_committed' => 'required|date_format:H:i',
-            'cases.*.case_status' => 'required|string|in:open,pending,convicted,deceased,case_closed,on_trial',
+            'cases.*.case_status' => 'required|string|in:open,pending,convicted,deceased,dismissed,on_trial',
 
             'cases.*.case_remarks' => 'nullable|string',
             'cases.*.security_classification' => 'required|string|in:low,medium,high,maximum',
@@ -155,7 +155,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'cases.*.time_committed.required' => 'Time committed is required for all cases',
             'cases.*.time_committed.date_format' => 'Time committed must be in HH:MM format',
             'cases.*.case_status.required' => 'Case status is required for all cases',
-            'cases.*.case_status.in' => 'Case status must be open, closed, pending, convicted, deceased, or on trial',
+            'cases.*.case_status.in' => 'Case status must be open, pending, convicted, deceased, dismissed, or on trial',
             'cases.*.security_classification.required' => 'Security classification is required for all cases',
             'cases.*.security_classification.in' => 'Security classification must be low, medium, high, or maximum',
         ];
