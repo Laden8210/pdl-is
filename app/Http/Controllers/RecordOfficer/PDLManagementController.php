@@ -38,6 +38,7 @@ class PDLManagementController extends Controller
                     'id' => $pdl->id,
                     'fname' => $pdl->fname,
                     'lname' => $pdl->lname,
+                    'mname' => $pdl->mname,
                     'alias' => $pdl->alias,
                     'birthdate' => $pdl->birthdate,
                     'age' => $pdl->age,
@@ -76,13 +77,13 @@ class PDLManagementController extends Controller
                     'medicalRecords',
                     'cases',
                     'personnel:id,fname,lname'
-                ])->whereNull('archive_status'); // Exclude archived PDLs
+                ])->whereNull('archive_status'); 
             },
             'reviewer:id,fname,lname'
         ])
             ->where('status', '=', 'approved')
             ->whereHas('pdl', function ($query) {
-                $query->whereNull('archive_status'); // Ensure PDL exists and is not archived
+                $query->whereNull('archive_status'); 
             })
             ->latest()
             ->get();
@@ -104,6 +105,7 @@ class PDLManagementController extends Controller
                         'id' => $pdl->id,
                         'fname' => $pdl->fname,
                         'lname' => $pdl->lname,
+                        'mname' => $pdl->mname,
                         'alias' => $pdl->alias,
                         'birthdate' => $pdl->birthdate,
                         'age' => $pdl->age,
@@ -718,6 +720,16 @@ class PDLManagementController extends Controller
                     'drug_related' => $caseData['drug_related'] ?? false,
                 ]);
             }
+
+            // if($user->position === 'admin' || $user->position === 'record-officer'){
+            //     $pdl->verifications()->create([
+            //         'status' => 'approved',
+            //         'reason' => 'PDL created',
+            //         'feedback' => 'PDL created',
+            //         'reviewed_at' => now(),
+            //         'reviewed_by' => $user->id,
+            //     ]);
+            // }
 
             DB::commit();
 

@@ -81,7 +81,7 @@ export default function PersonalInformation() {
                                     <TableRow key={pdl.id}>
                                         <TableCell>{pdl.id}</TableCell>
                                         <TableCell>
-                                            {`${pdl?.fname || ''} ${pdl?.lname || ''}`
+                                            {`${pdl?.fname || ''}  ${pdl?.mname} ${pdl?.lname || ''}`
                                                 .trim()
                                                 .split(' ')
                                                 .filter(Boolean)
