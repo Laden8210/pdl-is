@@ -237,7 +237,7 @@ export default function PersonalInformation() {
                                             <TableRow key={verification.pdl.id}>
                                                 <TableCell>{verification.pdl.id}</TableCell>
                                                 <TableCell>
-                                                    {`${verification?.pdl?.fname || ''}  ${verification?.pdl?.lname || ''}`
+                                                    {`${verification?.pdl?.fname || ''} ${verification?.pdl.mname || ''}  ${verification?.pdl?.lname || ''}`
                                                         .trim()
                                                         .split(' ')
                                                         .filter(Boolean)
