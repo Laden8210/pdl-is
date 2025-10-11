@@ -237,11 +237,14 @@ export default function PersonalInformation() {
                                             <TableRow key={verification.pdl.id}>
                                                 <TableCell>{verification.pdl.id}</TableCell>
                                                 <TableCell>
-                                                    {`${verification.pdl.fname} ${verification.pdl.mname} ${verification.pdl.lname}`
+                                                    {`${verification?.pdl?.fname || ''}  ${verification?.pdl?.lname || ''}`
+                                                        .trim()
                                                         .split(' ')
+                                                        .filter(Boolean)
                                                         .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                                                         .join(' ')}
                                                 </TableCell>
+
                                                 <TableCell>{verification.pdl.alias ?? '-'}</TableCell>
                                                 <TableCell>{verification.pdl.gender ?? '-'}</TableCell>
                                                 <TableCell>{verification.pdl.ethnic_group ?? '-'}</TableCell>
@@ -453,8 +456,6 @@ export default function PersonalInformation() {
                             </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4">
-                     
-
                             <div className="space-y-2">
                                 <Label htmlFor="archive_status">Archive Status *</Label>
                                 <Select value={archiveData.archive_status} onValueChange={(value) => setArchiveData('archive_status', value)}>
