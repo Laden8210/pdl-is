@@ -28,7 +28,7 @@ export default function ProfileManagement() {
         position: user?.position || '',
         status: (user as any)?.status || 'active',
         password: '',
-        cpassword: '',
+        oldpassword: '',
         profileImage: null as File | null,
     });
 
@@ -39,7 +39,7 @@ export default function ProfileManagement() {
             preserveScroll: true,
             forceFormData: true,
             onSuccess: () => {
-                reset('password', 'profileImage');
+                reset('password', 'profileImage', 'oldpassword');
             },
         });
     };
@@ -128,16 +128,17 @@ export default function ProfileManagement() {
                                 />
                             </div>
                             <div>
-                                <Label htmlFor="password">Confirm password</Label>
+                                <Label htmlFor="password">Old password</Label>
                                 <Input
-                                    id="password"
+                                    id="oldpassword"
                                     type="password"
                                     placeholder="Enter your password"
-                                    value={data.cpassword}
-                                    onChange={(e) => setData('cpassword', e.target.value)}
+                                    value={data.oldpassword}
+                                    onChange={(e) => setData('oldpassword', e.target.value)}
                                 />
                             </div>
                         </div>
+                        
 
                         {/* Right Column */}
                         <div className="space-y-4">

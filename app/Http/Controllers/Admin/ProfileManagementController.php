@@ -21,6 +21,7 @@ class ProfileManagementController extends Controller
 
     public function update(UpdateProfileRequest $request): RedirectResponse
     {
+
         $user = Auth::user();
 
         $user->fname = $request->input('firstName');
@@ -30,9 +31,7 @@ class ProfileManagementController extends Controller
 
 
         if ($request->filled('password')) {
-            if ($request->input('password') !== $request->input('cpassword')) {
-                return redirect()->back()->with('error', 'Password and confirm password do not match.');
-            }
+                
             $user->password = Hash::make($request->input('password'));
         }
 
