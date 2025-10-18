@@ -220,8 +220,8 @@
     </div>
 
     <div class="signature-section">
-        <div class="signature-name">{{ $data['signed_by']['name'] }}</div>
-        <div class="signature-position">{{ $data['signed_by']['position'] }}</div>
+        <div class="signature-name">{{ $data['officer_name']  }}</div>
+        <div class="signature-position">{{ $data['officer_position'] }}</div>
     </div>
 
     <div style="margin-top: 20px; font-size: 8px; text-align: right;">

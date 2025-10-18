@@ -426,8 +426,8 @@
 
     <div class="signature-section">
         <div class="signature-line"></div>
-        <div class="signature-name">JUAN R. LANZADERAS, JR. MPA.</div>
-        <div class="signature-title">Provincial Warden</div>
+        <div class="signature-name">{{$full_name ?? 'Provincial Warden'}}</div>
+        <div class="signature-title">{{$position ?? 'Provincial Warden'}}</div>
     </div>
 </body>
 

@@ -37,7 +37,9 @@ export const court_order_columns: ColumnDef<CourtOrder>[] = [
     header: "Order Type",
     cell: ({ row }) => (
       <Badge variant="secondary" className="capitalize">
-        {row.original.order_type}
+
+
+        {row.original.order_type.replace(/_/g, ' ').charAt(0).toUpperCase() + row.original.order_type.replace(/_/g, ' ').slice(1)}
       </Badge>
     ),
   },

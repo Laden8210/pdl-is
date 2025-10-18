@@ -13,7 +13,7 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Models\PasswordReset;
 use Illuminate\Support\Facades\Validator;
 use Mockery\Generator\StringManipulation\Pass\Pass;
-
+use App\Models\Agency;
 class UserManagementController extends Controller
 {
     public function index(Request $request)
@@ -31,9 +31,11 @@ class UserManagementController extends Controller
             })
             ->paginate(10)
             ->appends(['search' => $search]);
+        $agencies = Agency::all();
 
         return Inertia::render('admin/user-management/list', [
             'users' => $users,
+            'agencies' => $agencies,
             'filters' => [
                 'search' => $search
             ],

@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -29,6 +30,8 @@ export default function GCTATASTMReport() {
     const { props } = usePage<PageProps>();
     const { verifications } = props;
     const [searchTerm, setSearchTerm] = useState('');
+    const [fullName, setFullName] = useState('');
+    const [position, setPosition] = useState('');
 
     const { data, setData, get } = useForm({
         start_date: '',
@@ -51,10 +54,12 @@ export default function GCTATASTMReport() {
         );
     });
 
-    const handleExport = (verification_id: number) => {
+    const handleExport = () => {
         const params = new URLSearchParams();
 
-        if (verification_id) params.append('verification_id', verification_id.toString());
+        params.append('verification_id', verificationId?.toString() ?? '');
+        params.append('full_name', fullName);
+        params.append('position', position);
 
         window.open(route('reports.gcta-tastm.export') + '?' + params.toString(), '_blank');
     };
@@ -66,6 +71,13 @@ export default function GCTATASTMReport() {
                 end_date: data.end_date,
             }),
         );
+    };
+    const [verificationId, setVerificationId] = useState<number | null>(null);
+    const [viewDialogOpen, setViewDialogOpen] = useState(false);
+
+    const handleViewDialog = (verification_id: number) => {
+        setVerificationId(verification_id);
+        setViewDialogOpen(true);
     };
 
     return (
@@ -105,13 +117,11 @@ export default function GCTATASTMReport() {
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-center">
-                            <div className="flex items-center justify-center gap-4 mb-4">
-
+                            <div className="mb-4 flex items-center justify-center gap-4">
                                 <div>
                                     <div className="text-xl font-bold">GCTA & TASTM Reports</div>
                                     <div className="text-sm text-gray-600">South Cotabato Rehabilitation and Detention Center</div>
                                 </div>
-
                             </div>
                         </CardTitle>
                     </CardHeader>
@@ -153,8 +163,11 @@ export default function GCTATASTMReport() {
                                                             : '—'}
                                                     </TableCell>
                                                     <TableCell className="space-x-1">
-                                                        <Button size="sm" variant="outline"
-                                                        onClick={() => handleExport(verification.verification_id)}>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            onClick={() => handleViewDialog(verification.verification_id)}
+                                                        >
                                                             View
                                                         </Button>
                                                     </TableCell>
@@ -172,6 +185,31 @@ export default function GCTATASTMReport() {
                         </Table>
                     </CardContent>
                 </Card>
+
+                <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>GCTA & TASTM Report</DialogTitle>
+                        </DialogHeader>
+
+                        <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="full-name">Full Name</Label>
+                                <Input id="full-name" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="alias">Position</Label>
+                                <Input id="position" type="text" value={position} onChange={(e) => setPosition(e.target.value)} />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                            </DialogClose>
+                            <Button onClick={() => handleExport()}>Export</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </AppLayout>
     );

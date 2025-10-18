@@ -24,6 +24,8 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SearchResultsController;
+use App\Http\Controllers\CourtController;
+use App\Http\Controllers\AgencyController;
 
 Route::get('/', [AuthController::class, 'index'])->name('home');
 
@@ -51,6 +53,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('/cell-management/create', [CellAssignmentController::class, 'create'])->name('cell.create');
     Route::post('/cell-management/update', [CellAssignmentController::class, 'update'])->name('cell.update');
     Route::post('/cell-management/assign', [CellAssignmentController::class, 'assign'])->name('cell.assign');
+
+
 
     Route::get('/report/list-of-pdl-reports', [ReportController::class, 'index'])->name('reports.pdl-list');
     Route::get('/report/list-of-pdl-reports/export', [ReportController::class, 'export'])->name('reports.pdl-list.export');
@@ -157,6 +161,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
 // Record Officer Routes - Protected by auth and record.officer middleware
 Route::middleware(['auth', 'record.officer'])->prefix('record-officer')->group(function () {
+
+    Route::get('/court-list', [CourtController::class, 'index'])->name('court-list.index');
+    Route::post('/court-list/create', [CourtController::class, 'create'])->name('court-list.create');
+    Route::put('/court-list/{id}', [CourtController::class, 'update'])->name('court-list.update');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.record-officer');
     Route::get('/jail-events', [JailEventsController::class, 'index'])->name('record-officer.jail-events.index');
 
@@ -295,7 +303,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pdl/{pdl}/unarchive', [App\Http\Controllers\PdlArchiveController::class, 'unarchive'])->name('pdl.unarchive');
     Route::post('/pdl/{pdl}/custody-dates', [App\Http\Controllers\PdlArchiveController::class, 'updateCustodyDates'])->name('pdl.custody-dates');
     Route::post('/user-pdl-archive/{pdl}/unarchive', [UserPDLArchiveController::class, 'unarchivePdl'])->name('user-pdl-archive.unarchive');
-    Route::post('/user-personnel-archive/{personnel}/restore', [UserPDLArchiveController::class, 'restorePersonnel'])->name('user-personnel-archive.restore');
+    Route::post('/user-personnel-archive/{personnelId}/restore', [UserPDLArchiveController::class, 'restorePersonnel'])->name('user-personnel-archive.restore');
     Route::patch('/admin/verification/{verification}/update', [VerificationController::class, 'update'])
         ->name('admin.verification.update');
     Route::post('/profile/update', [ProfileManagementController::class, 'update'])->name('admin.profile.update');
@@ -306,9 +314,17 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/pdl-management/court-order/{courtOrder}', [PDLManagementController::class, 'update_court_order'])->name('court-orders.update');
     Route::post('/pdl-management/cell-assignment', [CellAssignmentController::class, 'assign'])->name('cell-assignments.store');
 
-    Route::post('/jail-events', [JailEventsController::class, 'store'])->name('admin.jail-events.store');
+    Route::post('/admin/jail-events', [JailEventsController::class, 'store'])->name('admin.jail-events.store');
     Route::post('/jail-events', [JailEventsController::class, 'store'])->name('record-officer.jail-events.store');
+
+    Route::post('/admin/jail-events/reschedule', [JailEventsController::class, 'reschedule'])->name('admin.jail-events.reschedule');
+    Route::patch('/admin/jail-events/cancel', [JailEventsController::class, 'cancel'])->name('admin.jail-events.cancel');
     Route::post('/pdl-management/cell-assignment/transfer', [CellAssignmentController::class, 'transfer'])->name('cell-assignments.transfer');
+
+    Route::post('/agency', [AgencyController::class, 'create'])->name('agency.create');
+// Change the route to accept query parameter
+Route::get('/report/pdl-information', [ReportController::class, 'pdlInformationReport'])
+    ->name('pdl-management.download');
 });
 
 Route::get('storage/profile_images/{filename}', function ($filename) {
@@ -341,5 +357,12 @@ Route::get('storage/court_documents/{filename}', function ($filename) {
     }
 });
 
+Route::get('storage/mugshots/{filename}', function ($filename) {
+    $path = storage_path('app/public/mugshots/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+});
 
 require __DIR__ . '/auth.php';

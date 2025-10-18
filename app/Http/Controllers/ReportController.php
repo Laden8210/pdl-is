@@ -36,7 +36,7 @@ class ReportController extends Controller
             ->map(function ($pdl) {
                 $mainCase = $pdl
 
-                ->cases->first();
+                    ->cases->first();
                 $courtOrder = $pdl->courtOrders->first();
 
                 // Calculate age
@@ -59,7 +59,11 @@ class ReportController extends Controller
                     'deceased' => 'Deceased'
                 ];
                 $caseStatus = $caseStatusMap[strtolower($caseStatus)] ?? $caseStatus;
-                $totalYear = $courtOrder->admission_date->diffInYears($courtOrder->release_date);
+                if ($courtOrder && $courtOrder->admission_date && $courtOrder->release_date) {
+                    $totalYear = $courtOrder->admission_date->diffInYears($courtOrder->release_date);
+                } else {
+                    $totalYear = 0;
+                }
 
 
                 return [
@@ -74,7 +78,8 @@ class ReportController extends Controller
                     'tribe' => $pdl->ethnic_group ?? 'N/A',
                     'years' => $totalYear,
                     'case_status' => $caseStatus,
-                    'rtc' => $courtOrder->court_branch ?? 'N/A'
+                    'rtc' => $courtOrder?->court?->branch_code ?? 'N/A'
+
                 ];
             });
 
@@ -130,6 +135,8 @@ class ReportController extends Controller
         $validator = Validator::make($request->all(), [
             'pdl_id' => 'required|exists:pdl,id',
             'issue_date' => 'required|date',
+            'officer_name' => 'required|string|max:255',
+            'officer_position' => 'required|string|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -175,8 +182,8 @@ class ReportController extends Controller
             'detention_period' => $detentionText,
             'issue_date' => $issueDate->format('jS \d\a\y \o\f F Y'),
             'issue_city' => 'City of Koronadal',
-            'warden_name' => 'JUAN R. LANZADERAS, JR., MPA',
-            'warden_title' => 'Provincial Warden'
+            'officer_name' => $request->officer_name,
+            'officer_position' => $request->officer_position
         ];
 
         $pdf = Pdf::loadView('reports.certificate-of-detention', $data);
@@ -289,7 +296,12 @@ class ReportController extends Controller
                     'deceased' => 'Deceased'
                 ];
                 $caseStatus = $caseStatusMap[strtolower($caseStatus)] ?? $caseStatus;
-                $totalYear = $courtOrder->admission_date->diffInYears($courtOrder->release_date);
+                if ($courtOrder && $courtOrder->admission_date && $courtOrder->release_date) {
+                    $totalYear = $courtOrder->admission_date->diffInYears($courtOrder->release_date);
+                } else {
+                    $totalYear = 0;
+                }
+
 
                 return [
                     'Name' => $pdl->fname . ' ' . $pdl->lname,
@@ -302,7 +314,7 @@ class ReportController extends Controller
                     'Tribe' => $pdl->ethnic_group ?? 'N/A',
                     'Years' => $totalYear,
                     'CaseStatus' => $caseStatus,
-                    'RTC' => $courtOrder->court_branch ?? 'N/A'
+                    'RTC' => $courtOrder?->court?->branch_code ?? 'N/A'
                 ];
             });
 
@@ -673,7 +685,8 @@ class ReportController extends Controller
     public function generateGCTATASTM(Request $request)
     {
         $verificationId = $request->input('verification_id');
-
+        $full_name = $request->input('full_name');
+        $position = $request->input('position');
         $verification = Verifications::with([
             'personnel:id,fname,lname',
             'pdl' => function ($query) {
@@ -721,7 +734,9 @@ class ReportController extends Controller
             'total_gcta' => $totalGCTA,
             'total_tastm' => $totalTASTM,
             'total_allowances' => $totalGCTA + $totalTASTM,
-            'convertDaysToYMD' => [$this, 'convertDaysToYMD']
+            'convertDaysToYMD' => [$this, 'convertDaysToYMD'],
+            'full_name' => $full_name,
+            'position' => $position
         ];
 
         $html = view('reports.gcta-tastm', $data)->render();
@@ -926,19 +941,19 @@ class ReportController extends Controller
             $endDate = Carbon::create($year, $monthNumber, 1)->endOfMonth();
 
             // Get all PDLs with drug-related cases (not just those committed in this month)
-            $drugRelatedPdls = Pdl::with(['cases' => function($query) {
-                    $query->where('drug_related', true);
-                }])
-                ->whereHas('cases', function($query) {
+            $drugRelatedPdls = Pdl::with(['cases' => function ($query) {
+                $query->where('drug_related', true);
+            }])
+                ->whereHas('cases', function ($query) {
                     $query->where('drug_related', true);
                 })
                 ->where('created_at', '<=', $endDate) // PDLs created up to this month
                 ->get();
 
             // Filter for active PDLs (not archived) as of this month
-            $activeDrugPdls = $drugRelatedPdls->filter(function($pdl) use ($endDate) {
+            $activeDrugPdls = $drugRelatedPdls->filter(function ($pdl) use ($endDate) {
                 return $pdl->archive_status === null ||
-                       ($pdl->archived_at && $pdl->archived_at->gt($endDate));
+                    ($pdl->archived_at && $pdl->archived_at->gt($endDate));
             });
 
             $maleDetainees = $activeDrugPdls->where('gender', 'Male')->count();
@@ -946,21 +961,21 @@ class ReportController extends Controller
             $totalDetainees = $maleDetainees + $femaleDetainees;
 
             // Get committed count (drug-related PDLs created in this month)
-            $committed = $drugRelatedPdls->filter(function($pdl) use ($startDate, $endDate) {
+            $committed = $drugRelatedPdls->filter(function ($pdl) use ($startDate, $endDate) {
                 return $pdl->created_at->between($startDate, $endDate);
             })->count();
 
             // Get discharged count (drug-related PDLs with discharge status in this month)
-            $discharged = $drugRelatedPdls->filter(function($pdl) use ($startDate, $endDate) {
+            $discharged = $drugRelatedPdls->filter(function ($pdl) use ($startDate, $endDate) {
                 return $pdl->archive_status !== null &&
-                       $pdl->archived_at &&
-                       $pdl->archived_at->between($startDate, $endDate);
+                    $pdl->archived_at &&
+                    $pdl->archived_at->between($startDate, $endDate);
             })->count();
 
             // Get drug-related cases for the month (for discharge status breakdown)
             $drugCases = CaseInformation::with(['pdl'])
                 ->where('drug_related', true)
-                ->whereHas('pdl', function($query) use ($endDate) {
+                ->whereHas('pdl', function ($query) use ($endDate) {
                     $query->where('created_at', '<=', $endDate);
                 })
                 ->get();
@@ -1947,18 +1962,10 @@ class ReportController extends Controller
 
     public function generateNoRecordsCertificate(Request $request)
     {
-        // $request->validate([
-        //     'persons' => 'required|array|min:1',
-        //     'persons.*.fname' => 'required|string|max:255',
-        //     'persons.*.mname' => 'nullable|string|max:255',
-        //     'persons.*.lname' => 'required|string|max:255',
-        //     'requested_by' => 'required|string|max:255',
-        //     'requesting_agency' => 'required|string|max:255',
-        //     'export_pdf' => 'boolean'
-        // ]);
 
         $currentDate = now();
-
+        $officer_name = $request->input('officer_name');
+        $officer_position = $request->input('officer_position');
         // Format person names for display
         $formattedPersons = collect($request->persons)->map(function ($person) {
             $name = trim($person['fname']);
@@ -1992,7 +1999,9 @@ class ReportController extends Controller
             'signed_by' => [
                 'name' => 'JUAN R. LANZADERAS, JR., MPA',
                 'position' => 'Provincial Warden'
-            ]
+            ],
+            'officer_name' => $officer_name,
+            'officer_position' => $officer_position
         ];
 
         if ($request->export_pdf) {
@@ -2017,7 +2026,9 @@ class ReportController extends Controller
             'persons.*.mname' => 'nullable|string|max:255',
             'persons.*.lname' => 'required|string|max:255',
             'requested_by' => 'required|string|max:255',
-            'requesting_agency' => 'required|string|max:255'
+            'requesting_agency' => 'required|string|max:255',
+            'officer_name' => 'required|string|max:255',
+            'officer_position' => 'required|string|max:255'
         ]);
 
         $currentDate = now();
@@ -2052,16 +2063,41 @@ class ReportController extends Controller
             'requesting_agency' => $request->requesting_agency,
             'issue_date' => $currentDate->format('F d, Y'),
             'issue_location' => 'City of Koronadal',
-            'signed_by' => [
-                'name' => 'JUAN R. LANZADERAS, JR., MPA',
-                'position' => 'Provincial Warden'
-            ]
+            'officer_name' => $request->officer_name,
+            'officer_position' => $request->officer_position
         ];
 
         $fileName = 'certificate_of_no_records_' . date('Y-m-d') . '.pdf';
 
         $html = view('reports.no-records-certificate', [
             'data' => $data
+        ])->render();
+
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->loadHtml($html);
+        $dompdf->render();
+
+        return response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ]);
+    }
+    public function pdlInformationReport(Request $request)
+    {
+        $pdl = Pdl::with('cases')->find($request->pdl_id);
+
+        if (!$pdl) {
+            return redirect()->back()->with('error', 'PDL not found.');
+        }
+
+        $fileName = 'pdl-information_' . $pdl->id . '.pdf';
+        // get the image and convert to base64
+        $image = file_get_contents(public_path('storage/' . $pdl->mugshot_path));
+        $imageBase64 = base64_encode($image);
+        $html = view('reports.pdl-information', [
+            'pdl' => $pdl,
+            'image' => $imageBase64
         ])->render();
 
         $dompdf = new \Dompdf\Dompdf();

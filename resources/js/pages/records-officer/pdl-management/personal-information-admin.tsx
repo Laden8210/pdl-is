@@ -13,8 +13,8 @@ import { getAge } from '@/lib/dateUtils';
 import { PageProps, type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Archive, Edit } from 'lucide-react';
-import { useState } from 'react';
+import { Archive, Edit, ChevronUp, ChevronDown, Search } from 'lucide-react';
+import { useState, useMemo } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -44,6 +44,13 @@ export default function PersonalInformation() {
     const [custodyDialogOpen, setCustodyDialogOpen] = useState(false);
     const [courtOrderDialogOpen, setCourtOrderDialogOpen] = useState(false);
     const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
+
+    // State for search, sorting, and pagination
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortField, setSortField] = useState('name');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     const {
         data: custodyData,
@@ -81,6 +88,97 @@ export default function PersonalInformation() {
         archive_court_order_type: '',
         archive_court_order_file: null as File | null,
     });
+
+    // Filter and sort verifications
+    const filteredAndSortedVerifications = useMemo(() => {
+        // First, filter out verifications without PDL data
+        let filtered = verifications.filter(verification => verification.pdl);
+
+        // Apply search filter
+        if (searchTerm) {
+            filtered = filtered.filter(verification => {
+                const pdl = verification.pdl;
+                const fullName = `${pdl?.fname || ''} ${pdl?.mname || ''} ${pdl?.lname || ''}`.toLowerCase();
+                const searchLower = searchTerm.toLowerCase();
+
+                return (
+                    fullName.includes(searchLower) ||
+                    pdl.alias?.toLowerCase().includes(searchLower) ||
+                    pdl.gender?.toLowerCase().includes(searchLower) ||
+                    pdl.ethnic_group?.toLowerCase().includes(searchLower) ||
+                    pdl.civil_status?.toLowerCase().includes(searchLower) ||
+                    pdl.brgy?.toLowerCase().includes(searchLower) ||
+                    pdl.city?.toLowerCase().includes(searchLower) ||
+                    pdl.province?.toLowerCase().includes(searchLower) ||
+                    pdl.id.toString().includes(searchLower)
+                );
+            });
+        }
+
+        // Sort verifications
+        filtered.sort((a, b) => {
+            let aValue: any;
+            let bValue: any;
+
+            switch (sortField) {
+                case 'name':
+                    aValue = `${a.pdl.fname} ${a.pdl.mname} ${a.pdl.lname}`.toLowerCase();
+                    bValue = `${b.pdl.fname} ${b.pdl.mname} ${b.pdl.lname}`.toLowerCase();
+                    break;
+                case 'id':
+                    aValue = a.pdl.id;
+                    bValue = b.pdl.id;
+                    break;
+                case 'gender':
+                    aValue = a.pdl.gender?.toLowerCase() || '';
+                    bValue = b.pdl.gender?.toLowerCase() || '';
+                    break;
+                case 'ethnic_group':
+                    aValue = a.pdl.ethnic_group?.toLowerCase() || '';
+                    bValue = b.pdl.ethnic_group?.toLowerCase() || '';
+                    break;
+                case 'civil_status':
+                    aValue = a.pdl.civil_status?.toLowerCase() || '';
+                    bValue = b.pdl.civil_status?.toLowerCase() || '';
+                    break;
+                case 'age':
+                    aValue = getAge(a.pdl.birthdate);
+                    bValue = getAge(b.pdl.birthdate);
+                    break;
+                default:
+                    aValue = a.pdl[sortField as keyof typeof a.pdl];
+                    bValue = b.pdl[sortField as keyof typeof b.pdl];
+            }
+
+            if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+            if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        return filtered;
+    }, [verifications, searchTerm, sortField, sortDirection]);
+
+    // Pagination
+    const totalPages = Math.ceil(filteredAndSortedVerifications.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedVerifications = filteredAndSortedVerifications.slice(startIndex, startIndex + itemsPerPage);
+
+    // Handle sort
+    const handleSort = (field: string) => {
+        if (sortField === field) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortDirection('asc');
+        }
+        setCurrentPage(1);
+    };
+
+    // Sort indicator component
+    const SortIndicator = ({ field }: { field: string }) => {
+        if (sortField !== field) return null;
+        return sortDirection === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
+    };
 
     const handleCustodyDates = (pdl: any) => {
         setSelectedPdl(pdl);
@@ -193,101 +291,234 @@ export default function PersonalInformation() {
 
             <div className="flex flex-col gap-6 p-4">
                 <h1 className="text-2xl font-bold">Personal Information</h1>
+
+                {/* Search and Controls */}
+                <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+                    <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Search PDLs..."
+                            value={searchTerm}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                            className="pl-8"
+                        />
+                    </div>
+
+                    <div className="flex gap-4 items-center">
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground">Show:</span>
+                            <Select
+                                value={itemsPerPage.toString()}
+                                onValueChange={(value) => {
+                                    setItemsPerPage(Number(value));
+                                    setCurrentPage(1);
+                                }}
+                            >
+                                <SelectTrigger className="w-20">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="10">10</SelectItem>
+                                    <SelectItem value="25">25</SelectItem>
+                                    <SelectItem value="50">50</SelectItem>
+                                    <SelectItem value="100">100</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {!isAdmin && (
+                            <Link
+                                href="/pdl-management/personal-information/create"
+                                className="flex items-center gap-2 rounded-sm bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
+                            >
+                                Add PDL Information
+                            </Link>
+                        )}
+                    </div>
+                </div>
+
                 <Card>
                     <CardHeader>
                         <CardTitle>
-                            <div className="flex items-center justify-between">
-                                <span>Personal Information List</span>
-
-                                <div className="flex gap-2">
-                                    {!isAdmin && (
-                                        <Link
-                                            href="/pdl-management/personal-information/create"
-                                            className="flex items-center gap-2 rounded-sm bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
-                                        >
-                                            Add PDL Information
-                                        </Link>
-                                    )}
-                                </div>
-                            </div>
+                            Personal Information List
+                            <span className="text-sm font-normal text-muted-foreground ml-2">
+                                ({filteredAndSortedVerifications.length} PDL{filteredAndSortedVerifications.length !== 1 ? 's' : ''})
+                            </span>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>ID</TableHead>
-                                    <TableHead>Full Name</TableHead>
+                                    <TableHead
+                                        className="cursor-pointer hover:bg-muted/50"
+                                        onClick={() => handleSort('id')}
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            ID
+                                            <SortIndicator field="id" />
+                                        </div>
+                                    </TableHead>
+                                    <TableHead
+                                        className="cursor-pointer hover:bg-muted/50"
+                                        onClick={() => handleSort('name')}
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            Full Name
+                                            <SortIndicator field="name" />
+                                        </div>
+                                    </TableHead>
                                     <TableHead>Alias</TableHead>
-                                    <TableHead>Gender</TableHead>
-                                    <TableHead>Ethnic Group</TableHead>
-                                    <TableHead>Civil Status</TableHead>
+                                    <TableHead
+                                        className="cursor-pointer hover:bg-muted/50"
+                                        onClick={() => handleSort('gender')}
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            Gender
+                                            <SortIndicator field="gender" />
+                                        </div>
+                                    </TableHead>
+                                    <TableHead
+                                        className="cursor-pointer hover:bg-muted/50"
+                                        onClick={() => handleSort('ethnic_group')}
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            Ethnic Group
+                                            <SortIndicator field="ethnic_group" />
+                                        </div>
+                                    </TableHead>
+                                    <TableHead
+                                        className="cursor-pointer hover:bg-muted/50"
+                                        onClick={() => handleSort('civil_status')}
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            Civil Status
+                                            <SortIndicator field="civil_status" />
+                                        </div>
+                                    </TableHead>
                                     <TableHead>Date of Birth</TableHead>
-                                    <TableHead>Age</TableHead>
+                                    <TableHead
+                                        className="cursor-pointer hover:bg-muted/50"
+                                        onClick={() => handleSort('age')}
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            Age
+                                            <SortIndicator field="age" />
+                                        </div>
+                                    </TableHead>
                                     <TableHead>Address</TableHead>
-                                    <TableHead>Added By</TableHead>
-
+                                    <TableHead>Encoded By</TableHead>
                                     <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {verifications?.map(
-                                    (verification: any) =>
-                                        verification.pdl && (
-                                            <TableRow key={verification.pdl.id}>
-                                                <TableCell>{verification.pdl.id}</TableCell>
-                                                <TableCell>
-                                                    {`${verification?.pdl?.fname || ''} ${verification?.pdl.mname || ''}  ${verification?.pdl?.lname || ''}`
-                                                        .trim()
-                                                        .split(' ')
-                                                        .filter(Boolean)
-                                                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                                                        .join(' ')}
-                                                </TableCell>
-
-                                                <TableCell>{verification.pdl.alias ?? '-'}</TableCell>
-                                                <TableCell>{verification.pdl.gender ?? '-'}</TableCell>
-                                                <TableCell>{verification.pdl.ethnic_group ?? '-'}</TableCell>
-                                                <TableCell>{verification.pdl.civil_status ?? '-'}</TableCell>
-                                                <TableCell>{format(new Date(verification.pdl.birthdate), 'MMMM dd, yyyy')}</TableCell>
-                                                <TableCell>{getAge(verification.pdl.birthdate)}</TableCell>
-                                                <TableCell>{`${verification.pdl.brgy ?? ''}, ${verification.pdl.city ?? ''}, ${verification.pdl.province ?? ''}`}</TableCell>
-                                                <TableCell>
-                                                    {verification.pdl.personnel
-                                                        ? `${verification.pdl.personnel.fname} ${verification.pdl.personnel.lname}`
-                                                        : '—'}
-                                                </TableCell>
-
-                                                <TableCell className="space-x-1">
-                                                    <ViewPdlInformation pdl={verification.pdl} />
-                                                    {!isAdmin && (
-                                                        <Button variant="outline" size="sm" onClick={() => handleArchive(verification.pdl)}>
-                                                            <Archive className="mr-1 h-4 w-4" />
-                                                            Archive
-                                                        </Button>
-                                                    )}
-
-                                                    {!isAdmin && (
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                window.location.href = `/record-officer/pdl-management/personal-information/${verification.pdl.id}`;
-                                                            }}
-                                                        >
-                                                            <Edit className="mr-1 h-4 w-4" />
-                                                            Edit
-                                                        </Button>
-                                                    )}
-                                                </TableCell>
-                                            </TableRow>
-                                        ),
-                                )}
+                                {paginatedVerifications.map((verification: any) => (
+                                    <TableRow key={verification.pdl.id}>
+                                        <TableCell>{verification.pdl.id}</TableCell>
+                                        <TableCell>
+                                            {`${verification?.pdl?.fname || ''} ${verification?.pdl.mname || ''}  ${verification?.pdl?.lname || ''}`
+                                                .trim()
+                                                .split(' ')
+                                                .filter(Boolean)
+                                                .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                                                .join(' ')}
+                                        </TableCell>
+                                        <TableCell>{verification.pdl.alias ?? '-'}</TableCell>
+                                        <TableCell>{verification.pdl.gender ?? '-'}</TableCell>
+                                        <TableCell>{verification.pdl.ethnic_group ?? '-'}</TableCell>
+                                        <TableCell>{verification.pdl.civil_status ?? '-'}</TableCell>
+                                        <TableCell>{format(new Date(verification.pdl.birthdate), 'MMMM dd, yyyy')}</TableCell>
+                                        <TableCell>{getAge(verification.pdl.birthdate)}</TableCell>
+                                        <TableCell>{`${verification.pdl.brgy ?? ''}, ${verification.pdl.city ?? ''}, ${verification.pdl.province ?? ''}`}</TableCell>
+                                        <TableCell>
+                                            {verification.pdl.personnel
+                                                ? `${verification.pdl.personnel.fname} ${verification.pdl.personnel.lname}`
+                                                : '—'}
+                                        </TableCell>
+                                        <TableCell className="space-x-1">
+                                            <ViewPdlInformation pdl={verification.pdl} />
+                                            {!isAdmin && (
+                                                <Button variant="outline" size="sm" onClick={() => handleArchive(verification.pdl)}>
+                                                    <Archive className="mr-1 h-4 w-4" />
+                                                    Archive
+                                                </Button>
+                                            )}
+                                            {!isAdmin && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        window.location.href = `/record-officer/pdl-management/personal-information/${verification.pdl.id}`;
+                                                    }}
+                                                >
+                                                    <Edit className="mr-1 h-4 w-4" />
+                                                    Edit
+                                                </Button>
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
                             </TableBody>
                         </Table>
+
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                            <div className="flex items-center justify-between mt-4">
+                                <div className="text-sm text-muted-foreground">
+                                    Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredAndSortedVerifications.length)} of {filteredAndSortedVerifications.length} entries
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                        disabled={currentPage === 1}
+                                    >
+                                        Previous
+                                    </Button>
+                                    <div className="flex items-center gap-1">
+                                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                            let pageNum;
+                                            if (totalPages <= 5) {
+                                                pageNum = i + 1;
+                                            } else if (currentPage <= 3) {
+                                                pageNum = i + 1;
+                                            } else if (currentPage >= totalPages - 2) {
+                                                pageNum = totalPages - 4 + i;
+                                            } else {
+                                                pageNum = currentPage - 2 + i;
+                                            }
+
+                                            return (
+                                                <Button
+                                                    key={pageNum}
+                                                    variant={currentPage === pageNum ? "default" : "outline"}
+                                                    size="sm"
+                                                    onClick={() => setCurrentPage(pageNum)}
+                                                >
+                                                    {pageNum}
+                                                </Button>
+                                            );
+                                        })}
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                        disabled={currentPage === totalPages}
+                                    >
+                                        Next
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
 
+                {/* Rest of your dialogs remain the same */}
                 {/* Manage Custody Dates Dialog */}
                 <Dialog open={custodyDialogOpen} onOpenChange={setCustodyDialogOpen}>
                     <DialogContent>
@@ -463,15 +694,10 @@ export default function PersonalInformation() {
                                         <SelectValue placeholder="Select archive status" />
                                     </SelectTrigger>
                                     <SelectContent>
+                                        <SelectItem value="SERVED_SENTENCE">Served Sentence</SelectItem>
                                         <SelectItem value="BONDED">BONDED</SelectItem>
-                                        <SelectItem value="SERVED_SENTENCE">SERVED SENTENCE</SelectItem>
-                                        <SelectItem value="PROV_DISMISSED">PROV. DISMISSED</SelectItem>
-                                        <SelectItem value="DISMISSED">DISMISSED</SelectItem>
-                                        <SelectItem value="TRANSFER_TO_OTHER_FACILITY">TRANSFER TO OTHER FACILITY</SelectItem>
-                                        <SelectItem value="DAPECOL">DAPECOL</SelectItem>
-                                        <SelectItem value="PROBATION">PROBATION</SelectItem>
-                                        <SelectItem value="DECEASED">DECEASED</SelectItem>
-                                        <SelectItem value="ACQUITTED">ACQUITTED</SelectItem>
+                                        <SelectItem value="TRANSFERRED_TO_OTHER_JAIL">Transferred to Another Jail</SelectItem>
+                                        <SelectItem value="DISMISSED">Dismissed</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>

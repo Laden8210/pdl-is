@@ -25,6 +25,8 @@ class Pdl extends Model
         'brgy',
         'city',
         'province',
+        'mugshot_path',
+        'mugshot_original_filename',
         'personnel_id',
         'archive_status',
         'archive_reason',
@@ -161,13 +163,9 @@ class Pdl extends Model
         return [
             'BONDED' => 'BONDED',
             'SERVED_SENTENCE' => 'SERVED SENTENCE',
-            'PROV_DISMISSED' => 'PROV. DISMISSED',
-            'DISMISSED' => 'DISMISSED',
-            'TRANSFER_TO_OTHER_FACILITY' => 'TRANSFER TO OTHER FACILITY',
-            'DAPECOL' => 'DAPECOL',
-            'PROBATION' => 'PROBATION',
-            'DECEASED' => 'DECEASED',
-            'ACQUITTED' => 'ACQUITTED',
+            'BONDED' => 'BONDED',
+            'TRANSFERRED_TO_OTHER_JAIL' => 'Transferred to Another Jail',
+            'DISMISSED' => 'Dismissed',
         ];
     }
 

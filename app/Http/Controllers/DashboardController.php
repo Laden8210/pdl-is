@@ -16,6 +16,9 @@ use App\Models\CourtOrder;
 use App\Models\Personnel;
 use App\Models\MedicalRecord;
 use App\Models\Verifications;
+use App\Models\Activity;
+use App\Models\SystemNotification;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -220,6 +223,7 @@ class DashboardController extends Controller
                         'type' => 'admission',
                         'title' => "New PDL admission - {$pdl->fname} {$pdl->lname}",
                         'description' => $pdl->created_at->diffForHumans() . " • Cell Assignment pending",
+                        'timestamp' => $pdl->created_at->format('M d, Y H:i'),
                         'badge' => 'Admission',
                         'color' => 'blue'
                     ];
@@ -235,6 +239,7 @@ class DashboardController extends Controller
                         'type' => 'time_allowance',
                         'title' => strtoupper($allowance->type) . " approved for {$allowance->pdl->fname} {$allowance->pdl->lname}",
                         'description' => \Carbon\Carbon::parse($allowance->awarded_at)->diffForHumans() . " • {$allowance->days} days awarded",
+                        'timestamp' => $allowance->created_at->format('M d, Y H:i'),
                         'badge' => 'Time Allowance',
                         'color' => 'green'
                     ];
@@ -250,6 +255,7 @@ class DashboardController extends Controller
                         'type' => 'court_order',
                         'title' => "Court order processed for {$order->pdl->fname} {$order->pdl->lname}",
                         'description' => $order->created_at->diffForHumans() . " • {$order->order_type}",
+                        'timestamp' => $order->created_at->format('M d, Y H:i'),
                         'badge' => 'Court Order',
                         'color' => 'purple'
                     ];
@@ -266,6 +272,7 @@ class DashboardController extends Controller
                         'type' => 'verification',
                         'title' => "Verification request for {$verification->pdl->fname} {$verification->pdl->lname}",
                         'description' => $verification->created_at->diffForHumans() . " • Awaiting review",
+                        'timestamp' => $verification->created_at->format('M d, Y H:i'),
                         'badge' => 'Verification',
                         'color' => 'red'
                     ];
@@ -281,11 +288,28 @@ class DashboardController extends Controller
                         'type' => 'medical',
                         'title' => "Medical examination for {$medical->pdl->fname} {$medical->pdl->lname}",
                         'description' => $medical->created_at->diffForHumans() . " • {$medical->complaint}",
+                        'timestamp' => $medical->created_at->format('M d, Y H:i'),
                         'badge' => 'Medical',
                         'color' => 'orange'
                     ];
                 })
         ])->sortByDesc('created_at')->take(5)->values();
+
+        // count upcaming events for 2 week
+        $upcomingEvents = Activity::where('activity_date', '>=', now())
+            ->where('activity_date', '<=', now()->addDays(14))
+            ->count();
+
+        // get unread notifications
+        $personnelId = auth()->user()->id;
+
+        $unreadCount = SystemNotification::where('personnel_id', '!=', $personnelId)
+            ->whereDoesntHave('readBy', function ($query) use ($personnelId) {
+                $query->where('personnel_id', $personnelId);
+            })
+            ->count();
+
+
 
         return Inertia::render('dashboard', [
             'dashboardData' => [
@@ -299,6 +323,8 @@ class DashboardController extends Controller
                 'verificationStatusData' => $verificationStatusData,
                 'personnelByPosition' => $personnelByPosition,
                 'recentActivities' => $recentActivities,
+                'upcomingEvents' => $upcomingEvents,
+                'unreadCount' => $unreadCount,
                 'metrics' => [
                     'totalPDL' => $totalPDL,
                     'activeCases' => $activeCases,
@@ -320,10 +346,15 @@ class DashboardController extends Controller
     {
         // Get PDL demographics by gender for law enforcement view
 
+        $agency = Auth::user()->agency;
+
         $pdlByGender = Pdl::select('gender', DB::raw('count(*) as value'))
             ->whereNull('deleted_at')
+            ->whereHas('personnel', function ($query) use ($agency) {
+                $query->where('agency', $agency);
+            })
             ->whereDoesntHave('verifications', function ($q) {
-                $q->where('status', 'approved'); // exclude those with approved verification
+                $q->where('status', 'approved');
             })
             ->groupBy('gender')
             ->get()
@@ -337,6 +368,11 @@ class DashboardController extends Controller
 
         // Get case status distribution for law enforcement
         $caseStatusData = CaseInformation::select('case_status', DB::raw('count(*) as value'))
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
             ->groupBy('case_status')
             ->get()
             ->map(function ($item) {
@@ -361,6 +397,9 @@ class DashboardController extends Controller
             $monthName = $date->format('M');
 
             $admissions = Pdl::whereMonth('created_at', $date->month)
+                ->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                })
                 ->whereYear('created_at', $date->year)
                 ->whereNull('deleted_at')
                 ->count();
@@ -373,6 +412,11 @@ class DashboardController extends Controller
 
         // Get court order types - important for law enforcement
         $courtOrderTypes = CourtOrder::select('order_type', DB::raw('count(*) as count'))
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
             ->groupBy('order_type')
             ->get()
             ->map(function ($item) {
@@ -392,6 +436,11 @@ class DashboardController extends Controller
 
         // Get security classification distribution - critical for law enforcement
         $securityClassificationData = CaseInformation::select('security_classification', DB::raw('count(*) as count'))
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
             ->whereNotNull('security_classification')
             ->groupBy('security_classification')
             ->get()
@@ -410,6 +459,9 @@ class DashboardController extends Controller
 
         // Get recent PDL admissions - law enforcement perspective
         $recentAdmissions = Pdl::whereNull('deleted_at')
+            ->whereHas('personnel', function ($query) use ($agency) {
+                $query->where('agency', $agency);
+            })
             ->latest()
             ->limit(5)
             ->get()
@@ -426,6 +478,11 @@ class DashboardController extends Controller
 
         // Get pending court orders - important for law enforcement workflow
         $pendingCourtOrders = CourtOrder::with('pdl')
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
             ->where('order_date', '>=', now()->subDays(30))
             ->latest('order_date')
             ->limit(5)
@@ -443,6 +500,11 @@ class DashboardController extends Controller
 
         // Get recent case information updates
         $recentCaseUpdates = CaseInformation::with('pdl')
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
             ->latest()
             ->limit(5)
             ->get()
@@ -459,22 +521,59 @@ class DashboardController extends Controller
 
         // Calculate key metrics for law enforcement
         $totalPDL = Pdl::whereNull('deleted_at')
+            ->whereHas('personnel', function ($query) use ($agency) {
+                $query->where('agency', $agency);
+            })
             ->whereDoesntHave('verifications', function ($q) {
                 $q->where('status', 'approved'); // exclude those with approved verification
             })
+            ->whereHas('personnel', function ($query) use ($agency) {
+                $query->where('agency', $agency);
+            })
             ->count();
-        $activeCases = CaseInformation::where('case_status', 'Active')->count();
+        $activeCases = CaseInformation::where('case_status', 'Active')
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
+            ->count();
         $totalCases = CaseInformation::count();
         $pendingCourtOrdersCount = CourtOrder::where('order_date', '>=', now()->subDays(30))->count();
-        $totalCourtOrders = CourtOrder::count();
-        $highSecurityPDL = CaseInformation::where('security_classification', 'Maximum')->count();
-        $mediumSecurityPDL = CaseInformation::where('security_classification', 'Medium')->count();
-        $lowSecurityPDL = CaseInformation::where('security_classification', 'Minimum')->count();
+        $totalCourtOrders = CourtOrder::whereHas('pdl', function ($query) use ($agency) {
+            $query->whereHas('personnel', function ($query) use ($agency) {
+                $query->where('agency', $agency);
+            });
+        })->count();
+        $highSecurityPDL = CaseInformation::where('security_classification', 'Maximum')
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
+            ->count();
+        $mediumSecurityPDL = CaseInformation::where('security_classification', 'Medium')
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
+            ->count();
+        $lowSecurityPDL = CaseInformation::where('security_classification', 'Minimum')
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
+            ->count();
 
         // Get recent activities specific to law enforcement
         $recentActivities = collect([
             // Recent PDL admissions
             ...Pdl::whereNull('deleted_at')
+                ->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                })
                 ->latest()
                 ->limit(3)
                 ->get()
@@ -483,6 +582,7 @@ class DashboardController extends Controller
                         'type' => 'admission',
                         'title' => "New PDL admission - {$pdl->fname} {$pdl->lname}",
                         'description' => $pdl->created_at->diffForHumans() . " • Processing required",
+                        'timestamp' => $pdl->created_at->format('M d, Y H:i'),
                         'badge' => 'New Admission',
                         'color' => 'blue'
                     ];
@@ -490,6 +590,11 @@ class DashboardController extends Controller
 
             // Recent court orders
             ...CourtOrder::with('pdl')
+                ->whereHas('pdl', function ($query) use ($agency) {
+                    $query->whereHas('personnel', function ($query) use ($agency) {
+                        $query->where('agency', $agency);
+                    });
+                })
                 ->latest('order_date')
                 ->limit(2)
                 ->get()
@@ -497,14 +602,20 @@ class DashboardController extends Controller
                     return [
                         'type' => 'court_order',
                         'title' => "Court order processed for {$order->pdl->fname} {$order->pdl->lname}",
-                        'description' => $order->created_at->diffForHumans() . " • {$order->order_type}",
+                        'description' => "{$order->order_type} • {$order->created_at->diffForHumans()}",
                         'badge' => 'Court Order',
+                        'timestamp' => $order->created_at->format('M d, Y H:i'),
                         'color' => 'purple'
                     ];
                 }),
 
             // Recent case updates
             ...CaseInformation::with('pdl')
+                ->whereHas('pdl', function ($query) use ($agency) {
+                    $query->whereHas('personnel', function ($query) use ($agency) {
+                        $query->where('agency', $agency);
+                    });
+                })
                 ->latest()
                 ->limit(2)
                 ->get()
@@ -549,7 +660,14 @@ class DashboardController extends Controller
         // Records Officer Dashboard - Focus on verification and record management
 
         // Get pending verifications count and details
+        $agency = Auth::user()->agency;
+
         $pendingVerifications = Verifications::where('status', 'pending')
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
             ->with('pdl')
             ->latest()
             ->get()
@@ -567,6 +685,11 @@ class DashboardController extends Controller
 
         // Get verification status distribution
         $verificationStatusData = Verifications::select('status', DB::raw('count(*) as count'))
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
             ->groupBy('status')
             ->get()
             ->map(function ($item) {
@@ -584,6 +707,9 @@ class DashboardController extends Controller
 
         // Get recent PDL records created (last 30 days)
         $recentPDLRecords = Pdl::whereNull('deleted_at')
+            ->whereHas('personnel', function ($query) use ($agency) {
+                $query->where('agency', $agency);
+            })
             ->where('created_at', '>=', now()->subDays(30))
             ->latest()
             ->limit(10)
@@ -601,6 +727,9 @@ class DashboardController extends Controller
 
         // Get incomplete PDL records (missing required information)
         $incompleteRecords = Pdl::whereNull('deleted_at')
+            ->whereHas('personnel', function ($query) use ($agency) {
+                $query->where('agency', $agency);
+            })
             ->where(function ($query) {
                 $query->whereNull('fname')
                     ->orWhereNull('lname')
@@ -630,6 +759,11 @@ class DashboardController extends Controller
 
         // Get case information status
         $caseStatusData = CaseInformation::select('case_status', DB::raw('count(*) as count'))
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
             ->groupBy('case_status')
             ->get()
             ->map(function ($item) {
@@ -654,11 +788,19 @@ class DashboardController extends Controller
             $monthName = $date->format('M');
 
             $recordsCreated = Pdl::whereMonth('created_at', $date->month)
+                ->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                })
                 ->whereYear('created_at', $date->year)
                 ->whereNull('deleted_at')
                 ->count();
 
             $verificationsProcessed = Verifications::whereMonth('updated_at', $date->month)
+                ->whereHas('pdl', function ($query) use ($agency) {
+                    $query->whereHas('personnel', function ($query) use ($agency) {
+                        $query->where('agency', $agency);
+                    });
+                })
                 ->whereYear('updated_at', $date->year)
                 ->whereIn('status', ['approved', 'rejected'])
                 ->count();
@@ -675,6 +817,11 @@ class DashboardController extends Controller
             // Recent verifications
             ...Verifications::with('pdl')
                 ->where('status', 'pending')
+                ->whereHas('pdl', function ($query) use ($agency) {
+                    $query->whereHas('personnel', function ($query) use ($agency) {
+                        $query->where('agency', $agency);
+                    });
+                })
                 ->latest()
                 ->limit(3)
                 ->get()
@@ -691,6 +838,9 @@ class DashboardController extends Controller
 
             // Recent PDL records
             ...Pdl::whereNull('deleted_at')
+                ->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                })
                 ->latest()
                 ->limit(2)
                 ->get()
@@ -706,6 +856,11 @@ class DashboardController extends Controller
 
             // Recent case information updates
             ...CaseInformation::with('pdl')
+                ->whereHas('pdl', function ($query) use ($agency) {
+                    $query->whereHas('personnel', function ($query) use ($agency) {
+                        $query->where('agency', $agency);
+                    });
+                })
                 ->latest()
                 ->limit(2)
                 ->get()
@@ -722,6 +877,9 @@ class DashboardController extends Controller
 
         // Calculate key metrics for records officer
         $totalPDL = Pdl::whereNull('deleted_at')
+            ->whereHas('personnel', function ($query) use ($agency) {
+                $query->where('agency', $agency);
+            })
             ->whereHas('verifications', function ($query) {
                 $query->where('status', 'approved');
             })
@@ -731,6 +889,9 @@ class DashboardController extends Controller
         $rejectedVerificationsCount = Verifications::where('status', 'rejected')->count();
         $totalVerifications = Verifications::count();
         $incompleteRecordsCount = Pdl::whereNull('deleted_at')
+            ->whereHas('personnel', function ($query) use ($agency) {
+                $query->where('agency', $agency);
+            })
             ->where(function ($query) {
                 $query->whereNull('fname')
                     ->orWhereNull('lname')
@@ -741,15 +902,33 @@ class DashboardController extends Controller
             })
             ->count();
         $totalCases = CaseInformation::count();
-        $activeCases = CaseInformation::where('case_status', 'Active')->count();
+        $activeCases = CaseInformation::where('case_status', 'Active')
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
+            ->count();
         $recordsCreatedThisMonth = Pdl::whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->whereNull('deleted_at')
             ->count();
 
         // Get time allowances distribution - separate GCTA and TASTM for records officer
-        $gctaCount = TimeAllowance::where('type', 'gcta')->count();
-        $tastmCount = TimeAllowance::where('type', 'tastm')->count();
+        $gctaCount = TimeAllowance::where('type', 'gcta')
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
+            ->count();
+        $tastmCount = TimeAllowance::where('type', 'tastm')
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereHas('personnel', function ($query) use ($agency) {
+                    $query->where('agency', $agency);
+                });
+            })
+            ->count();
 
         $timeAllowanceData = collect([
             [

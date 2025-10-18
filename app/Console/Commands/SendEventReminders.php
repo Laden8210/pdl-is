@@ -32,20 +32,20 @@ class SendEventReminders extends Command
         $this->info('Checking for upcoming events...');
 
         $now = Carbon::now();
-        $next24Hours = $now->copy()->addHours(24);
+        $next3Days = $now->copy()->addDays(3);
 
-        // Find events happening in the next 24 hours
+        // Find events happening in the next 3 days
         $upcomingEvents = Activity::where('activity_date', '>=', $now->format('Y-m-d'))
-            ->where('activity_date', '<=', $next24Hours->format('Y-m-d'))
-            ->where(function($query) use ($now, $next24Hours) {
-                $query->where(function($q) use ($now, $next24Hours) {
+            ->where('activity_date', '<=', $next3Days->format('Y-m-d'))
+            ->where(function($query) use ($now, $next3Days) {
+                $query->where(function($q) use ($now, $next3Days) {
                     // Events today
                     $q->where('activity_date', $now->format('Y-m-d'))
                       ->where('activity_time', '>=', $now->format('H:i:s'));
-                })->orWhere(function($q) use ($next24Hours) {
+                })->orWhere(function($q) use ($next3Days) {
                     // Events tomorrow
-                    $q->where('activity_date', $next24Hours->format('Y-m-d'))
-                      ->where('activity_time', '<=', $next24Hours->format('H:i:s'));
+                    $q->where('activity_date', $next3Days->format('Y-m-d'))
+                      ->where('activity_time', '<=', $next3Days->format('H:i:s'));
                 });
             })
             ->get();
@@ -56,8 +56,8 @@ class SendEventReminders extends Command
             $eventDateTime = Carbon::parse($activity->activity_date . ' ' . $activity->activity_time);
             $hoursUntilEvent = $eventDateTime->diffInHours($now);
 
-            // Send notification if event is within 24 hours
-            if ($hoursUntilEvent <= 24 && $hoursUntilEvent >= 0) {
+            // Send notification if event is within 3 days
+            if ($hoursUntilEvent <= 3 && $hoursUntilEvent >= 0) {
                 // Handle both array and JSON string cases
                 $pdlIds = is_array($activity->pdl_ids) ? $activity->pdl_ids : json_decode($activity->pdl_ids, true);
                 $pdlIds = $pdlIds ?: [];

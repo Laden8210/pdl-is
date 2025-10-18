@@ -14,11 +14,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { after } from 'node:test';
 import { FormEventHandler, useRef } from 'react';
-import { useEffect } from 'react';
+import { CreateAgency } from './create-agency';
+import { Agency } from '@/types';
 
-export function CreateUser() {
+export function CreateUser( { agencies }: { agencies: Agency[] } ) {
     const avatarRef = useRef<HTMLInputElement>(null);
     const { props } = usePage<any>();
     const successMessage = props.success;
@@ -33,9 +33,7 @@ export function CreateUser() {
         password: '',
         position: '',
         agency: '',
-
     });
-
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -55,18 +53,15 @@ export function CreateUser() {
                     agency: '',
                 });
 
-
                 setTimeout(() => {
-                 const closeButton = document.querySelector('.dialog-close-button') as HTMLElement;
-                 if (closeButton) {
-                      closeButton.click();
-                 }
+                    const closeButton = document.querySelector('.dialog-close-button') as HTMLElement;
+                    if (closeButton) {
+                        closeButton.click();
+                    }
                 }, 3000);
-
             },
         });
     };
-
 
 
     return (
@@ -84,7 +79,7 @@ export function CreateUser() {
                     </DialogHeader>
 
                     {Object.keys(errors).length > 0 && (
-                        <Alert variant="destructive" className="mb-4 mt-4">
+                        <Alert variant="destructive" className="mt-4 mb-4">
                             <AlertTitle>Unable to process request</AlertTitle>
                             <AlertDescription>
                                 {Object.values(errors).map((error, index) => (
@@ -106,34 +101,17 @@ export function CreateUser() {
                     <div className="grid grid-cols-3 gap-4 py-2">
                         <div className="col-span-2">
                             <Label htmlFor="firstName">First Name *</Label>
-                            <Input
-                                id="fname"
-                                name="fname"
-                                value={data.fname}
-                                onChange={(e) => setData('fname', e.target.value)}
-                                required
-                            />
+                            <Input id="fname" name="fname" value={data.fname} onChange={(e) => setData('fname', e.target.value)} required />
                         </div>
 
                         <div>
                             <Label htmlFor="middleName">Middle Name</Label>
-                            <Input
-                                id="middleName"
-                                name="mname"
-                                value={data.mname}
-                                onChange={(e) => setData('mname', e.target.value)}
-                            />
+                            <Input id="middleName" name="mname" value={data.mname} onChange={(e) => setData('mname', e.target.value)} />
                         </div>
 
                         <div className="col-span-3">
                             <Label htmlFor="lastName">Last Name *</Label>
-                            <Input
-                                id="lname"
-                                name="lname"
-                                value={data.lname}
-                                onChange={(e) => setData('lname', e.target.value)}
-                                required
-                            />
+                            <Input id="lname" name="lname" value={data.lname} onChange={(e) => setData('lname', e.target.value)} required />
                         </div>
 
                         <div className="col-span-3">
@@ -184,11 +162,7 @@ export function CreateUser() {
 
                         <div className="col-span-3">
                             <Label htmlFor="userType">User Type *</Label>
-                            <Select
-                                value={data.position}
-                                onValueChange={(value) => setData('position', value)}
-                                required
-                            >
+                            <Select value={data.position} onValueChange={(value) => setData('position', value)} required>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select user type" />
                                 </SelectTrigger>
@@ -199,17 +173,26 @@ export function CreateUser() {
                                 </SelectContent>
                             </Select>
                         </div>
+                        <div className="col-span-3 grid grid-cols-3 items-end gap-4 py-2">
+                            {/* Agency Select */}
+                            <div className="col-span-2">
+                                <Label htmlFor="agency">Agency *</Label>
+                                <Select value={data.agency} onValueChange={(value) => setData('agency', value)} required>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select agency" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {agencies.map((agency) => (
+                                            <SelectItem key={agency.id} value={agency.agency_name}>{agency.agency_name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
-
-                        <div className="col-span-3">
-                            <Label htmlFor="agency">Agency *    </Label>
-                            <Input
-                                id="agency"
-                                name="agency"
-                                value={data.agency}
-                                onChange={(e) => setData('agency', e.target.value)}
-                                required
-                            />
+                            {/* Add Agency Button */}
+                            <div className="col-span-1 flex items-end">
+                              <CreateAgency />
+                            </div>
                         </div>
                     </div>
 
@@ -217,12 +200,7 @@ export function CreateUser() {
                         <DialogClose asChild>
                             <Button variant="secondary">Cancel</Button>
                         </DialogClose>
-                        <Button
-                            type="submit"
-                            form="create-user-form"
-                            className="bg-blue-500 hover:bg-blue-600"
-                            disabled={processing}
-                        >
+                        <Button type="submit" form="create-user-form" className="bg-blue-500 hover:bg-blue-600" disabled={processing}>
                             {processing ? 'Creating...' : 'Create User'}
                         </Button>
                     </DialogFooter>

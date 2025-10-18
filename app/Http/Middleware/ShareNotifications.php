@@ -66,11 +66,13 @@ class ShareNotifications
         if (Auth::check()) {
             $user = Auth::user();
             $userRole = $user->position ?? 'admin';
+            $personnelId = $user->id;
 
             // Build query with role-based filtering
-            $query = SystemNotification::with(['sender', 'pdl', 'readBy'])
-                ->latest()
-                ->take(20);
+            $query = SystemNotification::where('personnel_id', '!=', $personnelId)
+                ->whereDoesntHave('readBy', function ($query) use ($personnelId) {
+                    $query->where('personnel_id', $personnelId);
+                });
 
             // Filter notifications based on user role
             if ($userRole === 'law-enforcement') {

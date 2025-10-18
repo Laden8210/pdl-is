@@ -20,7 +20,7 @@ class CourtOrder extends Model
         'document_type',
         'document_path',
         'original_filename',
-        'court_branch',
+        'court_id',
         'pdl_id',
         'admission_date',
         'release_date',
@@ -36,5 +36,16 @@ class CourtOrder extends Model
     public function pdl()
     {
         return $this->belongsTo(Pdl::class, 'pdl_id');
+    }
+
+
+    public function court_branch()
+    {
+        return $this->belongsTo(Court::class, 'court_id')->select('branch_code');
+    }
+
+    public function court()
+    {
+        return $this->belongsTo(Court::class, 'court_id');
     }
 }

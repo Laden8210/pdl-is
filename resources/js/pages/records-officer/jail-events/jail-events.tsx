@@ -12,9 +12,11 @@ import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import { Search } from 'lucide-react';
 
+
 import CreateEvent from '@/features/court-hearing/create-event';
 import { usePage } from '@inertiajs/react';
-
+import { CancelEvent } from '@/features/cancel-event';
+import { RescheduleEvent } from '@/features/reschedule-event';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
@@ -23,7 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import { useState } from 'react';
 
@@ -49,10 +51,11 @@ export default function Calendar() {
                 pdls: activity.pdls || [],
                 pdlNames: pdlNames,
                 category: activity.category,
-                location: activity.location || 'Not specified',
+                reason: activity.reason || 'No reason provided',
             },
             backgroundColor: getEventColor(activity.category),
             borderColor: getEventColor(activity.category),
+            status: activity.status,
             textColor: '#ffffff',
             className: 'hover:shadow-md transition-shadow duration-200',
         };
@@ -78,6 +81,21 @@ export default function Calendar() {
             case 'jail_activity':
             case 'jail activity':
                 return '#8b5cf6'; // violet for jail activities
+            default:
+                return '#6b7280'; // gray
+        }
+    }
+
+    function getStatusColor(status: string) {
+        switch (status.toLowerCase()) {
+            case 'pending':
+                return '#f59e0b'; // amber
+            case 'completed':
+                return '#3b82f6'; // blue
+            case 'cancelled':
+                return '#ef4444'; // red
+            case 'rescheduled':
+                return '#f59e0b'; // amber
             default:
                 return '#6b7280'; // gray
         }
@@ -151,6 +169,7 @@ export default function Calendar() {
                         }}
                         eventClick={(info) => {
                             setSelectedEvent({
+                                activity_id: info.event.id,
                                 title: info.event.title,
                                 start: info.event.start,
                                 description: info.event.extendedProps.description,
@@ -158,7 +177,9 @@ export default function Calendar() {
                                 pdls: info.event.extendedProps.pdls,
                                 pdlNames: info.event.extendedProps.pdlNames,
                                 category: info.event.extendedProps.category,
-                                location: info.event.extendedProps.location,
+
+                                status: info.event.extendedProps.status,
+                                reason: info.event.extendedProps.reason,
                             });
                         }}
                         dateClick={handleDateDoubleClick} // Handle single click if needed
@@ -186,6 +207,22 @@ export default function Calendar() {
                             >
                                 {selectedEvent?.category}
                             </Badge>
+
+                            <Badge
+                                variant="outline"
+                                className="border-0 text-white"
+                                style={{
+                                    backgroundColor: getStatusColor(selectedEvent?.status || ''),
+                                }}
+                            >
+                                {selectedEvent?.status}
+                            </Badge>
+                        </div>
+
+                        <div className="grid gap-4 py-4">
+                            <h3 className="text-sm font-medium text-muted-foreground">Reason</h3>
+                            <p>{selectedEvent?.reason || 'No reason provided'}</p>
+
                         </div>
                     </DialogHeader>
 
@@ -219,6 +256,11 @@ export default function Calendar() {
                             </div>
                         )}
                     </div>
+                    <DialogFooter>
+                        <CancelEvent event={selectedEvent} />
+                        <RescheduleEvent event={selectedEvent} />
+                    </DialogFooter>
+
                 </DialogContent>
             </Dialog>
 
@@ -242,6 +284,7 @@ export default function Calendar() {
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 
 function SimpleEventForm({ pdls, preselectedDate, onSuccess }: { pdls: any[]; preselectedDate: string; onSuccess: () => void }) {
     const [showSuggestions, setShowSuggestions] = useState(false);

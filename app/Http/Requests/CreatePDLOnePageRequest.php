@@ -22,28 +22,35 @@ class CreatePDLOnePageRequest extends FormRequest
             'age' => 'required|integer|min:18',
             'gender' => 'required|string|in:Male,Female',
             'ethnic_group' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
-            'civil_status' => 'required|string|in:Single,Married,Widowed,Divorced',
+            'civil_status' => 'required|string|in:Single,Married,Widowed,Annulment',
             'brgy' => 'required|string|max:255',
             'city' => 'required|string|max:255',
             'province' => 'required|string|max:255',
+            'mugshot' => 'nullable|file|mimes:jpg,jpeg,png|max:5120', // 5MB max for mugshots
 
 
             // Court Order
 
-            'order_type' => 'required|string|max:255',
-            'order_date' => 'required|date',
-            'received_date' => 'required|date',
-            'document_type' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png,txt|max:10240',
-            'court_branch' => 'required|string|max:255',
-            'cod_remarks' => 'nullable|string',
+            'court_orders' => 'required|array',
+            'court_orders.*.order_type' => 'required|string|max:255',
+            'court_orders.*.order_date' => 'required|date',
+            'court_orders.*.received_date' => 'required|date',
+            'court_orders.*.document_type' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png,txt|max:10240',
+            'court_orders.*.court_id' => 'required|exists:courts,court_id',
+            'court_orders.*.cod_remarks' => 'nullable|string',
+
+
 
             // Medical Record
-            'complaint' => 'required|string',
-            'date' => 'required|date',
-            'prognosis' => 'required|string',
-            'medical_file' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png,txt|max:10240',
-            'prescription' => 'required|string',
-            'findings' => 'required|string',
+            'medical_records' => 'required|array',
+            'medical_records.*.complaint' => 'required|string',
+            'medical_records.*.date' => 'required|date',
+            'medical_records.*.prognosis' => 'required|string',
+            'medical_records.*.prescription' => 'required|string',
+            'medical_records.*.findings' => 'required|string',
+            'medical_records.*.medical_file' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png,txt|max:10240',
+
+
 
             // Physical Characteristics
             'height' => 'required|numeric',
@@ -62,7 +69,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'cases.*.crime_committed' => 'required|string',
             'cases.*.date_committed' => 'required|date',
             'cases.*.time_committed' => 'required|date_format:H:i',
-            'cases.*.case_status' => 'required|string|in:open,pending,convicted,deceased,dismissed,on_trial',
+            'cases.*.case_status' => 'required|string|in:on_trial,pending,convicted,dismissed,arraignment',
 
             'cases.*.case_remarks' => 'nullable|string',
             'cases.*.security_classification' => 'required|string|in:low,medium,high,maximum',
@@ -102,31 +109,33 @@ class CreatePDLOnePageRequest extends FormRequest
             'city.max' => 'City must not exceed 255 characters',
             'province.required' => 'Province is required',
             'province.max' => 'Province must not exceed 255 characters',
+            'mugshot.file' => 'Mugshot must be a valid image file',
+            'mugshot.mimes' => 'Mugshot must be a JPG, JPEG, or PNG image',
+            'mugshot.max' => 'Mugshot file size must not exceed 5MB',
 
             // Court Order Information
-            'order_type.required' => 'Order type is required',
-            'order_type.max' => 'Order type must not exceed 255 characters',
-            'order_date.required' => 'Order date is required',
-            'order_date.date' => 'Order date must be a valid date',
-            'received_date.required' => 'Received date is required',
-            'received_date.date' => 'Received date must be a valid date',
-            'document_type.required' => 'Document file is required',
-            'document_type.file' => 'Document must be a valid file',
-            'document_type.mimes' => 'Document must be a PDF, DOC, DOCX, JPG, JPEG, PNG, or TXT file',
-            'document_type.max' => 'Document file size must not exceed 10MB',
-            'court_branch.required' => 'Court branch is required',
-            'court_branch.max' => 'Court branch must not exceed 255 characters',
+            'court_orders.required' => 'At least one court order is required',
+            'court_orders.array' => 'Court orders must be provided as an array',
+            'court_orders.*.order_type.required' => 'Order type is required for all court orders',
+            'court_orders.*.order_type.max' => 'Order type must not exceed 255 characters for all court orders',
+            'court_orders.*.order_date.required' => 'Order date is required for all court orders',
+            'court_orders.*.order_date.date' => 'Order date must be a valid date for all court orders',
+            'court_orders.*.received_date.required' => 'Received date is required for all court orders',
+            'court_orders.*.received_date.date' => 'Received date must be a valid date for all court orders',
 
             // Medical Record
-            'complaint.required' => 'Medical complaint is required',
-            'date.required' => 'Medical record date is required',
-            'date.date' => 'Medical record date must be valid',
-            'prognosis.required' => 'Prognosis is required',
-            'prescription.required' => 'Prescription is required',
-            'findings.required' => 'Medical findings are required',
-            'medical_file.file' => 'Medical file must be a valid file',
-            'medical_file.mimes' => 'Medical file must be a PDF, DOC, DOCX, JPG, JPEG, PNG, or TXT file',
-            'medical_file.max' => 'Medical file size must not exceed 10MB',
+            'medical_records.required' => 'At least one medical record is required',
+            'medical_records.array' => 'Medical records must be provided as an array',
+            'medical_records.*.complaint.required' => 'Medical complaint is required for all medical records',
+            'medical_records.*.date.required' => 'Medical record date is required for all medical records',
+            'medical_records.*.date.date' => 'Medical record date must be a valid date for all medical records',
+            'medical_records.*.prognosis.required' => 'Prognosis is required for all medical records',
+            'medical_records.*.prescription.required' => 'Prescription is required for all medical records',
+            'medical_records.*.findings.required' => 'Medical findings are required for all medical records',
+            'medical_records.*.medical_file.required' => 'Medical file is required for all medical records',
+            'medical_records.*.medical_file.file' => 'Medical file must be a valid file',
+            'medical_records.*.medical_file.mimes' => 'Medical file must be a PDF, DOC, DOCX, JPG, JPEG, PNG, or TXT file',
+            'medical_records.*.medical_file.max' => 'Medical file size must not exceed 10MB',
 
             // Physical Characteristics
             'height.required' => 'Height is required',

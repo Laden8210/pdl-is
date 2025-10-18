@@ -209,8 +209,8 @@
     </div>
 
     <div class="signature-section">
-        <div class="signature-name">{{ $warden_name }}</div>
-        <div class="signature-title">{{ $warden_title }}</div>
+        <div class="signature-name">{{ $officer_name }}</div>
+        <div class="signature-title">{{ $officer_position }}</div>
     </div>
 </body>
 </html>

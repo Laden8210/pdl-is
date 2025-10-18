@@ -35,6 +35,8 @@ interface CertificateData {
         name: string;
         position: string;
     };
+    officer_name: string;
+    officer_position: string;
 }
 
 interface PageProps {
@@ -52,11 +54,15 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
         requested_by: string;
         requesting_agency: string;
         export_pdf: boolean;
+        officer_name: string;
+        officer_position: string;
     }>({
         persons: filters?.persons || [{ fname: '', mname: '', lname: '' }],
         requested_by: filters?.requested_by || '',
         requesting_agency: filters?.requesting_agency || '',
         export_pdf: false,
+        officer_name: '',
+        officer_position: '',
     });
 
     const handleAddPerson = () => {
@@ -91,6 +97,8 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
 
         params.append('requested_by', data.requested_by);
         params.append('requesting_agency', data.requesting_agency);
+        params.append('officer_name', data.officer_name);
+        params.append('officer_position', data.officer_position);
 
         console.log(params.toString());
         console.log(route('reports.no-records-certificate.export') + '?' + params.toString());
@@ -134,6 +142,26 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-6">
+
+                            <div className="space-y-4">
+                                <Label className="text-base font-semibold">Officer Name</Label>
+                                <Input
+                                    id="officer_name"
+                                    placeholder="e.g., PEMS Edwin P. Arroyo"
+                                    value={data.officer_name}
+                                    onChange={(e) => setData('officer_name', e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-4">
+                                <Label className="text-base font-semibold">Officer Position</Label>
+                                <Input
+                                    id="officer_position"
+                                    placeholder="e.g., Provincial Warden"
+                                    value={data.officer_position}
+                                    onChange={(e) => setData('officer_position', e.target.value)}
+                                />
+                            </div>
+
                             {/* Person Names */}
                             <div className="space-y-4">
                                 <Label className="text-base font-semibold">Person Names</Label>
@@ -305,8 +333,8 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
 
                                 {/* Signature Section */}
                                 <div className="text-right mt-8">
-                                    <div className="font-bold">{certificateData.signed_by.name}</div>
-                                    <div>{certificateData.signed_by.position}</div>
+                                    <div className="font-bold">{data.officer_name ?? certificateData.signed_by.name}</div>
+                                    <div>{data.officer_position ?? certificateData.signed_by.position}</div>
                                 </div>
                             </CardContent>
                         </Card>
