@@ -14,6 +14,15 @@ class PersonnelSeeder extends Seeder
      */
     public function run(): void
     {
+
+        DB::table('agency')->insert([
+            [
+                'agency_name' => 'City of Koronadal',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
         DB::table('personnel')->insert([
             [
                 'fname' => 'John',
@@ -24,7 +33,7 @@ class PersonnelSeeder extends Seeder
                 'username' => 'johndoe',
                 'password' => Hash::make('password123'),
                 'position' => 'record-officer',
-                'agency' => 'LGU Buenavista',
+                'agency' => 'City of Koronadal',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -37,24 +46,24 @@ class PersonnelSeeder extends Seeder
                 'username' => 'janesmith',
                 'password' => Hash::make('securepass'),
                 'position' => 'admin',
-                'agency' => 'LGU Buenavista',
+                'agency' => 'City of Koronadal',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
 
-            // [
-            //     'fname' => 'Alice',
-            //     'mname' => 'C.',
-            //     'lname' => 'Johnson',
-            //     'contactnum' => '09172345678',
-            //     'avatar' => null,
-            //     'username' => 'alicejohnson',
-            //     'password' => Hash::make('alicepass'),
-            //     'position' => 'law-enforcement',
-            //     'agency' => 'LGU Buenavista',
-            //     'created_at' => now(),
-            //     'updated_at' => now(),
-            // ],
+            [
+                'fname' => 'Alice',
+                'mname' => 'C.',
+                'lname' => 'Johnson',
+                'contactnum' => '09172345678',
+                'avatar' => null,
+                'username' => 'alicejohnson',
+                'password' => Hash::make('alicepass'),
+                'position' => 'law-enforcement',
+                'agency' => 'City of Koronadal',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
 
 
         ]);
