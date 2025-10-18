@@ -360,10 +360,14 @@ const steps = [
 export default function CreatePDLInformation() {
     const [currentStep, setCurrentStep] = useState(1);
     const [activeCaseIndex, setActiveCaseIndex] = useState(0);
+    const [activeCourtOrderIndex, setActiveCourtOrderIndex] = useState(0);
+    const [activeMedicalRecordIndex, setActiveMedicalRecordIndex] = useState(0);
     const [crimeCommittedOpen, setCrimeCommittedOpen] = useState(false);
-    const [medicalFile, setMedicalFile] = useState<File | null>(null);
-    const [documentPreview, setDocumentPreview] = useState<string | null>(null);
-    const [medicalPreview, setMedicalPreview] = useState<string | null>(null);
+    const [medicalFiles, setMedicalFiles] = useState<File[]>([]);
+    const [mugshotFile, setMugshotFile] = useState<File | null>(null);
+    const [documentPreviews, setDocumentPreviews] = useState<(string | null)[]>([]);
+    const [medicalPreviews, setMedicalPreviews] = useState<(string | null)[]>([]);
+    const [mugshotPreview, setMugshotPreview] = useState<string | null>(null);
     const [isCustomOrderType, setIsCustomOrderType] = useState<boolean>(false);
     const [orderTypeOpen, setOrderTypeOpen] = useState(false);
 
@@ -393,16 +397,16 @@ export default function CreatePDLInformation() {
     const handleOrderTypeChange = (value: string) => {
         if (value === 'Others') {
             setIsCustomOrderType(true);
-            setData('order_type', '');
+            handleCourtOrderChange(activeCourtOrderIndex, 'order_type', '');
         } else {
             setIsCustomOrderType(false);
-            setData('order_type', value);
+            handleCourtOrderChange(activeCourtOrderIndex, 'order_type', value);
         }
     };
 
     // Handle order type input change for custom input
     const handleOrderTypeInputChange = (value: string) => {
-        setData('order_type', value);
+        handleCourtOrderChange(activeCourtOrderIndex, 'order_type', value);
     };
 
     // Handle location changes
@@ -432,26 +436,36 @@ export default function CreatePDLInformation() {
         if (file.type.startsWith('image/')) {
             // Handle image files (JPG, JPEG, PNG)
             reader.onload = (e) => {
-                setDocumentPreview(e.target?.result as string);
+                const newPreviews = [...documentPreviews];
+                newPreviews[activeCourtOrderIndex] = e.target?.result as string;
+                setDocumentPreviews(newPreviews);
             };
             reader.readAsDataURL(file);
         } else if (file.type === 'application/pdf') {
             // Handle PDF files
             reader.onload = (e) => {
-                setDocumentPreview(e.target?.result as string);
+                const newPreviews = [...documentPreviews];
+                newPreviews[activeCourtOrderIndex] = e.target?.result as string;
+                setDocumentPreviews(newPreviews);
             };
             reader.readAsDataURL(file);
         } else if (file.type === 'text/plain') {
             // Handle TXT files
             reader.onload = (e) => {
-                setDocumentPreview(e.target?.result as string);
+                const newPreviews = [...documentPreviews];
+                newPreviews[activeCourtOrderIndex] = e.target?.result as string;
+                setDocumentPreviews(newPreviews);
             };
             reader.readAsText(file);
         } else if (file.type.includes('document') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
             // Handle DOC/DOCX files - show file info since we can't preview them directly
-            setDocumentPreview('document-file');
+            const newPreviews = [...documentPreviews];
+            newPreviews[activeCourtOrderIndex] = 'document-file';
+            setDocumentPreviews(newPreviews);
         } else {
-            setDocumentPreview(null);
+            const newPreviews = [...documentPreviews];
+            newPreviews[activeCourtOrderIndex] = null;
+            setDocumentPreviews(newPreviews);
         }
     };
 
@@ -462,26 +476,36 @@ export default function CreatePDLInformation() {
         if (file.type.startsWith('image/')) {
             // Handle image files (JPG, JPEG, PNG)
             reader.onload = (e) => {
-                setMedicalPreview(e.target?.result as string);
+                const newPreviews = [...medicalPreviews];
+                newPreviews[activeMedicalRecordIndex] = e.target?.result as string;
+                setMedicalPreviews(newPreviews);
             };
             reader.readAsDataURL(file);
         } else if (file.type === 'application/pdf') {
             // Handle PDF files
             reader.onload = (e) => {
-                setMedicalPreview(e.target?.result as string);
+                const newPreviews = [...medicalPreviews];
+                newPreviews[activeMedicalRecordIndex] = e.target?.result as string;
+                setMedicalPreviews(newPreviews);
             };
             reader.readAsDataURL(file);
         } else if (file.type === 'text/plain') {
             // Handle TXT files
             reader.onload = (e) => {
-                setMedicalPreview(e.target?.result as string);
+                const newPreviews = [...medicalPreviews];
+                newPreviews[activeMedicalRecordIndex] = e.target?.result as string;
+                setMedicalPreviews(newPreviews);
             };
             reader.readAsText(file);
         } else if (file.type.includes('document') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
             // Handle DOC/DOCX files - show file info since we can't preview them directly
-            setMedicalPreview('document-file');
+            const newPreviews = [...medicalPreviews];
+            newPreviews[activeMedicalRecordIndex] = 'document-file';
+            setMedicalPreviews(newPreviews);
         } else {
-            setMedicalPreview(null);
+            const newPreviews = [...medicalPreviews];
+            newPreviews[activeMedicalRecordIndex] = null;
+            setMedicalPreviews(newPreviews);
         }
     };
 
@@ -500,6 +524,62 @@ export default function CreatePDLInformation() {
             },
         ]);
         setActiveCaseIndex(data.cases.length);
+    };
+
+    const handleAddNewCourtOrder = () => {
+        setData('court_orders', [
+            ...data.court_orders,
+            {
+                order_type: '',
+                order_date: '',
+                received_date: '',
+                document_type: null,
+                court_id: '',
+                cod_remarks: '',
+            },
+        ]);
+        setActiveCourtOrderIndex(data.court_orders.length);
+    };
+
+    const handleRemoveCourtOrder = (index: number) => {
+        if (data.court_orders.length <= 1) return;
+        const newCourtOrders = data.court_orders.filter((_, i) => i !== index);
+        setData('court_orders', newCourtOrders);
+        setActiveCourtOrderIndex(Math.min(activeCourtOrderIndex, newCourtOrders.length - 1));
+    };
+
+    const handleCourtOrderChange = (index: number, field: string, value: string | File | null) => {
+        const newCourtOrders = [...data.court_orders];
+        newCourtOrders[index] = { ...newCourtOrders[index], [field]: value };
+        setData('court_orders', newCourtOrders);
+    };
+
+    const handleAddNewMedicalRecord = () => {
+        setData('medical_records', [
+            ...data.medical_records,
+            {
+                complaint: '',
+                date: new Date().toISOString().split('T')[0],
+                prognosis: '',
+                prescription: '',
+                findings: '',
+                medical_file: null,
+            },
+        ]);
+        setActiveMedicalRecordIndex(data.medical_records.length);
+    };
+
+    const handleRemoveMedicalRecord = (index: number) => {
+        if (data.medical_records.length <= 1) return;
+        const newMedicalRecords = data.medical_records.filter((_, i) => i !== index);
+        setData('medical_records', newMedicalRecords);
+        setActiveMedicalRecordIndex(Math.min(activeMedicalRecordIndex, newMedicalRecords.length - 1));
+    };
+
+    const handleMedicalRecordChange = (index: number, field: string, value: string | File | null) => {
+        const newMedicalRecords = [...data.medical_records];
+        newMedicalRecords[index] = { ...newMedicalRecords[index], [field]: value };
+        setData('medical_records', newMedicalRecords);
     };
 
     const handleRemoveCase = (index: number) => {
@@ -522,19 +602,61 @@ export default function CreatePDLInformation() {
         setData('cases', newCases);
     };
 
+
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            setMedicalFile(file);
-            setData('medical_file', file);
+            setMedicalFiles([...medicalFiles, file]);
+            handleMedicalRecordChange(activeMedicalRecordIndex, 'medical_file', file);
             handleMedicalPreview(file);
         }
     };
 
-    const removeFile = () => {
-        setMedicalFile(null);
-        setData('medical_file', null);
-        setMedicalPreview(null);
+    const handleDocumentUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            handleCourtOrderChange(activeCourtOrderIndex, 'document_type', file);
+            handleDocumentPreview(file);
+        }
+    };
+
+    const handleMugshotUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setMugshotFile(file);
+            setData('mugshot', file);
+            handleMugshotPreview(file);
+        }
+    };
+
+    const handleMugshotPreview = (file: File) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            setMugshotPreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const removeFile = (index: number) => {
+        const newMedicalFiles = medicalFiles.filter((_, i) => i !== index);
+        setMedicalFiles(newMedicalFiles);
+        handleMedicalRecordChange(activeMedicalRecordIndex, 'medical_file', null);
+        const newPreviews = [...medicalPreviews];
+        newPreviews[activeMedicalRecordIndex] = null;
+        setMedicalPreviews(newPreviews);
+    };
+
+    const removeDocument = (index: number) => {
+        handleCourtOrderChange(activeCourtOrderIndex, 'document_type', null);
+        const newPreviews = [...documentPreviews];
+        newPreviews[activeCourtOrderIndex] = null;
+        setDocumentPreviews(newPreviews);
+    };
+
+    const removeMugshot = () => {
+        setMugshotFile(null);
+        setData('mugshot', null);
+        setMugshotPreview(null);
     };
 
     const getFileIcon = (file: File) => {
@@ -572,18 +694,22 @@ export default function CreatePDLInformation() {
         city: string;
         province: string;
 
-        order_type: string;
-        order_date: string;
-        received_date: string;
-        document_type: File | null;
-        court_branch: string;
-        cod_remarks: string;
-        complaint: string;
-        date: string;
-        prognosis: string;
-
-        prescription: string;
-        findings: string;
+        court_orders: {
+            order_type: string;
+            order_date: string;
+            received_date: string;
+            document_type: File | null;
+            court_id: string;
+            cod_remarks: string;
+        }[];
+        medical_records: {
+            complaint: string;
+            date: string;
+            prognosis: string;
+            prescription: string;
+            findings: string;
+            medical_file: File | null;
+        }[];
         height: number;
         weight: number;
         build: string;
@@ -603,7 +729,7 @@ export default function CreatePDLInformation() {
             security_classification: string;
             drug_related: boolean;
         }[];
-        medical_file: File | null;
+        mugshot: File | null;
     }>({
         fname: '',
         lname: '',
@@ -614,21 +740,30 @@ export default function CreatePDLInformation() {
         gender: '',
         ethnic_group: '',
         civil_status: '',
+
         brgy: '',
         city: '',
         province: '',
-        order_type: '',
-        order_date: '',
-        received_date: '',
-        document_type: null,
-        court_branch: '',
-        cod_remarks: '',
-        complaint: '',
-        date: new Date().toISOString().split('T')[0],
-        prognosis: '',
-
-        prescription: '',
-        findings: '',
+        court_orders: [
+            {
+                order_type: '',
+                order_date: '',
+                received_date: '',
+                document_type: null,
+                court_id: '',
+                cod_remarks: '',
+            },
+        ],
+        medical_records: [
+            {
+                complaint: '',
+                date: new Date().toISOString().split('T')[0],
+                prognosis: '',
+                prescription: '',
+                findings: '',
+                medical_file: null,
+            },
+        ],
         height: 170,
         weight: 70,
         build: '',
@@ -650,12 +785,13 @@ export default function CreatePDLInformation() {
                 drug_related: false,
             },
         ],
-        medical_file: null,
+        mugshot: null,
     });
 
     const { props } = usePage();
-    const successMessage = (props as any).success;
-    const errorMessage = (props as any).error;
+    const { auth } = props;
+    const { courts } = props;
+
 
     const [date, setDate] = useState<Date | undefined>(undefined);
 
@@ -679,7 +815,7 @@ export default function CreatePDLInformation() {
         e.preventDefault();
 
         // Update form data with medical files
-        setData('medical_file', medicalFile);
+        setData('mugshot', mugshotFile);
 
         // Use the post method from useForm to handle flash messages properly
         post(route('pdl-management.personal-information.create'), {
@@ -689,11 +825,15 @@ export default function CreatePDLInformation() {
                 reset();
                 setDate(undefined);
                 setActiveCaseIndex(0);
+                setActiveCourtOrderIndex(0);
+                setActiveMedicalRecordIndex(0);
                 setCurrentStep(1);
-                setMedicalFile(null);
+                setMedicalFiles([]);
+                setMugshotFile(null);
                 resetSelections();
-                setDocumentPreview(null);
-                setMedicalPreview(null);
+                setDocumentPreviews([]);
+                setMedicalPreviews([]);
+                setMugshotPreview(null);
                 setIsCustomOrderType(false);
                 setOrderTypeOpen(false);
             },
@@ -828,17 +968,20 @@ export default function CreatePDLInformation() {
                                             <SelectItem value="Single">Single</SelectItem>
                                             <SelectItem value="Married">Married</SelectItem>
                                             <SelectItem value="Widowed">Widowed</SelectItem>
-                                            <SelectItem value="Divorced">Divorced</SelectItem>
+                                            <SelectItem value="Annulment">Annulment</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
+
+
+
                             </div>
 
                             <Separator />
 
                             <div>
                                 <h3 className="mb-4 text-lg font-medium">Address Information</h3>
-                                
+
                                 {/* Location Error Alert */}
                                 {locationError && (
                                     <Alert variant="destructive" className="mb-4">
@@ -855,8 +998,8 @@ export default function CreatePDLInformation() {
                                             Province
                                             <span className="text-red-500">*</span>
                                         </Label>
-                                        <Select 
-                                            value={selectedProvince} 
+                                        <Select
+                                            value={selectedProvince}
                                             onValueChange={(value) => handleLocationChange('province', value)}
                                             disabled={loading.provinces}
                                         >
@@ -878,23 +1021,23 @@ export default function CreatePDLInformation() {
                                             </div>
                                         )}
                                     </div>
-                                    
+
                                     <div className="space-y-2">
                                         <Label htmlFor="city">
                                             City/Municipality
                                             <span className="text-red-500">*</span>
                                         </Label>
-                                        <Select 
-                                            value={selectedCityMunicipality} 
+                                        <Select
+                                            value={selectedCityMunicipality}
                                             onValueChange={(value) => handleLocationChange('city', value)}
                                             disabled={!selectedProvince || loading.citiesMunicipalities}
                                         >
                                             <SelectTrigger>
                                                 <SelectValue placeholder={
-                                                    !selectedProvince 
-                                                        ? "Select province first" 
-                                                        : loading.citiesMunicipalities 
-                                                            ? "Loading cities/municipalities..." 
+                                                    !selectedProvince
+                                                        ? "Select province first"
+                                                        : loading.citiesMunicipalities
+                                                            ? "Loading cities/municipalities..."
                                                             : "Select city/municipality"
                                                 } />
                                             </SelectTrigger>
@@ -916,23 +1059,23 @@ export default function CreatePDLInformation() {
                                             <div className="text-xs text-muted-foreground">Please select a province first</div>
                                         )}
                                     </div>
-                                    
+
                                     <div className="space-y-2">
                                         <Label htmlFor="brgy">
                                             Barangay
                                             <span className="text-red-500">*</span>
                                         </Label>
-                                        <Select 
-                                            value={selectedBarangay} 
+                                        <Select
+                                            value={selectedBarangay}
                                             onValueChange={(value) => handleLocationChange('barangay', value)}
                                             disabled={!selectedCityMunicipality || loading.barangays}
                                         >
                                             <SelectTrigger>
                                                 <SelectValue placeholder={
-                                                    !selectedCityMunicipality 
-                                                        ? "Select city/municipality first" 
-                                                        : loading.barangays 
-                                                            ? "Loading barangays..." 
+                                                    !selectedCityMunicipality
+                                                        ? "Select city/municipality first"
+                                                        : loading.barangays
+                                                            ? "Loading barangays..."
                                                             : "Select barangay"
                                                 } />
                                             </SelectTrigger>
@@ -956,159 +1099,41 @@ export default function CreatePDLInformation() {
                                     </div>
                                 </div>
                             </div>
-                        </CardContent>
-                    </Card>
-                );
 
-            case 2:
-                return (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Court Order Information</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <Label htmlFor="order_type">
-                                        Order Type <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Popover open={orderTypeOpen} onOpenChange={setOrderTypeOpen}>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                role="combobox"
-                                                aria-expanded={orderTypeOpen}
-                                                className="w-full justify-between"
-                                            >
-                                                {data.order_type || 'Select or type order type...'}
-                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-full p-0" align="start">
-                                            <Command>
-                                                <CommandInput
-                                                    placeholder="Search order types or type custom..."
-                                                    value={data.order_type}
-                                                    onValueChange={handleOrderTypeInputChange}
-                                                />
-                                                <CommandList>
-                                                    <CommandEmpty>
-                                                        <div className="p-2 text-sm text-muted-foreground">
-                                                            No order type found. Press Enter to add "{data.order_type}" as custom order type.
-                                                        </div>
-                                                    </CommandEmpty>
-                                                    <CommandGroup>
-                                                        {orderTypeSuggestions.map((orderType) => (
-                                                            <CommandItem
-                                                                key={orderType}
-                                                                value={orderType}
-                                                                onSelect={(currentValue) => {
-                                                                    handleOrderTypeChange(currentValue);
-                                                                    setOrderTypeOpen(false);
-                                                                }}
-                                                            >
-                                                                <Check
-                                                                    className={`mr-2 h-4 w-4 ${
-                                                                        data.order_type === orderType ? 'opacity-100' : 'opacity-0'
-                                                                    }`}
-                                                                />
-                                                                {orderType}
-                                                            </CommandItem>
-                                                        ))}
-                                                    </CommandGroup>
-                                                </CommandList>
-                                            </Command>
-                                        </PopoverContent>
-                                    </Popover>
-                                    <div className="text-xs text-muted-foreground">Select from common order types or type a custom order type</div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>
-                                        Order Date <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input type="date" value={data.order_date} onChange={(e) => setData('order_date', e.target.value)} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>
-                                        Received Date <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input type="date" value={data.received_date} onChange={(e) => setData('received_date', e.target.value)} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="document_type">
-                                        Upload Document <span className="text-red-500">*</span>
-                                    </Label>
-                                    <input
-                                        type="file"
-                                        id="document_type"
-                                        name="document_type"
-                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0];
-                                            if (file) {
-                                                setData('document_type', file);
-                                                handleDocumentPreview(file);
-                                            }
-                                        }}
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                                    />
-                                    <div className="text-xs text-muted-foreground">Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT</div>
+                            <Separator />
 
-                                    {/* Document Preview */}
-                                    {documentPreview && (
-                                        <div className="mt-4 space-y-2">
-                                            <Label>Document Preview</Label>
-                                            <div className="relative">
-                                                {documentPreview === 'document-file' ? (
-                                                    // DOC/DOCX file info display
-                                                    <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
-                                                        <div className="text-center">
-                                                            <FileText className="mx-auto h-16 w-16 text-gray-400" />
-                                                            <p className="mt-2 text-sm font-medium text-gray-900">{data.document_type?.name}</p>
-                                                            <p className="text-xs text-gray-500">Document file - Preview not available</p>
-                                                            <p className="text-xs text-gray-400">{formatFileSize(data.document_type?.size || 0)}</p>
-                                                        </div>
-                                                    </div>
-                                                ) : documentPreview.startsWith('data:image/') ? (
-                                                    // Image preview
-                                                    <img
-                                                        src={documentPreview}
-                                                        alt="Document preview"
-                                                        className="max-h-64 w-full rounded-lg border object-contain"
-                                                    />
-                                                ) : documentPreview.startsWith('data:application/pdf') ? (
-                                                    // PDF preview
-                                                    <iframe src={documentPreview} className="h-64 w-full rounded-lg border" title="PDF Preview" />
-                                                ) : (
-                                                    // Text file preview
-                                                    <div className="h-64 w-full rounded-lg border bg-white p-4">
-                                                        <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
-                                                            {documentPreview}
-                                                        </pre>
-                                                    </div>
-                                                )}
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="absolute top-2 right-2"
-                                                    onClick={() => setDocumentPreview(null)}
-                                                >
-                                                    <X className="h-4 w-4" />
-                                                </Button>
+                            <div>
+                                <h3 className="mb-4 text-lg font-medium">Mugshot Photo</h3>
+                                <div className="space-y-4">
+                                    {/* Mugshot Upload Area */}
+                                    <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-gray-400">
+                                        <input
+                                            type="file"
+                                            id="mugshot"
+                                            accept="image/jpeg,image/jpg,image/png"
+                                            onChange={handleMugshotUpload}
+                                            className="hidden"
+                                        />
+                                        <label htmlFor="mugshot" className="cursor-pointer">
+                                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                                            <div className="mt-2">
+                                                <span className="text-sm font-medium text-gray-900">Upload mugshot photo</span>
+                                                <p className="text-xs text-gray-500">Click to upload or drag and drop</p>
+                                                <p className="mt-1 text-xs text-gray-400">Supports: JPG, JPEG, PNG (Max 5MB)</p>
                                             </div>
-                                        </div>
-                                    )}
+                                        </label>
+                                    </div>
 
-                                    {/* File Info */}
-                                    {data.document_type && (
-                                        <div className="mt-2 rounded-lg bg-gray-50 p-3">
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center space-x-2">
-                                                    {getFileIcon(data.document_type)}
+                                    {/* Uploaded Mugshot */}
+                                    {mugshotFile && (
+                                        <div className="space-y-2">
+                                            <h4 className="text-sm font-medium">Uploaded Mugshot</h4>
+                                            <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                                <div className="flex items-center space-x-3">
+                                                    <Image className="h-5 w-5 text-blue-500" />
                                                     <div>
-                                                        <p className="text-sm font-medium">{data.document_type.name}</p>
-                                                        <p className="text-xs text-gray-500">{formatFileSize(data.document_type.size)}</p>
+                                                        <p className="text-sm font-medium text-gray-900">{mugshotFile.name}</p>
+                                                        <p className="text-xs text-gray-500">{formatFileSize(mugshotFile.size)}</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center space-x-2">
@@ -1116,9 +1141,9 @@ export default function CreatePDLInformation() {
                                                         type="button"
                                                         variant="ghost"
                                                         size="sm"
-                                                        onClick={() => data.document_type && handleDocumentPreview(data.document_type)}
+                                                        onClick={() => handleMugshotPreview(mugshotFile)}
                                                         className="text-blue-500 hover:text-blue-700"
-                                                        title="Preview file"
+                                                        title="Preview mugshot"
                                                     >
                                                         <Eye className="h-4 w-4" />
                                                     </Button>
@@ -1126,10 +1151,7 @@ export default function CreatePDLInformation() {
                                                         type="button"
                                                         variant="ghost"
                                                         size="sm"
-                                                        onClick={() => {
-                                                            setData('document_type', null);
-                                                            setDocumentPreview(null);
-                                                        }}
+                                                        onClick={removeMugshot}
                                                         className="text-red-500 hover:text-red-700"
                                                     >
                                                         <X className="h-4 w-4" />
@@ -1138,31 +1160,293 @@ export default function CreatePDLInformation() {
                                             </div>
                                         </div>
                                     )}
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="court_branch">
-                                        Court Branch <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input
-                                        id="court_branch"
-                                        name="court_branch"
-                                        value={data.court_branch}
-                                        onChange={handleChange}
-                                        placeholder="Enter court branch"
-                                    />
+
+                                    {/* Mugshot Preview */}
+                                    {mugshotPreview && (
+                                        <div className="mt-4 space-y-2">
+                                            <Label>Mugshot Preview</Label>
+                                            <div className="relative">
+                                                <img
+                                                    src={mugshotPreview}
+                                                    alt="Mugshot preview"
+                                                    className="max-h-96 w-full rounded-lg border object-contain"
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="absolute top-2 right-2"
+                                                    onClick={() => setMugshotPreview(null)}
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="cod_remarks">Remarks</Label>
-                                <Textarea
-                                    id="cod_remarks"
-                                    name="cod_remarks"
-                                    value={data.cod_remarks}
-                                    onChange={handleChange}
-                                    rows={3}
-                                    placeholder="Enter any additional remarks..."
-                                />
+                        </CardContent>
+                    </Card>
+                );
+
+            case 2:
+                return (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    Court Order Information
+                                </div>
+                                <Button variant="outline" size="sm" type="button" onClick={handleAddNewCourtOrder}>
+                                    Add New Court Order
+                                </Button>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            {/* Court Order Navigation Tabs */}
+                            <div className="flex gap-2 overflow-x-auto py-2">
+                                {data.court_orders.map((_, index) => (
+                                    <Button
+                                        key={index}
+                                        variant={activeCourtOrderIndex === index ? 'default' : 'outline'}
+                                        size="sm"
+                                        type="button"
+                                        onClick={() => setActiveCourtOrderIndex(index)}
+                                        className="relative"
+                                    >
+                                        Court Order {index + 1}
+                                        {data.court_orders.length > 1 && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleRemoveCourtOrder(index);
+                                                }}
+                                                className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white"
+                                            >
+                                                ×
+                                            </button>
+                                        )}
+                                    </Button>
+                                ))}
                             </div>
+
+                            {/* Court Order Form Fields */}
+                            {data.court_orders.length > 0 && (
+                                <>
+                                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="order_type">
+                                                Order Type <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Popover open={orderTypeOpen} onOpenChange={setOrderTypeOpen}>
+                                                <PopoverTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        role="combobox"
+                                                        aria-expanded={orderTypeOpen}
+                                                        className="w-full justify-between"
+                                                    >
+                                                        {data.court_orders[activeCourtOrderIndex].order_type || 'Select or type order type...'}
+                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-full p-0" align="start">
+                                                    <Command>
+                                                        <CommandInput
+                                                            placeholder="Search order types or type custom..."
+                                                            value={data.court_orders[activeCourtOrderIndex].order_type}
+                                                            onValueChange={(value) => handleCourtOrderChange(activeCourtOrderIndex, 'order_type', value)}
+                                                        />
+                                                        <CommandList>
+                                                            <CommandEmpty>
+                                                                <div className="p-2 text-sm text-muted-foreground">
+                                                                    No order type found. Press Enter to add "{data.court_orders[activeCourtOrderIndex].order_type}" as custom order type.
+                                                                </div>
+                                                            </CommandEmpty>
+                                                            <CommandGroup>
+                                                                {orderTypeSuggestions.map((orderType) => (
+                                                                    <CommandItem
+                                                                        key={orderType}
+                                                                        value={orderType}
+                                                                        onSelect={(currentValue) => {
+                                                                            handleCourtOrderChange(activeCourtOrderIndex, 'order_type', currentValue);
+                                                                            setOrderTypeOpen(false);
+                                                                        }}
+                                                                    >
+                                                                        <Check
+                                                                            className={`mr-2 h-4 w-4 ${
+                                                                                data.court_orders[activeCourtOrderIndex].order_type === orderType ? 'opacity-100' : 'opacity-0'
+                                                                            }`}
+                                                                        />
+                                                                        {orderType}
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+                                            <div className="text-xs text-muted-foreground">Select from common order types or type a custom order type</div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>
+                                                Order Date <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Input
+                                                type="date"
+                                                value={data.court_orders[activeCourtOrderIndex].order_date}
+                                                onChange={(e) => handleCourtOrderChange(activeCourtOrderIndex, 'order_date', e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>
+                                                Received Date <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Input
+                                                type="date"
+                                                value={data.court_orders[activeCourtOrderIndex].received_date}
+                                                onChange={(e) => handleCourtOrderChange(activeCourtOrderIndex, 'received_date', e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="document_type">
+                                                Upload Document <span className="text-red-500">*</span>
+                                            </Label>
+                                            <input
+                                                type="file"
+                                                id="document_type"
+                                                name="document_type"
+                                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                                                onChange={handleDocumentUpload}
+                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                            />
+                                            <div className="text-xs text-muted-foreground">Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT</div>
+
+                                            {/* Document Preview */}
+                                            {documentPreviews[activeCourtOrderIndex] && (
+                                                <div className="mt-4 space-y-2">
+                                                    <Label>Document Preview</Label>
+                                                    <div className="relative">
+                                                        {documentPreviews[activeCourtOrderIndex] === 'document-file' ? (
+                                                            // DOC/DOCX file info display
+                                                            <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
+                                                                <div className="text-center">
+                                                                    <FileText className="mx-auto h-16 w-16 text-gray-400" />
+                                                                    <p className="mt-2 text-sm font-medium text-gray-900">{data.court_orders[activeCourtOrderIndex].document_type?.name}</p>
+                                                                    <p className="text-xs text-gray-500">Document file - Preview not available</p>
+                                                                    <p className="text-xs text-gray-400">{formatFileSize(data.court_orders[activeCourtOrderIndex].document_type?.size || 0)}</p>
+                                                                </div>
+                                                            </div>
+                                                        ) : documentPreviews[activeCourtOrderIndex].startsWith('data:image/') ? (
+                                                            // Image preview
+                                                            <img
+                                                                src={documentPreviews[activeCourtOrderIndex]}
+                                                                alt="Document preview"
+                                                                className="max-h-64 w-full rounded-lg border object-contain"
+                                                            />
+                                                        ) : documentPreviews[activeCourtOrderIndex].startsWith('data:application/pdf') ? (
+                                                            // PDF preview
+                                                            <iframe src={documentPreviews[activeCourtOrderIndex]} className="h-64 w-full rounded-lg border" title="PDF Preview" />
+                                                        ) : (
+                                                            // Text file preview
+                                                            <div className="h-64 w-full rounded-lg border bg-white p-4">
+                                                                <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
+                                                                    {documentPreviews[activeCourtOrderIndex]}
+                                                                </pre>
+                                                            </div>
+                                                        )}
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="absolute top-2 right-2"
+                                                            onClick={() => {
+                                                                const newPreviews = [...documentPreviews];
+                                                                newPreviews[activeCourtOrderIndex] = null;
+                                                                setDocumentPreviews(newPreviews);
+                                                            }}
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* File Info */}
+                                            {data.court_orders[activeCourtOrderIndex].document_type && (
+                                                <div className="mt-2 rounded-lg bg-gray-50 p-3">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center space-x-2">
+                                                            {getFileIcon(data.court_orders[activeCourtOrderIndex].document_type)}
+                                                            <div>
+                                                                <p className="text-sm font-medium">{data.court_orders[activeCourtOrderIndex].document_type.name}</p>
+                                                                <p className="text-xs text-gray-500">{formatFileSize(data.court_orders[activeCourtOrderIndex].document_type.size)}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => data.court_orders[activeCourtOrderIndex].document_type && handleDocumentPreview(data.court_orders[activeCourtOrderIndex].document_type)}
+                                                                className="text-blue-500 hover:text-blue-700"
+                                                                title="Preview file"
+                                                            >
+                                                                <Eye className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => {
+                                                                    handleCourtOrderChange(activeCourtOrderIndex, 'document_type', null);
+                                                                    const newPreviews = [...documentPreviews];
+                                                                    newPreviews[activeCourtOrderIndex] = null;
+                                                                    setDocumentPreviews(newPreviews);
+                                                                }}
+                                                                className="text-red-500 hover:text-red-700"
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="court_branch">
+                                                Court Branch <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Select
+                                                value={data.court_orders[activeCourtOrderIndex].court_id}
+                                                onValueChange={(value) => handleCourtOrderChange(activeCourtOrderIndex, 'court_id', value)}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select court branch" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {(courts as any[]).map((court: any) => (
+                                                        <SelectItem key={court.court_id} value={court.court_id.toString()}>
+                                                            {court.branch_code}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="cod_remarks">Remarks</Label>
+                                        <Textarea
+                                            id="cod_remarks"
+                                            name="cod_remarks"
+                                            value={data.court_orders[activeCourtOrderIndex].cod_remarks}
+                                            onChange={(e) => handleCourtOrderChange(activeCourtOrderIndex, 'cod_remarks', e.target.value)}
+                                            rows={3}
+                                            placeholder="Enter any additional remarks..."
+                                        />
+                                    </div>
+                                </>
+                            )}
                         </CardContent>
                     </Card>
                 );
@@ -1332,9 +1616,12 @@ export default function CreatePDLInformation() {
                                                     <SelectItem value="on_trial">On Trial</SelectItem>
                                                     <SelectItem value="pending">Pending</SelectItem>
                                                     <SelectItem value="convicted">Convicted</SelectItem>
-                                                    <SelectItem value="deceased">Deceased</SelectItem>
+
                                                     <SelectItem value="dismissed">Dismissed</SelectItem>
-                                                    <SelectItem value="open">Open</SelectItem>
+
+                                                    {(auth as any)?.user?.position === 'law-enforcement' && (
+                                                        <SelectItem value="arraignment">Arraignment</SelectItem>
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -1402,186 +1689,239 @@ export default function CreatePDLInformation() {
                 return (
                     <Card>
                         <CardHeader>
-                            <CardTitle>Medical Records</CardTitle>
+                            <CardTitle className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    Medical Records
+                                </div>
+                                <Button variant="outline" size="sm" type="button" onClick={handleAddNewMedicalRecord}>
+                                    Add New Medical Record
+                                </Button>
+                            </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-6">
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <Label htmlFor="date">
-                                        Date <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input type="date" id="date" value={data.date} onChange={(e) => setData('date', e.target.value)} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="complaint">
-                                        Complaint <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Textarea
-                                        id="complaint"
-                                        name="complaint"
-                                        value={data.complaint}
-                                        onChange={handleChange}
-                                        rows={3}
-                                        placeholder="Describe the medical complaint or symptoms..."
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="findings">
-                                        Medical Findings <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Textarea
-                                        id="findings"
-                                        name="findings"
-                                        value={data.findings}
-                                        onChange={handleChange}
-                                        rows={3}
-                                        placeholder="Enter medical findings and observations..."
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="prognosis">
-                                        Prognosis <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Textarea
-                                        id="prognosis"
-                                        name="prognosis"
-                                        value={data.prognosis}
-                                        onChange={handleChange}
-                                        rows={3}
-                                        placeholder="Enter medical prognosis (e.g., Good prognosis with treatment, Poor prognosis due to complications, etc.)"
-                                    />
-                                    <div className="text-xs text-muted-foreground">Specify prognosis details in parentheses for clarity</div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="prescription">
-                                        Prescription <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Textarea
-                                        id="prescription"
-                                        name="prescription"
-                                        value={data.prescription}
-                                        onChange={handleChange}
-                                        rows={3}
-                                        placeholder="Enter prescribed medications and treatments..."
-                                    />
-                                </div>
+                            {/* Medical Record Navigation Tabs */}
+                            <div className="flex gap-2 overflow-x-auto py-2">
+                                {data.medical_records.map((_, index) => (
+                                    <Button
+                                        key={index}
+                                        variant={activeMedicalRecordIndex === index ? 'default' : 'outline'}
+                                        size="sm"
+                                        type="button"
+                                        onClick={() => setActiveMedicalRecordIndex(index)}
+                                        className="relative"
+                                    >
+                                        Medical Record {index + 1}
+                                        {data.medical_records.length > 1 && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleRemoveMedicalRecord(index);
+                                                }}
+                                                className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white"
+                                            >
+                                                ×
+                                            </button>
+                                        )}
+                                    </Button>
+                                ))}
                             </div>
 
-                            {/* Medical Documents Upload Section */}
-                            <Separator />
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-medium">
-                                    Medical Documents & Images
-                                    <span className="text-red-500"> *</span>
-                                </h3>
-                                <div className="space-y-4">
-                                    {/* File Upload Area */}
-                                    <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-gray-400">
-                                        <input
-                                            type="file"
-                                            id="medical-file"
-                                            accept="image/*,.pdf,.doc,.docx,.txt"
-                                            onChange={handleFileUpload}
-                                            className="hidden"
-                                        />
-                                        <label htmlFor="medical-file" className="cursor-pointer">
-                                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                                            <div className="mt-2">
-                                                <span className="text-sm font-medium text-gray-900">Upload medical document</span>
-                                                <p className="text-xs text-gray-500">Click to upload or drag and drop</p>
-                                                <p className="mt-1 text-xs text-gray-400">Supports: Images (JPG, PNG, GIF), PDF, DOC, DOCX, TXT</p>
-                                            </div>
-                                        </label>
+                            {/* Medical Record Form Fields */}
+                            {data.medical_records.length > 0 && (
+                                <>
+                                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="date">
+                                                Date <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Input
+                                                type="date"
+                                                id="date"
+                                                value={data.medical_records[activeMedicalRecordIndex].date}
+                                                onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'date', e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="complaint">
+                                                Complaint <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Textarea
+                                                id="complaint"
+                                                name="complaint"
+                                                value={data.medical_records[activeMedicalRecordIndex].complaint}
+                                                onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'complaint', e.target.value)}
+                                                rows={3}
+                                                placeholder="Describe the medical complaint or symptoms..."
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="findings">
+                                                Medical Findings <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Textarea
+                                                id="findings"
+                                                name="findings"
+                                                value={data.medical_records[activeMedicalRecordIndex].findings}
+                                                onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'findings', e.target.value)}
+                                                rows={3}
+                                                placeholder="Enter medical findings and observations..."
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="prognosis">
+                                                Prognosis <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Textarea
+                                                id="prognosis"
+                                                name="prognosis"
+                                                value={data.medical_records[activeMedicalRecordIndex].prognosis}
+                                                onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'prognosis', e.target.value)}
+                                                rows={3}
+                                                placeholder="Enter medical prognosis (e.g., Good prognosis with treatment, Poor prognosis due to complications, etc.)"
+                                            />
+                                            <div className="text-xs text-muted-foreground">Specify prognosis details in parentheses for clarity</div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label htmlFor="prescription">
+                                                Prescription <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Textarea
+                                                id="prescription"
+                                                name="prescription"
+                                                value={data.medical_records[activeMedicalRecordIndex].prescription}
+                                                onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'prescription', e.target.value)}
+                                                rows={3}
+                                                placeholder="Enter prescribed medications and treatments..."
+                                            />
+                                        </div>
                                     </div>
 
-                                    {/* Uploaded File */}
-                                    {medicalFile && (
-                                        <div className="space-y-2">
-                                            <h4 className="text-sm font-medium">Uploaded File</h4>
-                                            <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                                                <div className="flex items-center space-x-3">
-                                                    {getFileIcon(medicalFile)}
-                                                    <div>
-                                                        <p className="text-sm font-medium text-gray-900">{medicalFile.name}</p>
-                                                        <p className="text-xs text-gray-500">{formatFileSize(medicalFile.size)}</p>
+                                    {/* Medical Documents Upload Section */}
+                                    <Separator />
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-medium">
+                                            Medical Documents & Images
+                                            <span className="text-red-500"> *</span>
+                                        </h3>
+                                        <div className="space-y-4">
+                                            {/* File Upload Area */}
+                                            <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-gray-400">
+                                                <input
+                                                    type="file"
+                                                    id="medical-file"
+                                                    accept="image/*,.pdf,.doc,.docx,.txt"
+                                                    onChange={handleFileUpload}
+                                                    className="hidden"
+                                                />
+                                                <label htmlFor="medical-file" className="cursor-pointer">
+                                                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                                                    <div className="mt-2">
+                                                        <span className="text-sm font-medium text-gray-900">Upload medical document</span>
+                                                        <p className="text-xs text-gray-500">Click to upload or drag and drop</p>
+                                                        <p className="mt-1 text-xs text-gray-400">Supports: Images (JPG, PNG, GIF), PDF, DOC, DOCX, TXT</p>
                                                     </div>
-                                                </div>
-                                                <div className="flex items-center space-x-2">
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleMedicalPreview(medicalFile)}
-                                                        className="text-blue-500 hover:text-blue-700"
-                                                        title="Preview file"
-                                                    >
-                                                        <Eye className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={removeFile}
-                                                        className="text-red-500 hover:text-red-700"
-                                                    >
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
+                                                </label>
                                             </div>
-                                        </div>
-                                    )}
 
-                                    {/* Medical Files Preview */}
-                                    {medicalPreview && (
-                                        <div className="mt-4 space-y-2">
-                                            <Label>File Preview</Label>
-                                            <div className="relative">
-                                                {medicalPreview === 'document-file' ? (
-                                                    // DOC/DOCX file info display
-                                                    <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
-                                                        <div className="text-center">
-                                                            <FileText className="mx-auto h-16 w-16 text-gray-400" />
-                                                            <p className="mt-2 text-sm font-medium text-gray-900">
-                                                                Document file - Preview not available
-                                                            </p>
-                                                            <p className="text-xs text-gray-500">
-                                                                Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
-                                                            </p>
+                                            {/* Uploaded File */}
+                                            {data.medical_records[activeMedicalRecordIndex].medical_file && (
+                                                <div className="space-y-2">
+                                                    <h4 className="text-sm font-medium">Uploaded File</h4>
+                                                    <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                                        <div className="flex items-center space-x-3">
+                                                            {getFileIcon(data.medical_records[activeMedicalRecordIndex].medical_file)}
+                                                            <div>
+                                                                <p className="text-sm font-medium text-gray-900">{data.medical_records[activeMedicalRecordIndex].medical_file.name}</p>
+                                                                <p className="text-xs text-gray-500">{formatFileSize(data.medical_records[activeMedicalRecordIndex].medical_file.size)}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => data.medical_records[activeMedicalRecordIndex].medical_file && handleMedicalPreview(data.medical_records[activeMedicalRecordIndex].medical_file)}
+                                                                className="text-blue-500 hover:text-blue-700"
+                                                                title="Preview file"
+                                                            >
+                                                                <Eye className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => {
+                                                                    handleMedicalRecordChange(activeMedicalRecordIndex, 'medical_file', null);
+                                                                    const newPreviews = [...medicalPreviews];
+                                                                    newPreviews[activeMedicalRecordIndex] = null;
+                                                                    setMedicalPreviews(newPreviews);
+                                                                }}
+                                                                className="text-red-500 hover:text-red-700"
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
                                                         </div>
                                                     </div>
-                                                ) : medicalPreview.startsWith('data:image/') ? (
-                                                    // Image preview
-                                                    <img
-                                                        src={medicalPreview}
-                                                        alt="File preview"
-                                                        className="max-h-64 w-full rounded-lg border object-contain"
-                                                    />
-                                                ) : medicalPreview.startsWith('data:application/pdf') ? (
-                                                    // PDF preview
-                                                    <iframe src={medicalPreview} className="h-64 w-full rounded-lg border" title="PDF Preview" />
-                                                ) : (
-                                                    // Text file preview
-                                                    <div className="h-64 w-full rounded-lg border bg-white p-4">
-                                                        <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
-                                                            {medicalPreview}
-                                                        </pre>
+                                                </div>
+                                            )}
+
+                                            {/* Medical Files Preview */}
+                                            {medicalPreviews[activeMedicalRecordIndex] && (
+                                                <div className="mt-4 space-y-2">
+                                                    <Label>File Preview</Label>
+                                                    <div className="relative">
+                                                        {medicalPreviews[activeMedicalRecordIndex] === 'document-file' ? (
+                                                            // DOC/DOCX file info display
+                                                            <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
+                                                                <div className="text-center">
+                                                                    <FileText className="mx-auto h-16 w-16 text-gray-400" />
+                                                                    <p className="mt-2 text-sm font-medium text-gray-900">
+                                                                        Document file - Preview not available
+                                                                    </p>
+                                                                    <p className="text-xs text-gray-500">
+                                                                        Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        ) : medicalPreviews[activeMedicalRecordIndex].startsWith('data:image/') ? (
+                                                            // Image preview
+                                                            <img
+                                                                src={medicalPreviews[activeMedicalRecordIndex]}
+                                                                alt="File preview"
+                                                                className="max-h-64 w-full rounded-lg border object-contain"
+                                                            />
+                                                        ) : medicalPreviews[activeMedicalRecordIndex].startsWith('data:application/pdf') ? (
+                                                            // PDF preview
+                                                            <iframe src={medicalPreviews[activeMedicalRecordIndex]} className="h-64 w-full rounded-lg border" title="PDF Preview" />
+                                                        ) : (
+                                                            // Text file preview
+                                                            <div className="h-64 w-full rounded-lg border bg-white p-4">
+                                                                <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
+                                                                    {medicalPreviews[activeMedicalRecordIndex]}
+                                                                </pre>
+                                                            </div>
+                                                        )}
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="absolute top-2 right-2"
+                                                            onClick={() => {
+                                                                const newPreviews = [...medicalPreviews];
+                                                                newPreviews[activeMedicalRecordIndex] = null;
+                                                                setMedicalPreviews(newPreviews);
+                                                            }}
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
                                                     </div>
-                                                )}
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="absolute top-2 right-2"
-                                                    onClick={() => setMedicalPreview(null)}
-                                                >
-                                                    <X className="h-4 w-4" />
-                                                </Button>
-                                            </div>
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </div>
-                            </div>
+                                    </div>
+                                </>
+                            )}
                         </CardContent>
                     </Card>
                 );
@@ -1777,23 +2117,73 @@ export default function CreatePDLInformation() {
 
                                 {/* Court Order Summary */}
                                 <div className="space-y-3">
-                                    <h3 className="text-lg font-semibold">Court Order</h3>
-                                    <div className="space-y-2 text-sm">
-                                        {data.order_type && (
-                                            <div>
-                                                <span className="font-medium">Order Type:</span> {data.order_type}
+                                    <h3 className="text-lg font-semibold">Court Orders ({data.court_orders.length})</h3>
+                                    <div className="space-y-3">
+                                        {data.court_orders.map((courtOrder, index) => (
+                                            <div key={index} className="rounded-lg border p-3">
+                                                <div className="mb-2 flex items-center gap-2">
+                                                    <span className="font-medium">Court Order {index + 1}</span>
+                                                </div>
+                                                <div className="space-y-1 text-sm">
+                                                    {courtOrder.order_type && (
+                                                        <div>
+                                                            <span className="font-medium">Order Type:</span> {courtOrder.order_type}
+                                                        </div>
+                                                    )}
+                                                    {courtOrder.court_id && (
+                                                        <div>
+                                                            <span className="font-medium">Court Branch:</span> {courtOrder.court_id}
+                                                        </div>
+                                                    )}
+                                                    {courtOrder.order_date && (
+                                                        <div>
+                                                            <span className="font-medium">Order Date:</span> {courtOrder.order_date}
+                                                        </div>
+                                                    )}
+                                                    {courtOrder.received_date && (
+                                                        <div>
+                                                            <span className="font-medium">Received Date:</span> {courtOrder.received_date}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                        )}
-                                        {data.court_branch && (
-                                            <div>
-                                                <span className="font-medium">Court Branch:</span> {data.court_branch}
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Medical Records Summary */}
+                                <div className="space-y-3">
+                                    <h3 className="text-lg font-semibold">Medical Records ({data.medical_records.length})</h3>
+                                    <div className="space-y-3">
+                                        {data.medical_records.map((medicalRecord, index) => (
+                                            <div key={index} className="rounded-lg border p-3">
+                                                <div className="mb-2 flex items-center gap-2">
+                                                    <span className="font-medium">Medical Record {index + 1}</span>
+                                                </div>
+                                                <div className="space-y-1 text-sm">
+                                                    {medicalRecord.date && (
+                                                        <div>
+                                                            <span className="font-medium">Date:</span> {medicalRecord.date}
+                                                        </div>
+                                                    )}
+                                                    {medicalRecord.complaint && (
+                                                        <div>
+                                                            <span className="font-medium">Complaint:</span> {medicalRecord.complaint}
+                                                        </div>
+                                                    )}
+                                                    {medicalRecord.findings && (
+                                                        <div>
+                                                            <span className="font-medium">Findings:</span> {medicalRecord.findings}
+                                                        </div>
+                                                    )}
+                                                    {medicalRecord.prognosis && (
+                                                        <div>
+                                                            <span className="font-medium">Prognosis:</span> {medicalRecord.prognosis}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                        )}
-                                        {data.order_date && (
-                                            <div>
-                                                <span className="font-medium">Order Date:</span> {data.order_date}
-                                            </div>
-                                        )}
+                                        ))}
                                     </div>
                                 </div>
 
@@ -1921,7 +2311,7 @@ export default function CreatePDLInformation() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-         
+
                     {/* Step Content */}
                     {renderStepContent()}
 
@@ -1947,10 +2337,15 @@ export default function CreatePDLInformation() {
                                     reset();
                                     setDate(undefined);
                                     setCurrentStep(1);
+                                    setActiveCaseIndex(0);
+                                    setActiveCourtOrderIndex(0);
+                                    setActiveMedicalRecordIndex(0);
                                     resetSelections();
-                                    setDocumentPreview(null);
-                                    setMedicalPreview(null);
-                                    setMedicalFile(null);
+                                    setDocumentPreviews([]);
+                                    setMedicalPreviews([]);
+                                    setMugshotPreview(null);
+                                    setMedicalFiles([]);
+                                    setMugshotFile(null);
                                     setIsCustomOrderType(false);
                                     setOrderTypeOpen(false);
                                 }}

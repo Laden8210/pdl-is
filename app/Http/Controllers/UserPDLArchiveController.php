@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UserPDLArchiveController extends Controller
 {
@@ -60,7 +61,7 @@ class UserPDLArchiveController extends Controller
                 'personnel' => $archivedPersonnel,
                 'pdls' => $archivedPdls
             ],
-            'userRole' => auth()->user()->position ?? 'admin'
+            'userRole' => Auth::user()->position ?? 'admin'
         ]);
     }
 
@@ -70,6 +71,25 @@ class UserPDLArchiveController extends Controller
             Log::info('Unarchive request for PDL ID: ' . $pdl->id);
             Log::info('PDL before unarchive:', $pdl->toArray());
 
+            // Validate the request data
+            $validated = $request->validate([
+                'unarchive_reason' => 'required|string|max:1000',
+                'unarchive_remarks' => 'nullable|string|max:1000',
+                'cases' => 'required|array|min:1',
+                'cases.*.case_number' => 'required|string|max:255',
+                'cases.*.crime_committed' => 'required|string|max:255',
+                'cases.*.date_committed' => 'required|date',
+                'cases.*.time_committed' => 'required',
+                'cases.*.case_status' => 'required|string|in:open,pending,on_trial,convicted,dismissed',
+                'cases.*.case_remarks' => 'nullable|string',
+                'cases.*.security_classification' => 'required|string|in:low,medium,high,maximum',
+                'cases.*.drug_related' => 'required|boolean',
+            ]);
+
+            // Start database transaction
+            DB::beginTransaction();
+
+            // Clear archive information
             $pdl->update([
                 'archive_status' => null,
                 'archive_reason' => null,
@@ -80,30 +100,60 @@ class UserPDLArchiveController extends Controller
                 'archived_at' => null,
             ]);
 
+            // Create new case records
+            foreach ($validated['cases'] as $caseData) {
+                $pdl->cases()->create([
+                    'case_number' => $caseData['case_number'],
+                    'crime_committed' => $caseData['crime_committed'],
+                    'date_committed' => $caseData['date_committed'],
+                    'time_committed' => $caseData['time_committed'],
+                    'case_status' => $caseData['case_status'],
+                    'case_remarks' => $caseData['case_remarks'] ?? '',
+                    'security_classification' => $caseData['security_classification'],
+                    'drug_related' => $caseData['drug_related'],
+                ]);
+            }
+
+            // Log the unarchive reason and remarks
+            Log::info('Unarchive reason: ' . $validated['unarchive_reason']);
+            Log::info('Unarchive remarks: ' . ($validated['unarchive_remarks'] ?? 'None'));
+            Log::info('Cases created: ' . count($validated['cases']));
+
+            DB::commit();
+
             Log::info('PDL after unarchive:', $pdl->fresh()->toArray());
 
-            return redirect()->back()->with('success', 'PDL record has been successfully unarchived.');
+            return redirect()->back()->with('success', 'PDL record has been successfully unarchived with ' . count($validated['cases']) . ' new case(s).');
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Unarchive error: ' . $e->getMessage());
             Log::error('Unarchive error trace: ' . $e->getTraceAsString());
             return redirect()->back()->withErrors(['error' => 'Failed to unarchive PDL: ' . $e->getMessage()]);
         }
     }
-
-    public function restorePersonnel(Request $request, Personnel $personnel)
+    public function restorePersonnel(Request $request, $personnelId)
     {
         try {
-            Log::info('Restore request for Personnel ID: ' . $personnel->id);
-            Log::info('Personnel before restore:', $personnel->toArray());
+            Log::info('Restore request for Personnel ID: ' . $personnelId);
+
+            // Use the route parameter, not request ID
+            $personnel = Personnel::withTrashed()->find($personnelId);
+
+            if (!$personnel) {
+                Log::error('Personnel not found with ID: ' . $personnelId);
+                return redirect()->back()->withErrors(['error' => 'Personnel not found']);
+            }
+
+            Log::info('Personnel before restore:', ['id' => $personnel->id, 'name' => $personnel->name, 'deleted_at' => $personnel->deleted_at]);
 
             $personnel->restore();
 
-            Log::info('Personnel after restore:', $personnel->fresh()->toArray());
+            Log::info('Personnel restored successfully:', ['id' => $personnel->id, 'deleted_at' => $personnel->fresh()->deleted_at]);
 
             return redirect()->back()->with('success', 'Personnel record has been successfully restored.');
+
         } catch (\Exception $e) {
             Log::error('Restore personnel error: ' . $e->getMessage());
-            Log::error('Restore personnel error trace: ' . $e->getTraceAsString());
             return redirect()->back()->withErrors(['error' => 'Failed to restore personnel: ' . $e->getMessage()]);
         }
     }

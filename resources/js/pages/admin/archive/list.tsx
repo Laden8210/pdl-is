@@ -14,10 +14,15 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Search, ArchiveRestore, FileText, Download, Eye } from 'lucide-react';
+import { Search, ArchiveRestore, FileText, Download, Eye, Plus, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -51,21 +56,70 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
     const [restorePersonnelDialogOpen, setRestorePersonnelDialogOpen] = useState(false);
     const [personnelToRestore, setPersonnelToRestore] = useState<any>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [newCases, setNewCases] = useState<any[]>([]);
+    const [unarchiveReason, setUnarchiveReason] = useState('');
+    const [unarchiveRemarks, setUnarchiveRemarks] = useState('');
 
-    const { post: postUnarchive, processing: unarchiveProcessing } = useForm();
+    const { post: postUnarchive, processing: unarchiveProcessing, setData: setUnarchiveData } = useForm();
     const { post: postRestorePersonnel, processing: restorePersonnelProcessing } = useForm();
 
     const handleUnarchive = (pdl: any) => {
         setPdlToUnarchive(pdl);
+        setNewCases([{
+            case_number: '',
+            crime_committed: '',
+            date_committed: '',
+            time_committed: '',
+            case_status: 'open',
+            case_remarks: '',
+            security_classification: 'medium',
+            drug_related: false,
+        }]);
+        setUnarchiveReason('');
+        setUnarchiveRemarks('');
         setUnarchiveDialogOpen(true);
+    };
+
+    const addNewCase = () => {
+        setNewCases([...newCases, {
+            case_number: '',
+            crime_committed: '',
+            date_committed: '',
+            time_committed: '',
+            case_status: 'open',
+            case_remarks: '',
+            security_classification: 'medium',
+            drug_related: false,
+        }]);
+    };
+
+    const removeCase = (index: number) => {
+        if (newCases.length > 1) {
+            setNewCases(newCases.filter((_, i) => i !== index));
+        }
+    };
+
+    const updateCase = (index: number, field: string, value: any) => {
+        const updatedCases = [...newCases];
+        updatedCases[index] = { ...updatedCases[index], [field]: value };
+        setNewCases(updatedCases);
     };
 
     const confirmUnarchive = () => {
         if (pdlToUnarchive) {
+            setUnarchiveData({
+                cases: newCases,
+                unarchive_reason: unarchiveReason,
+                unarchive_remarks: unarchiveRemarks,
+            });
+
             postUnarchive(route('user-pdl-archive.unarchive', pdlToUnarchive.id), {
                 onSuccess: () => {
                     setUnarchiveDialogOpen(false);
                     setPdlToUnarchive(null);
+                    setNewCases([]);
+                    setUnarchiveReason('');
+                    setUnarchiveRemarks('');
                     // The page will refresh automatically due to redirect
                 },
                 onError: (errors) => {
@@ -85,13 +139,16 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
         setRestorePersonnelDialogOpen(true);
     };
 
+
     const confirmRestorePersonnel = () => {
+        console.log('Personnel ID:', personnelToRestore.id);
         if (personnelToRestore) {
-            postRestorePersonnel(route('user-personnel-archive.restore', personnelToRestore.id), {
+            postRestorePersonnel(route('user-personnel-archive.restore', { personnelId: personnelToRestore.id }), {
+                preserveScroll: true,
                 onSuccess: () => {
                     setRestorePersonnelDialogOpen(false);
                     setPersonnelToRestore(null);
-                    // The page will refresh automatically due to redirect
+
                 },
                 onError: (errors) => {
                     console.error('Restore personnel errors:', errors);
@@ -99,7 +156,6 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
             });
         }
     };
-
     // Filter data based on search term
     const filteredPdls = archivedUsers.pdls.filter(pdl =>
         pdl.fname.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -473,7 +529,7 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
 
                 {/* Unarchive Confirmation Dialog */}
                 <Dialog open={unarchiveDialogOpen} onOpenChange={setUnarchiveDialogOpen}>
-                    <DialogContent className="max-w-md">
+                    <DialogContent className="max-w-md overflow-auto max-h-[90vh]">
                         <DialogHeader>
                             <DialogTitle>Confirm Unarchive</DialogTitle>
                             <DialogDescription>
@@ -496,6 +552,190 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
                                     </div>
                                 </div>
 
+                                {/* Unarchive Reason and Remarks */}
+                                <div className="space-y-4">
+                                    <div>
+                                        <Label htmlFor="unarchive_reason">
+                                            Reason for Unarchiving <span className="text-red-500">*</span>
+                                        </Label>
+                                        <Textarea
+                                            id="unarchive_reason"
+                                            value={unarchiveReason}
+                                            onChange={(e) => setUnarchiveReason(e.target.value)}
+                                            placeholder="Enter the reason for unarchiving this PDL..."
+                                            rows={3}
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="unarchive_remarks">Additional Remarks</Label>
+                                        <Textarea
+                                            id="unarchive_remarks"
+                                            value={unarchiveRemarks}
+                                            onChange={(e) => setUnarchiveRemarks(e.target.value)}
+                                            placeholder="Enter any additional remarks or notes..."
+                                            rows={2}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Cases Information */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-lg font-semibold">New Case Information</h3>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={addNewCase}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <Plus className="h-4 w-4" />
+                                            Add Case
+                                        </Button>
+                                    </div>
+
+                                    <Accordion type="single" collapsible className="w-full">
+                                        {newCases.map((caseItem, index) => (
+                                            <AccordionItem key={index} value={`case-${index}`}>
+                                                <AccordionTrigger className="hover:no-underline">
+                                                    <div className="flex items-center justify-between w-full pr-4">
+                                                        <span>Case {index + 1}</span>
+                                                        {newCases.length > 1 && (
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    removeCase(index);
+                                                                }}
+                                                                className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </AccordionTrigger>
+                                                <AccordionContent>
+                                                    <div className="space-y-4 pt-4">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div>
+                                                                <Label htmlFor={`case_number_${index}`}>
+                                                                    Case Number <span className="text-red-500">*</span>
+                                                                </Label>
+                                                                <Input
+                                                                    id={`case_number_${index}`}
+                                                                    value={caseItem.case_number}
+                                                                    onChange={(e) => updateCase(index, 'case_number', e.target.value)}
+                                                                    placeholder="Enter case number"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <Label htmlFor={`crime_committed_${index}`}>
+                                                                    Crime Committed <span className="text-red-500">*</span>
+                                                                </Label>
+                                                                <Input
+                                                                    id={`crime_committed_${index}`}
+                                                                    value={caseItem.crime_committed}
+                                                                    onChange={(e) => updateCase(index, 'crime_committed', e.target.value)}
+                                                                    placeholder="Enter crime committed"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <Label htmlFor={`date_committed_${index}`}>
+                                                                    Date Committed <span className="text-red-500">*</span>
+                                                                </Label>
+                                                                <Input
+                                                                    id={`date_committed_${index}`}
+                                                                    type="date"
+                                                                    value={caseItem.date_committed}
+                                                                    onChange={(e) => updateCase(index, 'date_committed', e.target.value)}
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <Label htmlFor={`time_committed_${index}`}>
+                                                                    Time Committed <span className="text-red-500">*</span>
+                                                                </Label>
+                                                                <Input
+                                                                    id={`time_committed_${index}`}
+                                                                    type="time"
+                                                                    value={caseItem.time_committed}
+                                                                    onChange={(e) => updateCase(index, 'time_committed', e.target.value)}
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <Label htmlFor={`case_status_${index}`}>
+                                                                    Case Status <span className="text-red-500">*</span>
+                                                                </Label>
+                                                                <Select
+                                                                    value={caseItem.case_status}
+                                                                    onValueChange={(value) => updateCase(index, 'case_status', value)}
+                                                                >
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="Select case status" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="open">Open</SelectItem>
+                                                                        <SelectItem value="pending">Pending</SelectItem>
+                                                                        <SelectItem value="on_trial">On Trial</SelectItem>
+                                                                        <SelectItem value="convicted">Convicted</SelectItem>
+                                                                        <SelectItem value="dismissed">Dismissed</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                            <div>
+                                                                <Label htmlFor={`security_classification_${index}`}>
+                                                                    Security Classification <span className="text-red-500">*</span>
+                                                                </Label>
+                                                                <Select
+                                                                    value={caseItem.security_classification}
+                                                                    onValueChange={(value) => updateCase(index, 'security_classification', value)}
+                                                                >
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="Select classification" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="low">Low</SelectItem>
+                                                                        <SelectItem value="medium">Medium</SelectItem>
+                                                                        <SelectItem value="high">High</SelectItem>
+                                                                        <SelectItem value="maximum">Maximum</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <Label>Drug Related</Label>
+                                                            <RadioGroup
+                                                                value={caseItem.drug_related ? 'yes' : 'no'}
+                                                                onValueChange={(value) => updateCase(index, 'drug_related', value === 'yes')}
+                                                            >
+                                                                <div className="flex items-center space-x-2">
+                                                                    <RadioGroupItem value="yes" id={`drug_yes_${index}`} />
+                                                                    <Label htmlFor={`drug_yes_${index}`}>Yes</Label>
+                                                                </div>
+                                                                <div className="flex items-center space-x-2">
+                                                                    <RadioGroupItem value="no" id={`drug_no_${index}`} />
+                                                                    <Label htmlFor={`drug_no_${index}`}>No</Label>
+                                                                </div>
+                                                            </RadioGroup>
+                                                        </div>
+                                                        <div>
+                                                            <Label htmlFor={`case_remarks_${index}`}>Case Remarks</Label>
+                                                            <Textarea
+                                                                id={`case_remarks_${index}`}
+                                                                value={caseItem.case_remarks}
+                                                                onChange={(e) => updateCase(index, 'case_remarks', e.target.value)}
+                                                                placeholder="Enter case-related remarks..."
+                                                                rows={3}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                        ))}
+                                    </Accordion>
+                                </div>
+
                                 <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-md">
                                     <div className="flex">
                                         <div className="flex-shrink-0">
@@ -513,6 +753,8 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
                                         </div>
                                     </div>
                                 </div>
+
+
 
                                 <div className="flex justify-end space-x-2">
                                     <Button

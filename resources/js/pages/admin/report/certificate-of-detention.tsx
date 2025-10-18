@@ -39,6 +39,8 @@ export default function CertificateOfDetention({ pdls }: PageProps) {
     const { data, setData, post, processing, errors } = useForm({
         pdl_id: '',
         issue_date: '',
+        officer_name: '',
+        officer_position: '',
     });
 
     const handlePdlSelect = (pdlId: string) => {
@@ -61,6 +63,8 @@ export default function CertificateOfDetention({ pdls }: PageProps) {
         const params = new URLSearchParams();
         params.append('pdl_id', data.pdl_id);
         params.append('issue_date', data.issue_date);
+        params.append('officer_name', data.officer_name);
+        params.append('officer_position', data.officer_position);
         window.location.href = route('reports.certificate-of-detention.generate') + '?' + params.toString();
     };
 
@@ -112,6 +116,34 @@ export default function CertificateOfDetention({ pdls }: PageProps) {
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <Label htmlFor="officer_name" className="text-sm font-medium">
+                                        Officer Name
+                                    </Label>
+                                    <Input
+                                        id="officer_name"
+                                        type="text"
+                                        value={data.officer_name}
+                                        onChange={(e) => setData('officer_name', e.target.value)}
+                                    />
+                                    {errors.officer_name && (
+                                        <p className="text-sm text-red-500">{errors.officer_name}</p>
+                                    )}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="officer_position" className="text-sm font-medium">
+                                        Officer Position
+                                    </Label>
+                                    <Input
+                                        id="officer_position"
+                                        type="text"
+                                        value={data.officer_position}
+                                        onChange={(e) => setData('officer_position', e.target.value)}
+                                    />
+                                    {errors.officer_position && (
+                                        <p className="text-sm text-red-500">{errors.officer_position}</p>
+                                    )}
+                                </div>
                                 {/* PDL Selection */}
                                 <div className="space-y-2">
                                     <Label htmlFor="pdl_id" className="text-sm font-medium">
@@ -260,8 +292,8 @@ export default function CertificateOfDetention({ pdls }: PageProps) {
                                 </div>
 
                                 <div className="text-right mt-8">
-                                    <div className="font-bold uppercase">JUAN R. LANZADERAS, JR., MPA</div>
-                                    <div className="text-sm">Provincial Warden</div>
+                                    <div className="font-bold uppercase">{data.officer_name ?? 'JUAN R. LANZADERAS, JR., MPA'}</div>
+                                    <div className="text-sm">{data.officer_position ?? 'Provincial Warden'}</div>
                                 </div>
                             </div>
                         </CardContent>

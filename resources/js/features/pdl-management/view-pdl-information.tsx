@@ -10,7 +10,12 @@ import { Eye } from 'lucide-react';
 import { AddCaseInformation } from './add-case-information';
 
 export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
-    console.log(pdl);
+    const handleDownload = () => {
+        const params = new URLSearchParams();
+        params.append('pdl_id', pdl.id.toString());
+        const url = route('pdl-management.download', params.toString());
+        window.open(url, '_blank');
+    };
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -26,7 +31,38 @@ export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
                 <div className="grid gap-4 py-2">
                     {/* Basic Information */}
                     <div className="space-y-2">
-                        <h3 className="text-lg font-medium">Basic Information</h3>
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-medium">Basic Information</h3>
+                            <Button variant="outline" onClick={handleDownload}>Download PDL Information</Button>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground">Mugshot:</span>
+                            {pdl.mugshot_path ? (
+                                <>
+                                    <img
+                                        src={`/storage/${pdl.mugshot_path}`}
+                                        alt="Mugshot"
+                                        className="h-44 rounded border object-cover"
+                                        onError={(e) => {
+                                            e.currentTarget.style.display = 'none';
+                                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                        }}
+                                    />
+                                    <div className="flex hidden h-20 w-20 items-center justify-center rounded-full bg-gray-200 text-xs text-gray-500">
+                                        No Image
+                                    </div>
+                                    <Button variant="outline" onClick={() => window.open(`/storage/${pdl.mugshot_path}`, '_blank')}>
+                                        Preview
+                                    </Button>
+                                </>
+                            ) : (
+                                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-200 text-xs text-gray-500">
+                                    No Mugshot
+                                </div>
+                            )}
+                        </div>
+
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
                                 <span className="text-muted-foreground">Full Name:</span> {`${pdl.fname} ${pdl.lname}`}
@@ -112,9 +148,6 @@ export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
                                     {pdl.court_orders.map((order, index) => (
                                         <div key={index} className="grid grid-cols-2 gap-2 text-sm">
                                             <div>
-                                                <span className="text-muted-foreground">Order #:</span> {order.court_order_number}
-                                            </div>
-                                            <div>
                                                 <span className="text-muted-foreground">Type:</span> {order.order_type}
                                             </div>
                                             <div>
@@ -130,7 +163,10 @@ export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
                                             </div>
 
                                             <div className="">
-                                                <span className="text-muted-foreground">Document:</span> <Button variant="outline" onClick={() => window.open(`/storage/${order.document_path}`, '_blank')}>Preview</Button>
+                                                <span className="text-muted-foreground">Document:</span>{' '}
+                                                <Button variant="outline" onClick={() => window.open(`/storage/${order.document_path}`, '_blank')}>
+                                                    Preview
+                                                </Button>
                                             </div>
                                             {order.remarks && (
                                                 <div className="col-span-2">
@@ -167,9 +203,11 @@ export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
                                             </div>
 
                                             <div className="">
-                                                <span className="text-muted-foreground">Document:</span> <Button variant="outline" onClick={() => window.open(`/storage/${record.file_path}`, '_blank')}>Preview</Button>
+                                                <span className="text-muted-foreground">Document:</span>{' '}
+                                                <Button variant="outline" onClick={() => window.open(`/storage/${record.file_path}`, '_blank')}>
+                                                    Preview
+                                                </Button>
                                             </div>
-
                                         </div>
                                     ))}
                                 </AccordionContent>

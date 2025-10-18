@@ -43,6 +43,16 @@ export const cell_management_columns: ColumnDef<Cells>[] = [
     ),
   },
   {
+    accessorKey: "description",
+    header: "Description",
+    cell: ({ row }) => row.original.description || <span className="text-muted-foreground">N/A</span>,
+  },{
+    accessorKey: "created_at",
+    header: "Created At",
+
+    cell: ({ row }) => row.original.created_at ? new Date(row.original.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : <span className="text-muted-foreground">N/A</span>,
+  },
+  {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {

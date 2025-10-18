@@ -17,6 +17,8 @@ class Activity extends Model
         'activity_time',
 
         'pdl_ids',
+        'status',
+        'reason',
     ];
 
     protected $casts = [

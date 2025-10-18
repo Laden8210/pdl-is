@@ -13,6 +13,7 @@ import { user_columns } from '@/features/user-management/user-columns';
 
 import { Button } from '@/components/ui/button';
 import { CreateUser } from '@/features/user-management/create-user';
+import { Agency } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,7 +23,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function List() {
-    const { users, filters } = usePage().props as unknown as {
+    const { users, filters, agencies } = usePage().props as unknown as {
         users: {
             data: Personnel[];
             current_page: number;
@@ -31,6 +32,7 @@ export default function List() {
         filters: {
             search: string;
         };
+        agencies: Agency[];
     };
 
     const [searchInput, setSearchInput] = useState(filters.search || '');
@@ -52,7 +54,7 @@ export default function List() {
             </p>
           </div>
 
-          <CreateUser />
+          <CreateUser agencies={agencies} />
         </div>
 
         <div className="flex items-center space-x-4">

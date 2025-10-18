@@ -4,7 +4,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 
 import { type NavItem } from '@/types';
 import { Link, usePage, router } from '@inertiajs/react';
-import { Calendar, FileSearch, FileText, LayoutGrid, Shield, User, UserCheck, Users, Archive } from 'lucide-react';
+import { Calendar, FileSearch, FileText, LayoutGrid, Shield, User, UserCheck, Users, Archive, Bell, Gavel } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -43,6 +43,12 @@ const mainNavItems: NavItem[] = [
         userType: 'record-officer',
     },
 
+    {
+        title: 'Court List',
+        href: '/record-officer/court-list',
+        icon: Gavel,
+        userType: 'record-officer',
+    },
     {
         title: 'PDL Management',
         icon: Calendar,

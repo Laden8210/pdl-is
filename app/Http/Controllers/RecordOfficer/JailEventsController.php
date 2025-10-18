@@ -13,11 +13,11 @@ class JailEventsController extends Controller
     public function index()
     {
         $pdls = Pdl::with('personnel:id,fname,lname')
-        ->whereHas('verifications', function ($query) {
-            $query->where('status', 'approved');
-        })
-        ->latest()
-        ->get();
+            ->whereHas('verifications', function ($query) {
+                $query->where('status', 'approved');
+            })
+            ->latest()
+            ->get();
 
         // Load activities with their associated PDLs
         $activities = Activity::latest()
@@ -101,7 +101,7 @@ class JailEventsController extends Controller
                 $pdl = Pdl::find($pdlId);
                 $conflictingEvents[] = [
                     'pdl_name' => $pdl->fname . ' ' . $pdl->lname,
-                    'events' => $existingEvents->map(function($event) {
+                    'events' => $existingEvents->map(function ($event) {
                         return [
                             'activity_name' => $event->activity_name,
                             'time' => $event->activity_time
@@ -131,5 +131,44 @@ class JailEventsController extends Controller
                 );
             }
         }
+    }
+
+    public function reschedule(Request $request)
+    {
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'time' => 'required|date_format:H:i',
+            'reason' => 'required|string|max:255',
+            'status' => 'required|string|in:pending,completed,cancelled,rescheduled',
+        ]);
+
+        $activity = Activity::findOrFail($request->activity_id);
+
+        $activity->update([
+            'activity_date' => $validated['date'],
+            'activity_time' => $validated['time'],
+            'reason' => $validated['reason'],
+            'status' => $validated['status'],
+        ]);
+
+        return redirect()->back()->with('success', 'Event rescheduled successfully.');
+    }
+
+
+    public function cancel(Request $request)
+    {
+
+        $validated = $request->validate([
+            'activity_id' => 'required|exists:activity,activity_id',
+            'reason' => 'required|string|max:255',
+            'status' => 'required|string',
+        ]);
+
+        $activity = Activity::find($validated['activity_id']);
+        $activity->status = $validated['status'];
+        $activity->reason = $validated['reason'];
+        $activity->save();
+
+        return redirect()->back()->with('success', 'Event cancelled successfully.');
     }
 }

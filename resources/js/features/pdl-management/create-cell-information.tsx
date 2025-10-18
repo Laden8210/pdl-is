@@ -137,7 +137,19 @@ export function CreateCellInformation() {
 
                         <div className="md:col-span-2">
                             <Label htmlFor="description">Description</Label>
-                            <Input id="description" name="description" value={data.description} onChange={handleChange} />
+                            {/* isolation, female, male, trustee, kitchen boys */}
+                            <Select value={data.description} onValueChange={(value) => setData('description', value)}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select description" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="isolation">Isolation</SelectItem>
+                                    <SelectItem value="female">Female</SelectItem>
+                                    <SelectItem value="male">Male</SelectItem>
+                                    <SelectItem value="trustee">Trustee</SelectItem>
+                                    <SelectItem value="kitchen boys">Kitchen Boys</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
 

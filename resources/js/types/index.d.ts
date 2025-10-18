@@ -92,6 +92,8 @@ export interface Pdl {
     brgy?: string | null;
     city?: string | null;
     province?: string | null;
+    mugshot_path?: string | null;
+    mugshot_original_filename?: string | null;
     personnel_id?: number | null;
     created_at?: string;
     updated_at?: string;
@@ -127,6 +129,7 @@ export type CourtOrder = {
     received_date: string;
     remarks: string;
     document_type: string;
+    document_path: string;
     court_branch: string;
     pdl_id: number;
     pdl?: Pdl;
@@ -164,4 +167,20 @@ export interface Verification {
     updated_at: string;
     pdl?: Pdl;
     personnel?: Personnel;
+}
+
+export interface Agency {
+    id: number;
+    agency_name: string;
+}
+
+export interface Court {
+    court_id: number;
+    branch_code: string;
+    court_type: string;
+    location: string;
+    created_at: string;
+    updated_at: string;
+    added_by: string;
+    added_at: string;
 }

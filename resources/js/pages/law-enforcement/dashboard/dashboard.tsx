@@ -65,6 +65,7 @@ interface LawEnforcementDashboardProps {
       type: string;
       title: string;
       description: string;
+      timestamp: string;
       badge: string;
       color: string;
     }[];
@@ -521,7 +522,9 @@ export default function LawEnforcementDashboard() {
                           {activity.badge}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">{activity.description}</p>
+                      <p className="text-xs text-muted-foreground">{activity.timestamp}</p>
+
+                      <p className="text-sm text-muted-foreground">{activity.description.replace(/_/g, ' ').charAt(0).toUpperCase() + activity.description.replace(/_/g, ' ').slice(1)}</p>
                     </div>
                   </div>
                 ))}
