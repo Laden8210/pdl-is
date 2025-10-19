@@ -422,7 +422,7 @@ export default function UpdatePDLInformation() {
         }
     };
 
-    const { data, setData, put, processing, errors, reset } = useForm<{
+    const { data, setData, post, processing, errors, reset } = useForm<{
         id: number;
         fname: string;
         lname: string;
@@ -467,7 +467,6 @@ export default function UpdatePDLInformation() {
         identification_marks: string;
         mark_location: string;
         pc_remark: string;
-        medical_files: File[];
         mugshot: File | null;
         cases: {
             case_id: number;
@@ -501,7 +500,7 @@ export default function UpdatePDLInformation() {
                       order_type: co?.order_type || '',
                       order_date: co?.order_date ? format(new Date(co.order_date), 'yyyy-MM-dd') : '',
                       received_date: co?.received_date ? format(new Date(co.received_date), 'yyyy-MM-dd') : '',
-                      document_type: null,
+                      document_type: co?.document_type || '',
                       document_path: co?.document_path || '',
                       original_filename: co?.original_filename || '',
                       court_id: co?.court_id || 0,
@@ -513,7 +512,7 @@ export default function UpdatePDLInformation() {
                           order_type: '',
                           order_date: '',
                           received_date: '',
-                          document_type: null,
+                          document_type: '',
                           document_path: '',
                           original_filename: '',
                           court_id: 0,
@@ -552,7 +551,6 @@ export default function UpdatePDLInformation() {
         identification_marks: pdl.physical_characteristics?.[0]?.identification_marks || '',
         mark_location: pdl.physical_characteristics?.[0]?.mark_location || '',
         pc_remark: pdl.physical_characteristics?.[0]?.remark || '',
-        medical_files: [],
         mugshot: null,
         cases:
             Array.isArray(pdl.cases) && pdl.cases.length > 0
@@ -815,16 +813,94 @@ export default function UpdatePDLInformation() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Update form data with medical files and mugshot
-        setData('medical_files', medicalFiles);
+        // Inertia doesn't handle nested arrays with File objects well
+        // We need to flatten and prepare the data manually
+
+        const formData = new FormData();
+
+        // Add simple fields
+        formData.append('id', data.id.toString());
+        formData.append('fname', data.fname);
+        formData.append('lname', data.lname);
+        formData.append('mname', data.mname);
+        formData.append('alias', data.alias);
+        formData.append('birthdate', data.birthdate);
+        formData.append('age', data.age);
+        formData.append('gender', data.gender);
+        formData.append('ethnic_group', data.ethnic_group);
+        formData.append('civil_status', data.civil_status);
+        formData.append('brgy', data.brgy);
+        formData.append('city', data.city);
+        formData.append('province', data.province);
+
+        // Physical characteristics
+        formData.append('physical_characteristic_id', data.physical_characteristic_id.toString());
+        formData.append('height', data.height.toString());
+        formData.append('weight', data.weight.toString());
+        formData.append('build', data.build);
+        formData.append('complexion', data.complexion);
+        formData.append('hair_color', data.hair_color);
+        formData.append('eye_color', data.eye_color);
+        formData.append('identification_marks', data.identification_marks);
+        formData.append('mark_location', data.mark_location);
+        formData.append('pc_remark', data.pc_remark);
+
+        // Handle mugshot file
         if (mugshotFile) {
-            setData('mugshot', mugshotFile);
+            formData.append('mugshot', mugshotFile);
         }
 
-        put(route('pdl-management.personal-information.update', pdl.id), {
+        // Handle court orders array
+        data.court_orders.forEach((courtOrder, index) => {
+            formData.append(`court_orders[${index}][court_order_id]`, courtOrder.court_order_id.toString());
+            formData.append(`court_orders[${index}][order_type]`, courtOrder.order_type);
+            formData.append(`court_orders[${index}][order_date]`, courtOrder.order_date);
+            formData.append(`court_orders[${index}][received_date]`, courtOrder.received_date);
+            formData.append(`court_orders[${index}][court_id]`, courtOrder.court_id.toString());
+            formData.append(`court_orders[${index}][cod_remarks]`, courtOrder.cod_remarks);
+            formData.append(`court_orders[${index}][document_path]`, courtOrder.document_path);
+            formData.append(`court_orders[${index}][original_filename]`, courtOrder.original_filename);
+
+            // Add document file if present
+            if (courtOrder.document_type instanceof File) {
+                formData.append(`court_orders[${index}][document_type]`, courtOrder.document_type);
+            }
+        });
+
+        // Handle medical records array
+        data.medical_records.forEach((medicalRecord, index) => {
+            formData.append(`medical_records[${index}][medical_record_id]`, medicalRecord.medical_record_id.toString());
+            formData.append(`medical_records[${index}][complaint]`, medicalRecord.complaint);
+            formData.append(`medical_records[${index}][date]`, medicalRecord.date);
+            formData.append(`medical_records[${index}][prognosis]`, medicalRecord.prognosis);
+            formData.append(`medical_records[${index}][prescription]`, medicalRecord.prescription);
+            formData.append(`medical_records[${index}][findings]`, medicalRecord.findings);
+
+            // Add medical file if present
+            if (medicalRecord.medical_file instanceof File) {
+                formData.append(`medical_records[${index}][medical_file]`, medicalRecord.medical_file);
+            }
+        });
+
+        // Handle cases array
+        data.cases.forEach((caseItem, index) => {
+            formData.append(`cases[${index}][case_id]`, caseItem.case_id.toString());
+            formData.append(`cases[${index}][case_number]`, caseItem.case_number);
+            formData.append(`cases[${index}][crime_committed]`, caseItem.crime_committed);
+            formData.append(`cases[${index}][date_committed]`, caseItem.date_committed);
+            formData.append(`cases[${index}][time_committed]`, caseItem.time_committed);
+            formData.append(`cases[${index}][case_status]`, caseItem.case_status);
+            formData.append(`cases[${index}][case_remarks]`, caseItem.case_remarks);
+            formData.append(`cases[${index}][security_classification]`, caseItem.security_classification);
+            formData.append(`cases[${index}][drug_related]`, caseItem.drug_related ? '1' : '0');
+        });
+
+        // Use Inertia's router to submit raw FormData
+        post(route('pdl-management.personal-information.update', pdl.id), {
+            forceFormData: true,
+            ...formData,
             preserveScroll: true,
             onSuccess: () => {
-                // Reset form state
                 setActiveCaseIndex(0);
                 setActiveCourtOrderIndex(0);
                 setActiveMedicalRecordIndex(0);
@@ -836,6 +912,9 @@ export default function UpdatePDLInformation() {
                 setOldMedicalPreview(null);
                 setMugshotFile(null);
                 setMugshotPreview(null);
+            },
+            onError: (errors) => {
+                console.error('Submit errors:', errors);
             },
         });
     };
