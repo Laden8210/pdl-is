@@ -19,6 +19,8 @@ class CourtController extends Controller
     {
         $validated = $request->validate([
             'branch_code' => 'required|string|max:255',
+            'branch' => 'required|string|max:255',
+            'station' => 'required|string|max:255',
             'court_type' => 'required|string|max:255',
             'location' => 'required|string|max:255',
         ]);
@@ -29,6 +31,8 @@ class CourtController extends Controller
     {
         $validated = $request->validate([
             'branch_code' => 'required|string|max:255',
+            'branch' => 'required|string|max:255',
+            'station' => 'required|string|max:255',
             'court_type' => 'required|string|max:255',
             'location' => 'required|string|max:255',
         ]);

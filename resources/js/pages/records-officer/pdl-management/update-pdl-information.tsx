@@ -241,13 +241,12 @@ export default function UpdatePDLInformation() {
     const [activeCaseIndex, setActiveCaseIndex] = useState(0);
     const [activeCourtOrderIndex, setActiveCourtOrderIndex] = useState(0);
     const [activeMedicalRecordIndex, setActiveMedicalRecordIndex] = useState(0);
-
+    const [mugshotPreview, setMugshotPreview] = useState<string | null>(null);
+    const [mugshotFile, setMugshotFile] = useState<File | null>(null);
     const { props } = usePage<UpdatePDLInformationProps>();
     const { pdl } = props;
     const { auth } = props;
     const { courts } = props;
-
-    console.log("hello world");
 
     // PSGC Location hook
     const {
@@ -469,6 +468,7 @@ export default function UpdatePDLInformation() {
         mark_location: string;
         pc_remark: string;
         medical_files: File[];
+        mugshot: File | null;
         cases: {
             case_id: number;
             case_number: string;
@@ -494,48 +494,54 @@ export default function UpdatePDLInformation() {
         brgy: pdl.brgy || '',
         city: pdl.city || '',
         province: pdl.province || '',
-        court_orders: Array.isArray(pdl.court_orders) && pdl.court_orders.length > 0
-            ? pdl.court_orders.map((co: any) => ({
-                court_order_id: co?.court_order_id || 0,
-                order_type: co?.order_type || '',
-                order_date: co?.order_date ? format(new Date(co.order_date), 'yyyy-MM-dd') : '',
-                received_date: co?.received_date ? format(new Date(co.received_date), 'yyyy-MM-dd') : '',
-                document_type: null,
-                document_path: co?.document_path || '',
-                original_filename: co?.original_filename || '',
-                court_id: co?.court_id || 0,
-                cod_remarks: co?.remarks || '',
-            }))
-            : [{
-                court_order_id: 0,
-                order_type: '',
-                order_date: '',
-                received_date: '',
-                document_type: null,
-                document_path: '',
-                original_filename: '',
-                court_id: 0,
-                cod_remarks: '',
-            }],
-        medical_records: Array.isArray(pdl.medical_records) && pdl.medical_records.length > 0
-            ? pdl.medical_records.map((mr: any) => ({
-                medical_record_id: mr?.medical_record_id || 0,
-                complaint: mr?.complaint || '',
-                date: mr?.date || new Date().toISOString().split('T')[0],
-                prognosis: mr?.prognosis || '',
-                prescription: mr?.prescription || '',
-                findings: mr?.findings || '',
-                medical_file: null,
-            }))
-            : [{
-                medical_record_id: 0,
-                complaint: '',
-                date: new Date().toISOString().split('T')[0],
-                prognosis: '',
-                prescription: '',
-                findings: '',
-                medical_file: null,
-            }],
+        court_orders:
+            Array.isArray(pdl.court_orders) && pdl.court_orders.length > 0
+                ? pdl.court_orders.map((co: any) => ({
+                      court_order_id: co?.court_order_id || 0,
+                      order_type: co?.order_type || '',
+                      order_date: co?.order_date ? format(new Date(co.order_date), 'yyyy-MM-dd') : '',
+                      received_date: co?.received_date ? format(new Date(co.received_date), 'yyyy-MM-dd') : '',
+                      document_type: null,
+                      document_path: co?.document_path || '',
+                      original_filename: co?.original_filename || '',
+                      court_id: co?.court_id || 0,
+                      cod_remarks: co?.remarks || '',
+                  }))
+                : [
+                      {
+                          court_order_id: 0,
+                          order_type: '',
+                          order_date: '',
+                          received_date: '',
+                          document_type: null,
+                          document_path: '',
+                          original_filename: '',
+                          court_id: 0,
+                          cod_remarks: '',
+                      },
+                  ],
+        medical_records:
+            Array.isArray(pdl.medical_records) && pdl.medical_records.length > 0
+                ? pdl.medical_records.map((mr: any) => ({
+                      medical_record_id: mr?.medical_record_id || 0,
+                      complaint: mr?.complaint || '',
+                      date: mr?.date || new Date().toISOString().split('T')[0],
+                      prognosis: mr?.prognosis || '',
+                      prescription: mr?.prescription || '',
+                      findings: mr?.findings || '',
+                      medical_file: null,
+                  }))
+                : [
+                      {
+                          medical_record_id: 0,
+                          complaint: '',
+                          date: new Date().toISOString().split('T')[0],
+                          prognosis: '',
+                          prescription: '',
+                          findings: '',
+                          medical_file: null,
+                      },
+                  ],
         physical_characteristic_id: pdl.physical_characteristics?.[0]?.characteristic_id || 0,
         height: pdl.physical_characteristics?.[0]?.height ?? 170,
         weight: pdl.physical_characteristics?.[0]?.weight ?? 70,
@@ -547,6 +553,7 @@ export default function UpdatePDLInformation() {
         mark_location: pdl.physical_characteristics?.[0]?.mark_location || '',
         pc_remark: pdl.physical_characteristics?.[0]?.remark || '',
         medical_files: [],
+        mugshot: null,
         cases:
             Array.isArray(pdl.cases) && pdl.cases.length > 0
                 ? pdl.cases.map((c: any) => ({
@@ -574,7 +581,6 @@ export default function UpdatePDLInformation() {
                       },
                   ],
     });
-
 
     const successMessage = (props as any).success;
     const errorMessage = (props as any).error;
@@ -744,6 +750,29 @@ export default function UpdatePDLInformation() {
         setDocumentPreviews(newPreviews);
     };
 
+    const handleMugshotUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setMugshotFile(file);
+            setData('mugshot', file);
+            handleMugshotPreview(file);
+        }
+    };
+
+    const handleMugshotPreview = (file: File) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            setMugshotPreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const removeMugshot = () => {
+        setMugshotFile(null);
+        setData('mugshot', null);
+        setMugshotPreview(null);
+    };
+
     const getFileIcon = (file: File) => {
         const extension = file.name.split('.').pop()?.toLowerCase();
         switch (extension) {
@@ -786,8 +815,11 @@ export default function UpdatePDLInformation() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Update form data with medical files
+        // Update form data with medical files and mugshot
         setData('medical_files', medicalFiles);
+        if (mugshotFile) {
+            setData('mugshot', mugshotFile);
+        }
 
         put(route('pdl-management.personal-information.update', pdl.id), {
             preserveScroll: true,
@@ -802,6 +834,8 @@ export default function UpdatePDLInformation() {
                 setMedicalPreviews([]);
                 setOldDocumentPreview(null);
                 setOldMedicalPreview(null);
+                setMugshotFile(null);
+                setMugshotPreview(null);
             },
         });
     };
@@ -1055,6 +1089,119 @@ export default function UpdatePDLInformation() {
                                     </div>
                                 </div>
                             </div>
+
+                            <Separator />
+                            <div>
+                                <h3 className="mb-4 text-lg font-medium">Mugshot Photo</h3>
+                                <div className="space-y-4">
+                                    {/* Mugshot Upload Area */}
+                                    <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-gray-400">
+                                        <input
+                                            type="file"
+                                            id="mugshot"
+                                            accept="image/jpeg,image/jpg,image/png"
+                                            onChange={handleMugshotUpload}
+                                            className="hidden"
+                                        />
+                                        <label htmlFor="mugshot" className="cursor-pointer">
+                                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                                            <div className="mt-2">
+                                                <span className="text-sm font-medium text-gray-900">Upload mugshot photo</span>
+                                                <p className="text-xs text-gray-500">Click to upload or drag and drop</p>
+                                                <p className="mt-1 text-xs text-gray-400">Supports: JPG, JPEG, PNG (Max 5MB)</p>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    {/* Current Mugshot */}
+                                    {pdl.mugshot_path && pdl.mugshot_original_filename && (
+                                        <div className="space-y-2">
+                                            <h4 className="text-sm font-medium">Current Mugshot</h4>
+                                            <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                                <div className="flex items-center space-x-3">
+                                                    <Image className="h-5 w-5 text-blue-500" />
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-900">{pdl.mugshot_original_filename}</p>
+                                                        <p className="text-xs text-gray-500">Current mugshot</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => setMugshotPreview(`/storage/${pdl.mugshot_path}`)}
+                                                        className="text-blue-500 hover:text-blue-700"
+                                                        title="Preview current mugshot"
+                                                    >
+                                                        <Eye className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Uploaded Mugshot */}
+                                    {mugshotFile && (
+                                        <div className="space-y-2">
+                                            <h4 className="text-sm font-medium">New Mugshot</h4>
+                                            <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                                <div className="flex items-center space-x-3">
+                                                    <Image className="h-5 w-5 text-blue-500" />
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-900">{mugshotFile.name}</p>
+                                                        <p className="text-xs text-gray-500">{formatFileSize(mugshotFile.size)}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleMugshotPreview(mugshotFile)}
+                                                        className="text-blue-500 hover:text-blue-700"
+                                                        title="Preview mugshot"
+                                                    >
+                                                        <Eye className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={removeMugshot}
+                                                        className="text-red-500 hover:text-red-700"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Mugshot Preview */}
+                                    {mugshotPreview && (
+                                        <div className="mt-4 space-y-2">
+                                            <Label>{mugshotFile ? 'New Mugshot Preview' : 'Current Mugshot Preview'}</Label>
+                                            <div className="relative">
+                                                <img
+                                                    src={mugshotPreview}
+                                                    alt="Mugshot preview"
+                                                    className="max-h-96 w-full rounded-lg border object-contain"
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="absolute top-2 right-2"
+                                                    onClick={() => setMugshotPreview(null)}
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </CardContent>
                     </Card>
                 );
@@ -1064,9 +1211,7 @@ export default function UpdatePDLInformation() {
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    Court Order Information
-                                </div>
+                                <div className="flex items-center gap-2">Court Order Information</div>
                                 <Button variant="outline" size="sm" type="button" onClick={handleAddNewCourtOrder}>
                                     Add New Court Order
                                 </Button>
@@ -1148,13 +1293,17 @@ export default function UpdatePDLInformation() {
                                                 onChange={handleDocumentUpload}
                                                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                             />
-                                            <div className="text-xs text-muted-foreground">Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT</div>
+                                            <div className="text-xs text-muted-foreground">
+                                                Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
+                                            </div>
                                             {data.court_orders[activeCourtOrderIndex].original_filename && (
                                                 <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                                                     <div className="flex items-center space-x-3">
                                                         <FileText className="h-4 w-4 text-gray-400" />
                                                         <div>
-                                                            <p className="text-sm font-medium text-gray-900">{data.court_orders[activeCourtOrderIndex].original_filename}</p>
+                                                            <p className="text-sm font-medium text-gray-900">
+                                                                {data.court_orders[activeCourtOrderIndex].original_filename}
+                                                            </p>
                                                             <p className="text-xs text-gray-500">Current file</p>
                                                         </div>
                                                     </div>
@@ -1163,7 +1312,12 @@ export default function UpdatePDLInformation() {
                                                             type="button"
                                                             variant="ghost"
                                                             size="sm"
-                                                            onClick={() => handleOldDocumentPreview(data.court_orders[activeCourtOrderIndex].document_path || '', data.court_orders[activeCourtOrderIndex].original_filename || '')}
+                                                            onClick={() =>
+                                                                handleOldDocumentPreview(
+                                                                    data.court_orders[activeCourtOrderIndex].document_path || '',
+                                                                    data.court_orders[activeCourtOrderIndex].original_filename || '',
+                                                                )
+                                                            }
                                                             className="text-blue-500 hover:text-blue-700"
                                                             title="Preview current file"
                                                         >
@@ -1183,9 +1337,15 @@ export default function UpdatePDLInformation() {
                                                             <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
                                                                 <div className="text-center">
                                                                     <FileText className="mx-auto h-16 w-16 text-gray-400" />
-                                                                    <p className="mt-2 text-sm font-medium text-gray-900">{data.court_orders[activeCourtOrderIndex].document_type?.name}</p>
+                                                                    <p className="mt-2 text-sm font-medium text-gray-900">
+                                                                        {data.court_orders[activeCourtOrderIndex].document_type?.name}
+                                                                    </p>
                                                                     <p className="text-xs text-gray-500">Document file - Preview not available</p>
-                                                                    <p className="text-xs text-gray-400">{formatFileSize(data.court_orders[activeCourtOrderIndex].document_type?.size || 0)}</p>
+                                                                    <p className="text-xs text-gray-400">
+                                                                        {formatFileSize(
+                                                                            data.court_orders[activeCourtOrderIndex].document_type?.size || 0,
+                                                                        )}
+                                                                    </p>
                                                                 </div>
                                                             </div>
                                                         ) : documentPreviews[activeCourtOrderIndex]?.startsWith('data:image/') ? (
@@ -1197,7 +1357,11 @@ export default function UpdatePDLInformation() {
                                                             />
                                                         ) : documentPreviews[activeCourtOrderIndex]?.startsWith('data:application/pdf') ? (
                                                             // PDF preview
-                                                            <iframe src={documentPreviews[activeCourtOrderIndex]} className="h-64 w-full rounded-lg border" title="PDF Preview" />
+                                                            <iframe
+                                                                src={documentPreviews[activeCourtOrderIndex]}
+                                                                className="h-64 w-full rounded-lg border"
+                                                                title="PDF Preview"
+                                                            />
                                                         ) : (
                                                             // Text file preview
                                                             <div className="h-64 w-full rounded-lg border bg-white p-4">
@@ -1233,7 +1397,9 @@ export default function UpdatePDLInformation() {
                                                             <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
                                                                 <div className="text-center">
                                                                     <FileText className="mx-auto h-16 w-16 text-gray-400" />
-                                                                    <p className="mt-2 text-sm font-medium text-gray-900">{data.court_orders[activeCourtOrderIndex].original_filename}</p>
+                                                                    <p className="mt-2 text-sm font-medium text-gray-900">
+                                                                        {data.court_orders[activeCourtOrderIndex].original_filename}
+                                                                    </p>
                                                                     <p className="text-xs text-gray-500">Document file - Preview not available</p>
                                                                 </div>
                                                             </div>
@@ -1249,7 +1415,11 @@ export default function UpdatePDLInformation() {
                                                             />
                                                         ) : oldDocumentPreview.startsWith('/storage/') && oldDocumentPreview.includes('.pdf') ? (
                                                             // PDF preview
-                                                            <iframe src={oldDocumentPreview} className="h-64 w-full rounded-lg border" title="PDF Preview" />
+                                                            <iframe
+                                                                src={oldDocumentPreview}
+                                                                className="h-64 w-full rounded-lg border"
+                                                                title="PDF Preview"
+                                                            />
                                                         ) : (
                                                             // Text file preview
                                                             <div className="h-64 w-full rounded-lg border bg-white p-4">
@@ -1469,7 +1639,9 @@ export default function UpdatePDLInformation() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="on_trial">On Trial</SelectItem>
-                                                    <SelectItem value="pending">Pending</SelectItem>
+                                                    <SelectItem value="bonded">Bonded</SelectItem>
+                                                    <SelectItem value="transferred_to_another_jail">Transferred to another jail</SelectItem>
+                                                    <SelectItem value="served_sentence">Served Sentence</SelectItem>
                                                     <SelectItem value="convicted">Convicted</SelectItem>
 
                                                     <SelectItem value="dismissed">Dismissed</SelectItem>
@@ -1539,9 +1711,7 @@ export default function UpdatePDLInformation() {
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    Medical Records
-                                </div>
+                                <div className="flex items-center gap-2">Medical Records</div>
                                 <Button variant="outline" size="sm" type="button" onClick={handleAddNewMedicalRecord}>
                                     Add New Medical Record
                                 </Button>
@@ -1578,260 +1748,250 @@ export default function UpdatePDLInformation() {
                             {/* Medical Record Form Fields */}
                             {data.medical_records.length > 0 && (
                                 <>
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <Label htmlFor="date">
-                                        Date <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input type="date" id="date" value={data.medical_records[activeMedicalRecordIndex].date} onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'date', e.target.value)} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="complaint">
-                                        Complaint <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Textarea
-                                        id="complaint"
-                                        name="complaint"
-                                        value={data.medical_records[activeMedicalRecordIndex].complaint}
-                                        onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'complaint', e.target.value)}
-                                        rows={3}
-                                        placeholder="Describe the medical complaint or symptoms..."
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="findings">
-                                        Medical Findings <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Textarea
-                                        id="findings"
-                                        name="findings"
-                                        value={data.medical_records[activeMedicalRecordIndex].findings}
-                                        onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'findings', e.target.value)}
-                                        rows={3}
-                                        placeholder="Enter medical findings and observations..."
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="prognosis">
-                                        Prognosis <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Textarea
-                                        id="prognosis"
-                                        name="prognosis"
-                                        value={data.medical_records[activeMedicalRecordIndex].prognosis}
-                                        onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'prognosis', e.target.value)}
-                                        rows={3}
-                                        placeholder="Enter medical prognosis (e.g., Good prognosis with treatment, Poor prognosis due to complications, etc.)"
-                                    />
-                                    <div className="text-xs text-muted-foreground">Specify prognosis details in parentheses for clarity</div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="prescription">
-                                        Prescription <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Textarea
-                                        id="prescription"
-                                        name="prescription"
-                                        value={data.medical_records[activeMedicalRecordIndex].prescription}
-                                        onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'prescription', e.target.value)}
-                                        rows={3}
-                                        placeholder="Enter prescribed medications and treatments..."
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Medical Document Upload Section */}
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label>Medical Documents</Label>
-                                        <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-gray-400">
-                                            <input
-                                                type="file"
-                                                id="medical-file"
-                                                accept="image/*,.pdf,.doc,.docx,.txt"
-                                                onChange={handleFileUpload}
-                                                className="hidden"
+                                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="date">
+                                                Date <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Input
+                                                type="date"
+                                                id="date"
+                                                value={data.medical_records[activeMedicalRecordIndex].date}
+                                                onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'date', e.target.value)}
                                             />
-                                            <label htmlFor="medical-file" className="cursor-pointer">
-                                                <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                                                <div className="mt-2">
-                                                    <span className="text-sm font-medium text-gray-900">Upload medical document</span>
-                                                    <p className="text-xs text-gray-500">Click to upload or drag and drop</p>
-                                                    <p className="mt-1 text-xs text-gray-400">Supports: Images (JPG, PNG, GIF), PDF, DOC, DOCX, TXT</p>
-                                                </div>
-                                            </label>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="complaint">
+                                                Complaint <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Textarea
+                                                id="complaint"
+                                                name="complaint"
+                                                value={data.medical_records[activeMedicalRecordIndex].complaint}
+                                                onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'complaint', e.target.value)}
+                                                rows={3}
+                                                placeholder="Describe the medical complaint or symptoms..."
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="findings">
+                                                Medical Findings <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Textarea
+                                                id="findings"
+                                                name="findings"
+                                                value={data.medical_records[activeMedicalRecordIndex].findings}
+                                                onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'findings', e.target.value)}
+                                                rows={3}
+                                                placeholder="Enter medical findings and observations..."
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="prognosis">
+                                                Prognosis <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Textarea
+                                                id="prognosis"
+                                                name="prognosis"
+                                                value={data.medical_records[activeMedicalRecordIndex].prognosis}
+                                                onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'prognosis', e.target.value)}
+                                                rows={3}
+                                                placeholder="Enter medical prognosis (e.g., Good prognosis with treatment, Poor prognosis due to complications, etc.)"
+                                            />
+                                            <div className="text-xs text-muted-foreground">Specify prognosis details in parentheses for clarity</div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="prescription">
+                                                Prescription <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Textarea
+                                                id="prescription"
+                                                name="prescription"
+                                                value={data.medical_records[activeMedicalRecordIndex].prescription}
+                                                onChange={(e) => handleMedicalRecordChange(activeMedicalRecordIndex, 'prescription', e.target.value)}
+                                                rows={3}
+                                                placeholder="Enter prescribed medications and treatments..."
+                                            />
                                         </div>
                                     </div>
 
-                                    {/* Uploaded File */}
-                                    {data.medical_records[activeMedicalRecordIndex].medical_file && (
+                                    {/* Medical Document Upload Section */}
+                                    <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <h4 className="text-sm font-medium">Uploaded File</h4>
-                                            <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                                                <div className="flex items-center space-x-3">
-                                                    {getFileIcon(data.medical_records[activeMedicalRecordIndex].medical_file)}
-                                                    <div>
-                                                        <p className="text-sm font-medium text-gray-900">{data.medical_records[activeMedicalRecordIndex].medical_file.name}</p>
-                                                        <p className="text-xs text-gray-500">{formatFileSize(data.medical_records[activeMedicalRecordIndex].medical_file.size)}</p>
+                                            <Label>Medical Documents</Label>
+                                            <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-gray-400">
+                                                <input
+                                                    type="file"
+                                                    id="medical-file"
+                                                    accept="image/*,.pdf,.doc,.docx,.txt"
+                                                    onChange={handleFileUpload}
+                                                    className="hidden"
+                                                />
+                                                <label htmlFor="medical-file" className="cursor-pointer">
+                                                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                                                    <div className="mt-2">
+                                                        <span className="text-sm font-medium text-gray-900">Upload medical document</span>
+                                                        <p className="text-xs text-gray-500">Click to upload or drag and drop</p>
+                                                        <p className="mt-1 text-xs text-gray-400">
+                                                            Supports: Images (JPG, PNG, GIF), PDF, DOC, DOCX, TXT
+                                                        </p>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        {/* Uploaded File */}
+                                        {data.medical_records[activeMedicalRecordIndex].medical_file && (
+                                            <div className="space-y-2">
+                                                <h4 className="text-sm font-medium">Uploaded File</h4>
+                                                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                                    <div className="flex items-center space-x-3">
+                                                        {getFileIcon(data.medical_records[activeMedicalRecordIndex].medical_file)}
+                                                        <div>
+                                                            <p className="text-sm font-medium text-gray-900">
+                                                                {data.medical_records[activeMedicalRecordIndex].medical_file.name}
+                                                            </p>
+                                                            <p className="text-xs text-gray-500">
+                                                                {formatFileSize(data.medical_records[activeMedicalRecordIndex].medical_file.size)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() =>
+                                                                data.medical_records[activeMedicalRecordIndex].medical_file &&
+                                                                handleMedicalPreview(data.medical_records[activeMedicalRecordIndex].medical_file)
+                                                            }
+                                                            className="text-blue-500 hover:text-blue-700"
+                                                            title="Preview file"
+                                                        >
+                                                            <Eye className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                handleMedicalRecordChange(activeMedicalRecordIndex, 'medical_file', null);
+                                                                const newPreviews = [...medicalPreviews];
+                                                                newPreviews[activeMedicalRecordIndex] = null;
+                                                                setMedicalPreviews(newPreviews);
+                                                            }}
+                                                            className="text-red-500 hover:text-red-700"
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center space-x-2">
+                                            </div>
+                                        )}
+
+                                        {/* Medical Files Preview */}
+                                        {medicalPreviews[activeMedicalRecordIndex] && (
+                                            <div className="mt-4 space-y-2">
+                                                <Label>File Preview</Label>
+                                                <div className="relative">
+                                                    {medicalPreviews[activeMedicalRecordIndex] === 'document-file' ? (
+                                                        // DOC/DOCX file info display
+                                                        <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
+                                                            <div className="text-center">
+                                                                <FileText className="mx-auto h-16 w-16 text-gray-400" />
+                                                                <p className="mt-2 text-sm font-medium text-gray-900">
+                                                                    Document file - Preview not available
+                                                                </p>
+                                                                <p className="text-xs text-gray-500">
+                                                                    Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    ) : medicalPreviews[activeMedicalRecordIndex]?.startsWith('data:image/') ? (
+                                                        // Image preview
+                                                        <img
+                                                            src={medicalPreviews[activeMedicalRecordIndex]}
+                                                            alt="File preview"
+                                                            className="max-h-64 w-full rounded-lg border object-contain"
+                                                        />
+                                                    ) : medicalPreviews[activeMedicalRecordIndex]?.startsWith('data:application/pdf') ? (
+                                                        // PDF preview
+                                                        <iframe
+                                                            src={medicalPreviews[activeMedicalRecordIndex]}
+                                                            className="h-64 w-full rounded-lg border"
+                                                            title="PDF Preview"
+                                                        />
+                                                    ) : (
+                                                        // Text file preview
+                                                        <div className="h-64 w-full rounded-lg border bg-white p-4">
+                                                            <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
+                                                                {medicalPreviews[activeMedicalRecordIndex]}
+                                                            </pre>
+                                                        </div>
+                                                    )}
                                                     <Button
                                                         type="button"
-                                                        variant="ghost"
+                                                        variant="outline"
                                                         size="sm"
-                                                        onClick={() => data.medical_records[activeMedicalRecordIndex].medical_file && handleMedicalPreview(data.medical_records[activeMedicalRecordIndex].medical_file)}
-                                                        className="text-blue-500 hover:text-blue-700"
-                                                        title="Preview file"
-                                                    >
-                                                        <Eye className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="sm"
+                                                        className="absolute top-2 right-2"
                                                         onClick={() => {
-                                                            handleMedicalRecordChange(activeMedicalRecordIndex, 'medical_file', null);
                                                             const newPreviews = [...medicalPreviews];
                                                             newPreviews[activeMedicalRecordIndex] = null;
                                                             setMedicalPreviews(newPreviews);
                                                         }}
-                                                        className="text-red-500 hover:text-red-700"
                                                     >
                                                         <X className="h-4 w-4" />
                                                     </Button>
                                                 </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
-                                    {/* Medical Files Preview */}
-                                    {medicalPreviews[activeMedicalRecordIndex] && (
-                                        <div className="mt-4 space-y-2">
-                                            <Label>File Preview</Label>
-                                            <div className="relative">
-                                                {medicalPreviews[activeMedicalRecordIndex] === 'document-file' ? (
-                                                    // DOC/DOCX file info display
-                                                    <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
-                                                        <div className="text-center">
-                                                            <FileText className="mx-auto h-16 w-16 text-gray-400" />
-                                                            <p className="mt-2 text-sm font-medium text-gray-900">
-                                                                Document file - Preview not available
+                                        {/* Single Medical File */}
+                                        {pdl.medical_records?.[0]?.single_file && (
+                                            <div className="mt-4 space-y-2">
+                                                <Label>Current Medical Record File</Label>
+                                                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                                    <div className="flex items-center space-x-3">
+                                                        <FileText className="h-4 w-4 text-gray-400" />
+                                                        <div>
+                                                            <p className="text-sm font-medium text-gray-900">
+                                                                {pdl.medical_records[0].single_file.original_filename}
                                                             </p>
                                                             <p className="text-xs text-gray-500">
-                                                                Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
+                                                                {pdl.medical_records[0].single_file.extension?.toUpperCase()} • Medical record
                                                             </p>
                                                         </div>
                                                     </div>
-                                                ) : medicalPreviews[activeMedicalRecordIndex]?.startsWith('data:image/') ? (
-                                                    // Image preview
-                                                    <img
-                                                        src={medicalPreviews[activeMedicalRecordIndex]}
-                                                        alt="File preview"
-                                                        className="max-h-64 w-full rounded-lg border object-contain"
-                                                    />
-                                                ) : medicalPreviews[activeMedicalRecordIndex]?.startsWith('data:application/pdf') ? (
-                                                    // PDF preview
-                                                    <iframe src={medicalPreviews[activeMedicalRecordIndex]} className="h-64 w-full rounded-lg border" title="PDF Preview" />
-                                                ) : (
-                                                    // Text file preview
-                                                    <div className="h-64 w-full rounded-lg border bg-white p-4">
-                                                        <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
-                                                            {medicalPreviews[activeMedicalRecordIndex]}
-                                                        </pre>
-                                                    </div>
-                                                )}
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="absolute top-2 right-2"
-                                                    onClick={() => {
-                                                        const newPreviews = [...medicalPreviews];
-                                                        newPreviews[activeMedicalRecordIndex] = null;
-                                                        setMedicalPreviews(newPreviews);
-                                                    }}
-                                                >
-                                                    <X className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Single Medical File */}
-                                    {pdl.medical_records?.[0]?.single_file && (
-                                        <div className="mt-4 space-y-2">
-                                            <Label>Current Medical Record File</Label>
-                                            <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                                                <div className="flex items-center space-x-3">
-                                                    <FileText className="h-4 w-4 text-gray-400" />
-                                                    <div>
-                                                        <p className="text-sm font-medium text-gray-900">
-                                                            {pdl.medical_records[0].single_file.original_filename}
-                                                        </p>
-                                                        <p className="text-xs text-gray-500">
-                                                            {pdl.medical_records[0].single_file.extension?.toUpperCase()} • Medical record
-                                                        </p>
+                                                    <div className="flex items-center space-x-2">
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() =>
+                                                                handleOldMedicalPreview(
+                                                                    pdl.medical_records[0].single_file.file_path,
+                                                                    pdl.medical_records[0].single_file.original_filename,
+                                                                )
+                                                            }
+                                                            className="text-blue-500 hover:text-blue-700"
+                                                            title="Preview file"
+                                                        >
+                                                            <Eye className="h-4 w-4" />
+                                                        </Button>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center space-x-2">
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            handleOldMedicalPreview(
-                                                                pdl.medical_records[0].single_file.file_path,
-                                                                pdl.medical_records[0].single_file.original_filename,
-                                                            )
-                                                        }
-                                                        className="text-blue-500 hover:text-blue-700"
-                                                        title="Preview file"
-                                                    >
-                                                        <Eye className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
-                                    {/* Multiple Medical Files */}
-                                    {(pdl.medical_records?.[0]?.files && pdl.medical_records[0].files.length > 0) ||
-                                    (pdl.medical_records?.[0]?.original_filename && pdl.medical_records[0].original_filename) ? (
-                                        <div className="mt-4 space-y-2">
-                                            <Label>Current Medical Documents</Label>
-                                            <div className="space-y-2">
-                                                {/* New structure with files array */}
-                                                {pdl.medical_records[0].files && pdl.medical_records[0].files.length > 0
-                                                    ? pdl.medical_records[0].files.map((file: any, index: number) => (
-                                                          <div key={index} className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                                                              <div className="flex items-center space-x-3">
-                                                                  <FileText className="h-4 w-4 text-gray-400" />
-                                                                  <div>
-                                                                      <p className="text-sm font-medium text-gray-900">{file.original_filename}</p>
-                                                                      <p className="text-xs text-gray-500">
-                                                                          {file.extension?.toUpperCase()} • Medical document
-                                                                      </p>
-                                                                  </div>
-                                                              </div>
-                                                              <div className="flex items-center space-x-2">
-                                                                  <Button
-                                                                      type="button"
-                                                                      variant="ghost"
-                                                                      size="sm"
-                                                                      onClick={() => handleOldMedicalPreview(file.file_path, file.original_filename)}
-                                                                      className="text-blue-500 hover:text-blue-700"
-                                                                      title="Preview file"
-                                                                  >
-                                                                      <Eye className="h-4 w-4" />
-                                                                  </Button>
-                                                              </div>
-                                                          </div>
-                                                      ))
-                                                    : /* Fallback for old structure */
-                                                      pdl.medical_records[0].original_filename.split(',').map((filename: string, index: number) => {
-                                                          const filePath = pdl.medical_records[0].file_path?.split(',')[index];
-                                                          return (
+                                        {/* Multiple Medical Files */}
+                                        {(pdl.medical_records?.[0]?.files && pdl.medical_records[0].files.length > 0) ||
+                                        (pdl.medical_records?.[0]?.original_filename && pdl.medical_records[0].original_filename) ? (
+                                            <div className="mt-4 space-y-2">
+                                                <Label>Current Medical Documents</Label>
+                                                <div className="space-y-2">
+                                                    {/* New structure with files array */}
+                                                    {pdl.medical_records[0].files && pdl.medical_records[0].files.length > 0
+                                                        ? pdl.medical_records[0].files.map((file: any, index: number) => (
                                                               <div
                                                                   key={index}
                                                                   className="flex items-center justify-between rounded-lg bg-gray-50 p-3"
@@ -1839,8 +1999,12 @@ export default function UpdatePDLInformation() {
                                                                   <div className="flex items-center space-x-3">
                                                                       <FileText className="h-4 w-4 text-gray-400" />
                                                                       <div>
-                                                                          <p className="text-sm font-medium text-gray-900">{filename}</p>
-                                                                          <p className="text-xs text-gray-500">Medical document</p>
+                                                                          <p className="text-sm font-medium text-gray-900">
+                                                                              {file.original_filename}
+                                                                          </p>
+                                                                          <p className="text-xs text-gray-500">
+                                                                              {file.extension?.toUpperCase()} • Medical document
+                                                                          </p>
                                                                       </div>
                                                                   </div>
                                                                   <div className="flex items-center space-x-2">
@@ -1848,7 +2012,9 @@ export default function UpdatePDLInformation() {
                                                                           type="button"
                                                                           variant="ghost"
                                                                           size="sm"
-                                                                          onClick={() => handleOldMedicalPreview(filePath || '', filename)}
+                                                                          onClick={() =>
+                                                                              handleOldMedicalPreview(file.file_path, file.original_filename)
+                                                                          }
                                                                           className="text-blue-500 hover:text-blue-700"
                                                                           title="Preview file"
                                                                       >
@@ -1856,65 +2022,100 @@ export default function UpdatePDLInformation() {
                                                                       </Button>
                                                                   </div>
                                                               </div>
-                                                          );
-                                                      })}
+                                                          ))
+                                                        : /* Fallback for old structure */
+                                                          pdl.medical_records[0].original_filename
+                                                              .split(',')
+                                                              .map((filename: string, index: number) => {
+                                                                  const filePath = pdl.medical_records[0].file_path?.split(',')[index];
+                                                                  return (
+                                                                      <div
+                                                                          key={index}
+                                                                          className="flex items-center justify-between rounded-lg bg-gray-50 p-3"
+                                                                      >
+                                                                          <div className="flex items-center space-x-3">
+                                                                              <FileText className="h-4 w-4 text-gray-400" />
+                                                                              <div>
+                                                                                  <p className="text-sm font-medium text-gray-900">{filename}</p>
+                                                                                  <p className="text-xs text-gray-500">Medical document</p>
+                                                                              </div>
+                                                                          </div>
+                                                                          <div className="flex items-center space-x-2">
+                                                                              <Button
+                                                                                  type="button"
+                                                                                  variant="ghost"
+                                                                                  size="sm"
+                                                                                  onClick={() => handleOldMedicalPreview(filePath || '', filename)}
+                                                                                  className="text-blue-500 hover:text-blue-700"
+                                                                                  title="Preview file"
+                                                                              >
+                                                                                  <Eye className="h-4 w-4" />
+                                                                              </Button>
+                                                                          </div>
+                                                                      </div>
+                                                                  );
+                                                              })}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ) : null}
+                                        ) : null}
 
-                                    {/* Old Medical Files Preview */}
-                                    {oldMedicalPreview && (
-                                        <div className="mt-4 space-y-2">
-                                            <Label>Current Medical File Preview</Label>
-                                            <div className="relative">
-                                                {oldMedicalPreview === 'document-file' ? (
-                                                    // DOC/DOCX file info display
-                                                    <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
-                                                        <div className="text-center">
-                                                            <FileText className="mx-auto h-16 w-16 text-gray-400" />
-                                                            <p className="mt-2 text-sm font-medium text-gray-900">
-                                                                Document file - Preview not available
-                                                            </p>
-                                                            <p className="text-xs text-gray-500">
-                                                                Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
-                                                            </p>
+                                        {/* Old Medical Files Preview */}
+                                        {oldMedicalPreview && (
+                                            <div className="mt-4 space-y-2">
+                                                <Label>Current Medical File Preview</Label>
+                                                <div className="relative">
+                                                    {oldMedicalPreview === 'document-file' ? (
+                                                        // DOC/DOCX file info display
+                                                        <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
+                                                            <div className="text-center">
+                                                                <FileText className="mx-auto h-16 w-16 text-gray-400" />
+                                                                <p className="mt-2 text-sm font-medium text-gray-900">
+                                                                    Document file - Preview not available
+                                                                </p>
+                                                                <p className="text-xs text-gray-500">
+                                                                    Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                ) : oldMedicalPreview.startsWith('/storage/') &&
-                                                  (oldMedicalPreview.includes('.jpg') ||
-                                                      oldMedicalPreview.includes('.jpeg') ||
-                                                      oldMedicalPreview.includes('.png')) ? (
-                                                    // Image preview
-                                                    <img
-                                                        src={oldMedicalPreview}
-                                                        alt="Current medical file preview"
-                                                        className="max-h-64 w-full rounded-lg border object-contain"
-                                                    />
-                                                ) : oldMedicalPreview.startsWith('/storage/') && oldMedicalPreview.includes('.pdf') ? (
-                                                    // PDF preview
-                                                    <iframe src={oldMedicalPreview} className="h-64 w-full rounded-lg border" title="PDF Preview" />
-                                                ) : (
-                                                    // Text file preview
-                                                    <div className="h-64 w-full rounded-lg border bg-white p-4">
-                                                        <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
-                                                            {oldMedicalPreview}
-                                                        </pre>
-                                                    </div>
-                                                )}
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="absolute top-2 right-2"
-                                                    onClick={() => setOldMedicalPreview(null)}
-                                                >
-                                                    <X className="h-4 w-4" />
-                                                </Button>
+                                                    ) : oldMedicalPreview.startsWith('/storage/') &&
+                                                      (oldMedicalPreview.includes('.jpg') ||
+                                                          oldMedicalPreview.includes('.jpeg') ||
+                                                          oldMedicalPreview.includes('.png')) ? (
+                                                        // Image preview
+                                                        <img
+                                                            src={oldMedicalPreview}
+                                                            alt="Current medical file preview"
+                                                            className="max-h-64 w-full rounded-lg border object-contain"
+                                                        />
+                                                    ) : oldMedicalPreview.startsWith('/storage/') && oldMedicalPreview.includes('.pdf') ? (
+                                                        // PDF preview
+                                                        <iframe
+                                                            src={oldMedicalPreview}
+                                                            className="h-64 w-full rounded-lg border"
+                                                            title="PDF Preview"
+                                                        />
+                                                    ) : (
+                                                        // Text file preview
+                                                        <div className="h-64 w-full rounded-lg border bg-white p-4">
+                                                            <pre className="h-full w-full overflow-auto text-sm whitespace-pre-wrap text-gray-900">
+                                                                {oldMedicalPreview}
+                                                            </pre>
+                                                        </div>
+                                                    )}
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="absolute top-2 right-2"
+                                                        onClick={() => setOldMedicalPreview(null)}
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </>
+                                        )}
+                                    </div>
+                                </>
                             )}
                         </CardContent>
                     </Card>

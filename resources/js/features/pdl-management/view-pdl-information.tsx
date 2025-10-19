@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import { Eye } from 'lucide-react';
 
 import { AddCaseInformation } from './add-case-information';
+import { CustodyManagement } from '../custody/custody-management';
 
 export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
     const handleDownload = () => {
@@ -32,8 +33,13 @@ export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
                     {/* Basic Information */}
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
+
                             <h3 className="text-lg font-medium">Basic Information</h3>
-                            <Button variant="outline" onClick={handleDownload}>Download PDL Information</Button>
+                            <div className='flex items-center gap-2'>
+                                <CustodyManagement pdl={pdl} />
+                                <Button variant="outline" onClick={handleDownload}>Download PDL Information</Button>
+                            </div>
+
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -285,6 +291,8 @@ export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
                             </AccordionItem>
                         )}
                     </Accordion>
+
+
                 </div>
             </DialogContent>
         </Dialog>

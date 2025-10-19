@@ -255,14 +255,26 @@
                     <div class="detail-label">Alias:</div>
                     <div class="detail-value">{{ $pdl->alias }}</div>
                     <div class="detail-label-right">Date Committed:</div>
-                    <div class="detail-value-right">{{ $pdl->cases->first()->date_committed->format('F d, Y') }}</div>
+                    <div class="detail-value-right">
+                        @if($pdl->cases->isNotEmpty() && $pdl->cases->first()->date_committed)
+                            {{ $pdl->cases->first()->date_committed->format('F d, Y') }}
+                        @else
+                            N/A
+                        @endif
+                    </div>
                 </div>
 
                 <div class="details-row">
                     <div class="detail-label">Barangay:</div>
                     <div class="detail-value">{{ $pdl->brgy }}</div>
                     <div class="detail-label-right">Time Committed:</div>
-                    <div class="detail-value-right">{{ $pdl->cases->first()->time_committed }}</div>
+                    <div class="detail-value-right">
+                        @if($pdl->cases->isNotEmpty() && $pdl->cases->first()->time_committed)
+                            {{ $pdl->cases->first()->time_committed }}
+                        @else
+                            N/A
+                        @endif
+                    </div>
                 </div>
 
                 <div class="details-row">
@@ -294,7 +306,13 @@
                 </div>
                 <div class="case-item">
                     <div class="case-label">Case Status / RTC:</div>
-                    <div class="case-value">{{ $case->case_status }} / RTC {{ $case->pdl->court_branch }}</div>
+                    <div class="case-value">
+                        @if($case->case_status)
+                            {{ $case->case_status }} / RTC {{ $case->pdl->court_branch }}
+                        @else
+                            N/A
+                        @endif
+                    </div>
                 </div>
             @endforeach
         </div>

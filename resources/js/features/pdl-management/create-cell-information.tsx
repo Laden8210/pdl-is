@@ -25,18 +25,21 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 export function CreateCellInformation() {
     const { data, setData, post, processing, errors, reset } = useForm<{
         cell_name: string;
         capacity: string;
         gender: string;
+        cell_type: string;
         description: string;
         status: string;
     }>({
         cell_name: '',
         capacity: '',
         gender: 'male',
+        cell_type: 'isolation',
         description: '',
         status: 'active',
     });
@@ -136,11 +139,11 @@ export function CreateCellInformation() {
                         </div>
 
                         <div className="md:col-span-2">
-                            <Label htmlFor="description">Description</Label>
+                            <Label htmlFor="cell_type">Cell Type</Label>
                             {/* isolation, female, male, trustee, kitchen boys */}
-                            <Select value={data.description} onValueChange={(value) => setData('description', value)}>
+                            <Select value={data.cell_type} onValueChange={(value) => setData('cell_type', value)}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select description" />
+                                    <SelectValue placeholder="Select cell type" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="isolation">Isolation</SelectItem>
@@ -150,6 +153,12 @@ export function CreateCellInformation() {
                                     <SelectItem value="kitchen boys">Kitchen Boys</SelectItem>
                                 </SelectContent>
                             </Select>
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <Label htmlFor="description">Description</Label>
+                            <Textarea id="description" name="description" value={data.description} onChange={(e) => setData('description', e.target.value)} rows={3}
+                            placeholder="Enter description" />
                         </div>
                     </div>
 

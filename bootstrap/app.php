@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\SystemLogRequestsMiddleware;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\ShareNotifications;
@@ -25,7 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
-            ShareNotifications::class
+            ShareNotifications::class,
+            SystemLogRequestsMiddleware::class,
         ]);
 
         // Register middleware aliases

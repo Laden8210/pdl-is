@@ -7,13 +7,15 @@ import { useForm } from "@inertiajs/react";
 export function CreateCourt() {
     const { data, setData, post, processing, errors, reset } = useForm({
         branch_code: '',
+        branch: '',
+        station: '',
         court_type: '',
         location: '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('court-list.create'), { // Fixed: removed extra space in route name
+        post(route('court-list.create'), {
             preserveScroll: true,
             onSuccess: () => reset(),
         });
@@ -47,6 +49,32 @@ export function CreateCourt() {
                             />
                             {errors.branch_code && (
                                 <p className="text-sm text-red-600 mt-1">{errors.branch_code}</p>
+                            )}
+                        </div>
+                        <div>
+                            <Label htmlFor="branch">Branch</Label>
+                            <Input
+                                id="branch"
+                                name="branch"
+                                value={data.branch}
+                                onChange={handleChange}
+                                required
+                            />
+                            {errors.branch && (
+                                <p className="text-sm text-red-600 mt-1">{errors.branch}</p>
+                            )}
+                        </div>
+                        <div>
+                            <Label htmlFor="station">Station</Label>
+                            <Input
+                                id="station"
+                                name="station"
+                                value={data.station}
+                                onChange={handleChange}
+                                required
+                            />
+                            {errors.station && (
+                                <p className="text-sm text-red-600 mt-1">{errors.station}</p>
                             )}
                         </div>
                         <div>

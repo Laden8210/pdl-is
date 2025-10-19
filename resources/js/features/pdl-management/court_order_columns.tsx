@@ -21,11 +21,18 @@ export type CourtOrder = {
   remarks: string;
   document_type: string;
   document_path: string;
-  court_branch: string;
+
   pdl_id: number;
   pdl?: {
     fname: string;
     lname: string;
+  };
+  court: {
+    branch_code: string;
+    branch: string;
+    station: string;
+    court_type: string;
+    location: string;
   };
 };
 
@@ -74,6 +81,10 @@ export const court_order_columns: ColumnDef<CourtOrder>[] = [
   {
     accessorKey: "court_branch",
     header: "Court Branch",
+    cell: ({ row }) => {
+      const court = row.original.court;
+      return court ? `${court.branch_code} - ${court.branch} - ${court.station} - ${court.court_type} - ${court.location}` : `ID: ${row.original.court_id}`;
+    },
   },
   {
     id: "pdl",

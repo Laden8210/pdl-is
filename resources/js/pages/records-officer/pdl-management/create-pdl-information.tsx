@@ -19,9 +19,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { Check, ChevronsUpDown, Eye, FileText, Image, Upload, X, Loader2 } from 'lucide-react';
 import { usePSGCLocation } from '@/hooks/usePSGCLocation';
-
+import { Check, ChevronsUpDown, Eye, FileText, Image, Loader2, Upload, X } from 'lucide-react';
 
 // Order type suggestions
 const orderTypeSuggestions = [
@@ -412,18 +411,18 @@ export default function CreatePDLInformation() {
     // Handle location changes
     const handleLocationChange = (type: 'province' | 'city' | 'barangay', code: string) => {
         if (type === 'province') {
-            const province = provinces.find(p => p.code === code);
+            const province = provinces.find((p) => p.code === code);
             handleProvinceChange(code);
             setData('province', province?.name || '');
             setData('city', '');
             setData('brgy', '');
         } else if (type === 'city') {
-            const city = citiesMunicipalities.find(c => c.code === code);
+            const city = citiesMunicipalities.find((c) => c.code === code);
             handleCityMunicipalityChange(code);
             setData('city', city?.name || '');
             setData('brgy', '');
         } else if (type === 'barangay') {
-            const barangay = barangays.find(b => b.code === code);
+            const barangay = barangays.find((b) => b.code === code);
             handleBarangayChange(code);
             setData('brgy', barangay?.name || '');
         }
@@ -508,8 +507,8 @@ export default function CreatePDLInformation() {
             setMedicalPreviews(newPreviews);
         }
     };
-
     const handleAddNewCase = () => {
+        const newCaseIndex = data.cases.length;
         setData('cases', [
             ...data.cases,
             {
@@ -523,7 +522,7 @@ export default function CreatePDLInformation() {
                 drug_related: false,
             },
         ]);
-        setActiveCaseIndex(data.cases.length);
+        setActiveCaseIndex(newCaseIndex);
     };
 
     const handleAddNewCourtOrder = () => {
@@ -592,16 +591,8 @@ export default function CreatePDLInformation() {
     const handleCaseChange = (index: number, field: string, value: string | boolean) => {
         const newCases = [...data.cases];
         newCases[index] = { ...newCases[index], [field]: value };
-
-        // Auto-set security classification when crime is selected
-        if (field === 'crime_committed' && typeof value === 'string') {
-            const securityClassification = getSecurityClassification(value);
-            newCases[index].security_classification = securityClassification;
-        }
-
         setData('cases', newCases);
     };
-
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -764,8 +755,8 @@ export default function CreatePDLInformation() {
                 medical_file: null,
             },
         ],
-        height: 170,
-        weight: 70,
+        height: 0,
+        weight: 0,
         build: '',
         complexion: '',
         hair_color: '',
@@ -791,7 +782,6 @@ export default function CreatePDLInformation() {
     const { props } = usePage();
     const { auth } = props;
     const { courts } = props;
-
 
     const [date, setDate] = useState<Date | undefined>(undefined);
 
@@ -972,9 +962,6 @@ export default function CreatePDLInformation() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-
-
-
                             </div>
 
                             <Separator />
@@ -986,9 +973,7 @@ export default function CreatePDLInformation() {
                                 {locationError && (
                                     <Alert variant="destructive" className="mb-4">
                                         <AlertTitle>Location Service Error</AlertTitle>
-                                        <AlertDescription>
-                                            {locationError}. Please refresh the page or try again later.
-                                        </AlertDescription>
+                                        <AlertDescription>{locationError}. Please refresh the page or try again later.</AlertDescription>
                                     </Alert>
                                 )}
 
@@ -1004,7 +989,7 @@ export default function CreatePDLInformation() {
                                             disabled={loading.provinces}
                                         >
                                             <SelectTrigger>
-                                                <SelectValue placeholder={loading.provinces ? "Loading provinces..." : "Select province"} />
+                                                <SelectValue placeholder={loading.provinces ? 'Loading provinces...' : 'Select province'} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {provinces.map((province) => (
@@ -1033,13 +1018,15 @@ export default function CreatePDLInformation() {
                                             disabled={!selectedProvince || loading.citiesMunicipalities}
                                         >
                                             <SelectTrigger>
-                                                <SelectValue placeholder={
-                                                    !selectedProvince
-                                                        ? "Select province first"
-                                                        : loading.citiesMunicipalities
-                                                            ? "Loading cities/municipalities..."
-                                                            : "Select city/municipality"
-                                                } />
+                                                <SelectValue
+                                                    placeholder={
+                                                        !selectedProvince
+                                                            ? 'Select province first'
+                                                            : loading.citiesMunicipalities
+                                                              ? 'Loading cities/municipalities...'
+                                                              : 'Select city/municipality'
+                                                    }
+                                                />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {citiesMunicipalities.map((city) => (
@@ -1055,9 +1042,7 @@ export default function CreatePDLInformation() {
                                                 Loading cities/municipalities...
                                             </div>
                                         )}
-                                        {!selectedProvince && (
-                                            <div className="text-xs text-muted-foreground">Please select a province first</div>
-                                        )}
+                                        {!selectedProvince && <div className="text-xs text-muted-foreground">Please select a province first</div>}
                                     </div>
 
                                     <div className="space-y-2">
@@ -1071,13 +1056,15 @@ export default function CreatePDLInformation() {
                                             disabled={!selectedCityMunicipality || loading.barangays}
                                         >
                                             <SelectTrigger>
-                                                <SelectValue placeholder={
-                                                    !selectedCityMunicipality
-                                                        ? "Select city/municipality first"
-                                                        : loading.barangays
-                                                            ? "Loading barangays..."
-                                                            : "Select barangay"
-                                                } />
+                                                <SelectValue
+                                                    placeholder={
+                                                        !selectedCityMunicipality
+                                                            ? 'Select city/municipality first'
+                                                            : loading.barangays
+                                                              ? 'Loading barangays...'
+                                                              : 'Select barangay'
+                                                    }
+                                                />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {barangays.map((barangay) => (
@@ -1194,9 +1181,7 @@ export default function CreatePDLInformation() {
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    Court Order Information
-                                </div>
+                                <div className="flex items-center gap-2">Court Order Information</div>
                                 <Button variant="outline" size="sm" type="button" onClick={handleAddNewCourtOrder}>
                                     Add New Court Order
                                 </Button>
@@ -1255,12 +1240,15 @@ export default function CreatePDLInformation() {
                                                         <CommandInput
                                                             placeholder="Search order types or type custom..."
                                                             value={data.court_orders[activeCourtOrderIndex].order_type}
-                                                            onValueChange={(value) => handleCourtOrderChange(activeCourtOrderIndex, 'order_type', value)}
+                                                            onValueChange={(value) =>
+                                                                handleCourtOrderChange(activeCourtOrderIndex, 'order_type', value)
+                                                            }
                                                         />
                                                         <CommandList>
                                                             <CommandEmpty>
                                                                 <div className="p-2 text-sm text-muted-foreground">
-                                                                    No order type found. Press Enter to add "{data.court_orders[activeCourtOrderIndex].order_type}" as custom order type.
+                                                                    No order type found. Press Enter to add "
+                                                                    {data.court_orders[activeCourtOrderIndex].order_type}" as custom order type.
                                                                 </div>
                                                             </CommandEmpty>
                                                             <CommandGroup>
@@ -1275,7 +1263,9 @@ export default function CreatePDLInformation() {
                                                                     >
                                                                         <Check
                                                                             className={`mr-2 h-4 w-4 ${
-                                                                                data.court_orders[activeCourtOrderIndex].order_type === orderType ? 'opacity-100' : 'opacity-0'
+                                                                                data.court_orders[activeCourtOrderIndex].order_type === orderType
+                                                                                    ? 'opacity-100'
+                                                                                    : 'opacity-0'
                                                                             }`}
                                                                         />
                                                                         {orderType}
@@ -1286,7 +1276,9 @@ export default function CreatePDLInformation() {
                                                     </Command>
                                                 </PopoverContent>
                                             </Popover>
-                                            <div className="text-xs text-muted-foreground">Select from common order types or type a custom order type</div>
+                                            <div className="text-xs text-muted-foreground">
+                                                Select from common order types or type a custom order type
+                                            </div>
                                         </div>
                                         <div className="space-y-2">
                                             <Label>
@@ -1320,7 +1312,9 @@ export default function CreatePDLInformation() {
                                                 onChange={handleDocumentUpload}
                                                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                             />
-                                            <div className="text-xs text-muted-foreground">Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT</div>
+                                            <div className="text-xs text-muted-foreground">
+                                                Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
+                                            </div>
 
                                             {/* Document Preview */}
                                             {documentPreviews[activeCourtOrderIndex] && (
@@ -1332,9 +1326,15 @@ export default function CreatePDLInformation() {
                                                             <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-50">
                                                                 <div className="text-center">
                                                                     <FileText className="mx-auto h-16 w-16 text-gray-400" />
-                                                                    <p className="mt-2 text-sm font-medium text-gray-900">{data.court_orders[activeCourtOrderIndex].document_type?.name}</p>
+                                                                    <p className="mt-2 text-sm font-medium text-gray-900">
+                                                                        {data.court_orders[activeCourtOrderIndex].document_type?.name}
+                                                                    </p>
                                                                     <p className="text-xs text-gray-500">Document file - Preview not available</p>
-                                                                    <p className="text-xs text-gray-400">{formatFileSize(data.court_orders[activeCourtOrderIndex].document_type?.size || 0)}</p>
+                                                                    <p className="text-xs text-gray-400">
+                                                                        {formatFileSize(
+                                                                            data.court_orders[activeCourtOrderIndex].document_type?.size || 0,
+                                                                        )}
+                                                                    </p>
                                                                 </div>
                                                             </div>
                                                         ) : documentPreviews[activeCourtOrderIndex].startsWith('data:image/') ? (
@@ -1346,7 +1346,11 @@ export default function CreatePDLInformation() {
                                                             />
                                                         ) : documentPreviews[activeCourtOrderIndex].startsWith('data:application/pdf') ? (
                                                             // PDF preview
-                                                            <iframe src={documentPreviews[activeCourtOrderIndex]} className="h-64 w-full rounded-lg border" title="PDF Preview" />
+                                                            <iframe
+                                                                src={documentPreviews[activeCourtOrderIndex]}
+                                                                className="h-64 w-full rounded-lg border"
+                                                                title="PDF Preview"
+                                                            />
                                                         ) : (
                                                             // Text file preview
                                                             <div className="h-64 w-full rounded-lg border bg-white p-4">
@@ -1379,8 +1383,12 @@ export default function CreatePDLInformation() {
                                                         <div className="flex items-center space-x-2">
                                                             {getFileIcon(data.court_orders[activeCourtOrderIndex].document_type)}
                                                             <div>
-                                                                <p className="text-sm font-medium">{data.court_orders[activeCourtOrderIndex].document_type.name}</p>
-                                                                <p className="text-xs text-gray-500">{formatFileSize(data.court_orders[activeCourtOrderIndex].document_type.size)}</p>
+                                                                <p className="text-sm font-medium">
+                                                                    {data.court_orders[activeCourtOrderIndex].document_type.name}
+                                                                </p>
+                                                                <p className="text-xs text-gray-500">
+                                                                    {formatFileSize(data.court_orders[activeCourtOrderIndex].document_type.size)}
+                                                                </p>
                                                             </div>
                                                         </div>
                                                         <div className="flex items-center space-x-2">
@@ -1388,7 +1396,10 @@ export default function CreatePDLInformation() {
                                                                 type="button"
                                                                 variant="ghost"
                                                                 size="sm"
-                                                                onClick={() => data.court_orders[activeCourtOrderIndex].document_type && handleDocumentPreview(data.court_orders[activeCourtOrderIndex].document_type)}
+                                                                onClick={() =>
+                                                                    data.court_orders[activeCourtOrderIndex].document_type &&
+                                                                    handleDocumentPreview(data.court_orders[activeCourtOrderIndex].document_type)
+                                                                }
                                                                 className="text-blue-500 hover:text-blue-700"
                                                                 title="Preview file"
                                                             >
@@ -1515,7 +1526,7 @@ export default function CreatePDLInformation() {
                                             </Label>
                                             <Input
                                                 id="case_number"
-                                                value={data.cases[activeCaseIndex].case_number}
+                                                value={data.cases[activeCaseIndex]?.case_number || ''}
                                                 onChange={(e) => handleCaseChange(activeCaseIndex, 'case_number', e.target.value)}
                                                 placeholder="Enter case number"
                                             />
@@ -1532,7 +1543,7 @@ export default function CreatePDLInformation() {
                                                         aria-expanded={crimeCommittedOpen}
                                                         className="w-full justify-between"
                                                     >
-                                                        {data.cases[activeCaseIndex].crime_committed || 'Select or type crime committed...'}
+                                                        {data.cases[activeCaseIndex]?.crime_committed || 'Select or type crime committed...'}
                                                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                     </Button>
                                                 </PopoverTrigger>
@@ -1540,13 +1551,13 @@ export default function CreatePDLInformation() {
                                                     <Command>
                                                         <CommandInput
                                                             placeholder="Search crimes or type custom..."
-                                                            value={data.cases[activeCaseIndex].crime_committed}
+                                                            value={data.cases[activeCaseIndex]?.crime_committed || ''}
                                                             onValueChange={(value) => handleCaseChange(activeCaseIndex, 'crime_committed', value)}
                                                         />
                                                         <CommandList>
                                                             <CommandEmpty>
                                                                 <div className="p-2 text-sm text-muted-foreground">
-                                                                    No crime found. Press Enter to add "{data.cases[activeCaseIndex].crime_committed}"
+                                                                    No crime found. Press Enter to add "{data.cases[activeCaseIndex]?.crime_committed || ''}"
                                                                     as custom crime.
                                                                 </div>
                                                             </CommandEmpty>
@@ -1563,7 +1574,7 @@ export default function CreatePDLInformation() {
                                                                         >
                                                                             <Check
                                                                                 className={`mr-2 h-4 w-4 ${
-                                                                                    data.cases[activeCaseIndex].crime_committed === crime
+                                                                                    data.cases[activeCaseIndex]?.crime_committed === crime
                                                                                         ? 'opacity-100'
                                                                                         : 'opacity-0'
                                                                                 }`}
@@ -1587,7 +1598,7 @@ export default function CreatePDLInformation() {
                                             </Label>
                                             <Input
                                                 type="date"
-                                                value={data.cases[activeCaseIndex].date_committed}
+                                                value={data.cases[activeCaseIndex]?.date_committed || ''}
                                                 onChange={(e) => handleCaseChange(activeCaseIndex, 'date_committed', e.target.value)}
                                             />
                                         </div>
@@ -1597,7 +1608,7 @@ export default function CreatePDLInformation() {
                                             </Label>
                                             <Input
                                                 type="time"
-                                                value={data.cases[activeCaseIndex].time_committed}
+                                                value={data.cases[activeCaseIndex]?.time_committed || ''}
                                                 onChange={(e) => handleCaseChange(activeCaseIndex, 'time_committed', e.target.value)}
                                             />
                                         </div>
@@ -1606,7 +1617,7 @@ export default function CreatePDLInformation() {
                                                 Case Status <span className="text-red-500">*</span>
                                             </Label>
                                             <Select
-                                                value={data.cases[activeCaseIndex].case_status}
+                                                value={data.cases[activeCaseIndex]?.case_status || ''}
                                                 onValueChange={(value) => handleCaseChange(activeCaseIndex, 'case_status', value)}
                                             >
                                                 <SelectTrigger>
@@ -1614,7 +1625,9 @@ export default function CreatePDLInformation() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="on_trial">On Trial</SelectItem>
-                                                    <SelectItem value="pending">Pending</SelectItem>
+                                                    <SelectItem value="bonded">Bonded</SelectItem>
+                                                    <SelectItem value="transferred_to_another_jail">Transferred to another jail</SelectItem>
+                                                    <SelectItem value="served_sentence">Served Sentence</SelectItem>
                                                     <SelectItem value="convicted">Convicted</SelectItem>
 
                                                     <SelectItem value="dismissed">Dismissed</SelectItem>
@@ -1630,7 +1643,7 @@ export default function CreatePDLInformation() {
                                                 Security Classification <span className="text-red-500">*</span>
                                             </Label>
                                             <Select
-                                                value={data.cases[activeCaseIndex].security_classification}
+                                                value={data.cases[activeCaseIndex]?.security_classification || ''}
                                                 onValueChange={(value) => handleCaseChange(activeCaseIndex, 'security_classification', value)}
                                             >
                                                 <SelectTrigger>
@@ -1648,7 +1661,7 @@ export default function CreatePDLInformation() {
                                         <div className="space-y-2">
                                             <Label>Drug Related Case</Label>
                                             <RadioGroup
-                                                value={data.cases[activeCaseIndex].drug_related.toString()}
+                                                value={data.cases[activeCaseIndex]?.drug_related?.toString() || 'false'}
                                                 onValueChange={(value) => handleCaseChange(activeCaseIndex, 'drug_related', value === 'true')}
                                                 className="flex flex-row space-x-6"
                                             >
@@ -1674,6 +1687,7 @@ export default function CreatePDLInformation() {
                                         <Textarea
                                             id="case_remarks"
                                             value={data.cases[activeCaseIndex]?.case_remarks || ''}
+
                                             onChange={(e) => handleCaseChange(activeCaseIndex, 'case_remarks', e.target.value)}
                                             rows={3}
                                             placeholder="Enter case-related remarks..."
@@ -1690,9 +1704,7 @@ export default function CreatePDLInformation() {
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    Medical Records
-                                </div>
+                                <div className="flex items-center gap-2">Medical Records</div>
                                 <Button variant="outline" size="sm" type="button" onClick={handleAddNewMedicalRecord}>
                                     Add New Medical Record
                                 </Button>
@@ -1819,7 +1831,9 @@ export default function CreatePDLInformation() {
                                                     <div className="mt-2">
                                                         <span className="text-sm font-medium text-gray-900">Upload medical document</span>
                                                         <p className="text-xs text-gray-500">Click to upload or drag and drop</p>
-                                                        <p className="mt-1 text-xs text-gray-400">Supports: Images (JPG, PNG, GIF), PDF, DOC, DOCX, TXT</p>
+                                                        <p className="mt-1 text-xs text-gray-400">
+                                                            Supports: Images (JPG, PNG, GIF), PDF, DOC, DOCX, TXT
+                                                        </p>
                                                     </div>
                                                 </label>
                                             </div>
@@ -1832,8 +1846,12 @@ export default function CreatePDLInformation() {
                                                         <div className="flex items-center space-x-3">
                                                             {getFileIcon(data.medical_records[activeMedicalRecordIndex].medical_file)}
                                                             <div>
-                                                                <p className="text-sm font-medium text-gray-900">{data.medical_records[activeMedicalRecordIndex].medical_file.name}</p>
-                                                                <p className="text-xs text-gray-500">{formatFileSize(data.medical_records[activeMedicalRecordIndex].medical_file.size)}</p>
+                                                                <p className="text-sm font-medium text-gray-900">
+                                                                    {data.medical_records[activeMedicalRecordIndex].medical_file.name}
+                                                                </p>
+                                                                <p className="text-xs text-gray-500">
+                                                                    {formatFileSize(data.medical_records[activeMedicalRecordIndex].medical_file.size)}
+                                                                </p>
                                                             </div>
                                                         </div>
                                                         <div className="flex items-center space-x-2">
@@ -1841,7 +1859,10 @@ export default function CreatePDLInformation() {
                                                                 type="button"
                                                                 variant="ghost"
                                                                 size="sm"
-                                                                onClick={() => data.medical_records[activeMedicalRecordIndex].medical_file && handleMedicalPreview(data.medical_records[activeMedicalRecordIndex].medical_file)}
+                                                                onClick={() =>
+                                                                    data.medical_records[activeMedicalRecordIndex].medical_file &&
+                                                                    handleMedicalPreview(data.medical_records[activeMedicalRecordIndex].medical_file)
+                                                                }
                                                                 className="text-blue-500 hover:text-blue-700"
                                                                 title="Preview file"
                                                             >
@@ -1893,7 +1914,11 @@ export default function CreatePDLInformation() {
                                                             />
                                                         ) : medicalPreviews[activeMedicalRecordIndex].startsWith('data:application/pdf') ? (
                                                             // PDF preview
-                                                            <iframe src={medicalPreviews[activeMedicalRecordIndex]} className="h-64 w-full rounded-lg border" title="PDF Preview" />
+                                                            <iframe
+                                                                src={medicalPreviews[activeMedicalRecordIndex]}
+                                                                className="h-64 w-full rounded-lg border"
+                                                                title="PDF Preview"
+                                                            />
                                                         ) : (
                                                             // Text file preview
                                                             <div className="h-64 w-full rounded-lg border bg-white p-4">
@@ -2104,12 +2129,17 @@ export default function CreatePDLInformation() {
                                         )}
                                         {(() => {
                                             const locationNames = getSelectedLocationNames();
-                                            const addressParts = [locationNames.barangay, locationNames.cityMunicipality, locationNames.province].filter(Boolean);
-                                            return addressParts.length > 0 && (
-                                                <div>
-                                                    <span className="font-medium">Address:</span>{' '}
-                                                    {addressParts.join(', ')}
-                                                </div>
+                                            const addressParts = [
+                                                locationNames.barangay,
+                                                locationNames.cityMunicipality,
+                                                locationNames.province,
+                                            ].filter(Boolean);
+                                            return (
+                                                addressParts.length > 0 && (
+                                                    <div>
+                                                        <span className="font-medium">Address:</span> {addressParts.join(', ')}
+                                                    </div>
+                                                )
                                             );
                                         })()}
                                     </div>
@@ -2311,7 +2341,6 @@ export default function CreatePDLInformation() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-
                     {/* Step Content */}
                     {renderStepContent()}
 

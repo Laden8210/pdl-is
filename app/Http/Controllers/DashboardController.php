@@ -207,8 +207,18 @@ class DashboardController extends Controller
         $overallUtilization = $totalCapacity > 0 ? round(($totalOccupied / $totalCapacity) * 100) : 0;
         $pendingVerifications = Verifications::where('status', 'pending')->count();
         $totalTimeAllowances = TimeAllowance::count();
-        $totalCourtOrders = CourtOrder::count();
-        $totalMedicalRecords = MedicalRecord::count();
+
+        // filter by verification status
+        $totalCourtOrders = CourtOrder::whereHas('pdl', function ($query) {
+            $query->whereHas('verifications', function ($query) {
+                $query->where('status', 'approved');
+            });
+        })->count();
+        $totalMedicalRecords = MedicalRecord::whereHas('pdl', function ($query) {
+            $query->whereHas('verifications', function ($query) {
+                $query->where('status', 'approved');
+            });
+        })->count();
         $activePersonnel = Personnel::where('status', 1)->whereNull('deleted_at')->count();
 
         // Get recent activities (last 10 activities)

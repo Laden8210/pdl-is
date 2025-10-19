@@ -231,6 +231,13 @@ export default function VerificationCard({ verification, onUpdate, updateRoute =
                                                         <div>
                                                             <span className="text-muted-foreground">Document Type:</span> {order.document_type}
                                                         </div>
+
+                                                        <div>
+                                                            <span className="text-muted-foreground">Document:</span>
+                                                            <Button variant="outline" size="sm" onClick={() => window.open(`/storage/${order.document_path}`, '_blank')}>
+                                                                Preview
+                                                            </Button>
+                                                        </div>
                                                         {order.remarks && (
                                                             <div className="col-span-2">
                                                                 <span className="text-muted-foreground">Remarks:</span> {order.remarks}
@@ -269,6 +276,12 @@ export default function VerificationCard({ verification, onUpdate, updateRoute =
                                                         </div>
                                                         <div className="col-span-2">
                                                             <span className="text-muted-foreground">Prescription:</span> {record.prescription}
+                                                        </div>
+                                                        <div className="col-span-2">
+                                                            <span className="text-muted-foreground">Document:</span>
+                                                            <Button variant="outline" size="sm" onClick={() => window.open(`/storage/${record.file_path}`, '_blank')}>
+                                                                Preview
+                                                            </Button>
                                                         </div>
                                                     </div>
                                                 ))

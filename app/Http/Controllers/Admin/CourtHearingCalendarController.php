@@ -12,7 +12,12 @@ class CourtHearingCalendarController extends Controller
 {
     public function index()
     {
-        $pdls = Pdl::with('personnel:id,fname,lname')->latest()->get();
+        $pdls = Pdl::with('personnel:id,fname,lname')->whereHas('verifications', function ($query) {
+            $query->where('status', 'approved');
+        })
+        ->where('archive_status', '=', null)
+        ->latest()
+        ->get();
 
         // Load activities with their associated PDLs
         $activities = Activity::latest()

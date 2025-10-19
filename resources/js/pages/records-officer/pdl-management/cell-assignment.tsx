@@ -90,7 +90,7 @@ export default function CellAssignment() {
     },
     {
       title: 'Assignments',
-      href: '/admin/pdl-management/cell-assignment',
+      href: '/record-officer/pdl-management/cell-assignment',
     },
   ];
 
@@ -108,7 +108,7 @@ export default function CellAssignment() {
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
-                    onClick={() => router.get('/admin/pdl-management/cell-activity-log')}
+                    onClick={() => router.get('/record-officer/pdl-management/cell-activity-log')}
                   >
                     View Activity Log
                   </Button>

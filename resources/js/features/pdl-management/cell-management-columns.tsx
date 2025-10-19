@@ -1,4 +1,3 @@
-
 import type { ColumnDef } from "@tanstack/react-table";
 import { ViewCellActivityLog } from "@/features/pdl-management/view-cell-activity-log";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +23,7 @@ export const cell_management_columns: ColumnDef<Cells>[] = [
     header: "Gender",
     cell: ({ row }) => (
       <Badge variant={row.original.gender === 'male' ? 'default' : 'secondary'}>
-        {row.original.gender.charAt(0).toUpperCase() + row.original.gender.slice(1)}
+        {row.original.gender?.charAt(0).toUpperCase() + row.original.gender?.slice(1) || 'N/A'}
       </Badge>
     ),
   },
@@ -38,19 +37,34 @@ export const cell_management_columns: ColumnDef<Cells>[] = [
     header: "Status",
     cell: ({ row }) => (
       <Badge variant={row.original.status === 'active' ? 'default' : 'destructive'}>
-        {row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1)}
+        {row.original.status?.charAt(0).toUpperCase() + row.original.status?.slice(1) || 'N/A'}
       </Badge>
     ),
   },
   {
-    accessorKey: "description",
-    header: "Description",
-    cell: ({ row }) => row.original.description || <span className="text-muted-foreground">N/A</span>,
-  },{
+    accessorKey: "cell_type",
+    header: "Cell Type",
+    cell: ({ row }) => {
+
+
+      return (
+        <Badge variant={row.original.cell_type as any}>
+          {row.original.cell_type ? row.original.cell_type.replace(/_/g, ' ').charAt(0).toUpperCase() + row.original.cell_type.replace(/_/g, ' ').slice(1).toLowerCase() : <span className="text-muted-foreground">N/A</span>}
+        </Badge>
+      );
+    },
+  },
+  {
     accessorKey: "created_at",
     header: "Created At",
-
-    cell: ({ row }) => row.original.created_at ? new Date(row.original.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : <span className="text-muted-foreground">N/A</span>,
+    cell: ({ row }) => row.original.created_at ? new Date(row.original.created_at).toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    }) : <span className="text-muted-foreground">N/A</span>,
   },
   {
     id: "actions",
@@ -58,15 +72,15 @@ export const cell_management_columns: ColumnDef<Cells>[] = [
     cell: ({ row }) => {
       const cell = row.original;
 
-    return (
+      return (
         <div className="flex gap-2">
-            <UpdateCellInformation cell={{
-                ...cell,
-                description: cell.description ?? ""
-            }} />
-            <ViewCellActivityLog cell={cell} />
+          <UpdateCellInformation cell={{
+            ...cell,
+            description: cell.description ?? ""
+          }} />
+          <ViewCellActivityLog cell={cell} />
         </div>
-    );
+      );
     },
   },
 ];

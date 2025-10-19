@@ -9,15 +9,15 @@ DROP TABLE IF EXISTS `activity`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `activity` (
   `activity_id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `category` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `activity_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `category` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activity_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `activity_date` date NOT NULL,
   `activity_time` time NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `pdl_ids` json DEFAULT NULL,
-  `status` enum('pending','completed','cancelled','rescheduled') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
-  `reason` text COLLATE utf8mb4_unicode_ci,
+  `status` enum('pending','completed','cancelled','rescheduled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`activity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -26,7 +26,7 @@ DROP TABLE IF EXISTS `agency`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `agency` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `agency_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `agency_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -36,8 +36,8 @@ DROP TABLE IF EXISTS `cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cache` (
-  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` int NOT NULL,
   PRIMARY KEY (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -46,8 +46,8 @@ DROP TABLE IF EXISTS `cache_locks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cache_locks` (
-  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `owner` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` int NOT NULL,
   PRIMARY KEY (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -57,14 +57,14 @@ DROP TABLE IF EXISTS `case_information`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `case_information` (
   `case_id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `case_number` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `crime_committed` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `case_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `crime_committed` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `date_committed` date NOT NULL,
-  `time_committed` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `case_status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `case_remarks` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `time_committed` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `case_status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `case_remarks` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pdl_id` bigint unsigned NOT NULL,
-  `security_classification` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `security_classification` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `drug_related` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -100,7 +100,7 @@ CREATE TABLE `cell_transfer_logs` (
   `from_cell_id` bigint unsigned NOT NULL,
   `to_cell_id` bigint unsigned NOT NULL,
   `transferred_by` bigint unsigned NOT NULL,
-  `reason` text COLLATE utf8mb4_unicode_ci,
+  `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `transferred_at` timestamp NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -122,11 +122,12 @@ DROP TABLE IF EXISTS `cells`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cells` (
   `cell_id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `cell_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cell_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `capacity` int NOT NULL,
-  `gender` enum('male','female') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'male',
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `gender` enum('male','female') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'male',
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cell_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`cell_id`)
@@ -137,18 +138,18 @@ DROP TABLE IF EXISTS `certificates`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `certificates` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `certificate_number` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `certificate_type` enum('drug_clearing_status','no_records','good_standing','release_clearance','medical_clearance','disciplinary_clearance') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `certificate_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `certificate_type` enum('drug_clearing_status','no_records','good_standing','release_clearance','medical_clearance','disciplinary_clearance') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `pdl_data` json NOT NULL,
   `issuer_data` json NOT NULL,
   `issue_date` date NOT NULL,
   `valid_until` date DEFAULT NULL,
-  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
-  `purpose` text COLLATE utf8mb4_unicode_ci,
-  `remarks` text COLLATE utf8mb4_unicode_ci,
-  `file_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `purpose` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `remarks` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `file_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pdl_id` bigint unsigned DEFAULT NULL,
   `issued_by` bigint unsigned NOT NULL,
   `requested_by` bigint unsigned DEFAULT NULL,
@@ -171,22 +172,22 @@ DROP TABLE IF EXISTS `court_orders`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `court_orders` (
   `court_order_id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `order_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `order_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `order_date` date NOT NULL,
   `received_date` date DEFAULT NULL,
-  `remarks` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cod_remarks` text COLLATE utf8mb4_unicode_ci,
-  `document_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `original_filename` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `remarks` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cod_remarks` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `document_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `original_filename` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pdl_id` bigint unsigned NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `archive_status` enum('BONDED','SERVED_SENTENCE','PROV_DISMISSED','DISMISSED','TRANSFER_TO_OTHER_FACILITY','DAPECOL','PROBATION','DECEASED','ACQUITTED') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `archive_reason` text COLLATE utf8mb4_unicode_ci,
-  `archive_court_order_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `archive_status` enum('BONDED','SERVED_SENTENCE','PROV_DISMISSED','DISMISSED','TRANSFER_TO_OTHER_FACILITY','DAPECOL','PROBATION','DECEASED','ACQUITTED') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `archive_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `archive_court_order_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `archived_at` timestamp NULL DEFAULT NULL,
-  `archive_notes` text COLLATE utf8mb4_unicode_ci,
+  `archive_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `admission_date` timestamp NULL DEFAULT NULL,
   `release_date` timestamp NULL DEFAULT NULL,
   `court_id` bigint unsigned NOT NULL,
@@ -200,9 +201,11 @@ DROP TABLE IF EXISTS `courts`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `courts` (
   `court_id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `branch_code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `court_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `location` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `branch_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `branch` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `station` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `court_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`court_id`)
@@ -213,11 +216,11 @@ DROP TABLE IF EXISTS `failed_jobs`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `failed_jobs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `uuid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
@@ -227,13 +230,13 @@ DROP TABLE IF EXISTS `job_batches`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `job_batches` (
-  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `total_jobs` int NOT NULL,
   `pending_jobs` int NOT NULL,
   `failed_jobs` int NOT NULL,
-  `failed_job_ids` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `options` mediumtext COLLATE utf8mb4_unicode_ci,
+  `failed_job_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `options` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `cancelled_at` int DEFAULT NULL,
   `created_at` int NOT NULL,
   `finished_at` int DEFAULT NULL,
@@ -245,8 +248,8 @@ DROP TABLE IF EXISTS `jobs`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `jobs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `queue` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `attempts` tinyint unsigned NOT NULL,
   `reserved_at` int unsigned DEFAULT NULL,
   `available_at` int unsigned NOT NULL,
@@ -260,8 +263,8 @@ DROP TABLE IF EXISTS `login_attempts`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `login_attempts` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `success` tinyint(1) NOT NULL DEFAULT '0',
   `attempted_at` timestamp NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -279,15 +282,15 @@ DROP TABLE IF EXISTS `medical_records`;
 CREATE TABLE `medical_records` (
   `medical_record_id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `pdl_id` bigint unsigned NOT NULL,
-  `complaint` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `complaint` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `date` date NOT NULL,
-  `prognosis` text COLLATE utf8mb4_unicode_ci,
-  `prescription` text COLLATE utf8mb4_unicode_ci,
-  `findings` text COLLATE utf8mb4_unicode_ci,
+  `prognosis` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `prescription` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `findings` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `stored_filename` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `file_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `stored_filename` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `file_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`medical_record_id`),
   KEY `medical_records_pdl_id_foreign` (`pdl_id`),
   CONSTRAINT `medical_records_pdl_id_foreign` FOREIGN KEY (`pdl_id`) REFERENCES `pdl` (`id`) ON DELETE CASCADE
@@ -298,7 +301,7 @@ DROP TABLE IF EXISTS `migrations`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `migrations` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -321,29 +324,29 @@ DROP TABLE IF EXISTS `pdl`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `pdl` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `fname` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `lname` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `mname` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `alias` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `lname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `alias` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `birthdate` date DEFAULT NULL,
   `age` int DEFAULT NULL,
-  `gender` enum('Male','Female') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `ethnic_group` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `civil_status` enum('Single','Married','Widowed','Annulment') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `brgy` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `city` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `province` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `mugshot_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `mugshot_original_filename` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `gender` enum('Male','Female') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ethnic_group` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `civil_status` enum('Single','Married','Widowed','Annulment') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `brgy` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `province` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `mugshot_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `mugshot_original_filename` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `personnel_id` bigint unsigned NOT NULL,
-  `archive_status` enum('BONDED','SERVED_SENTENCE','PROV_DISMISSED','DISMISSED','TRANSFER_TO_OTHER_FACILITY','DAPECOL','PROBATION','DECEASED','ACQUITTED') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `archive_reason` text COLLATE utf8mb4_unicode_ci,
+  `archive_status` enum('BONDED','SERVED_SENTENCE','PROV_DISMISSED','DISMISSED','TRANSFER_TO_OTHER_FACILITY','DAPECOL','PROBATION','DECEASED','ACQUITTED') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `archive_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `archived_at` timestamp NULL DEFAULT NULL,
-  `archive_court_order_type` enum('RELEASE','BAIL','SERVED_SENTENCE','PROBATION','PAROLE','TRANSFER','OTHER') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `archive_court_order_file` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `archive_court_order_type` enum('RELEASE','BAIL','SERVED_SENTENCE','PROBATION','PAROLE','TRANSFER','OTHER') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `archive_court_order_file` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `archive_court_order_date` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `pdl_personnel_id_foreign` (`personnel_id`),
@@ -356,13 +359,13 @@ DROP TABLE IF EXISTS `pdl_alerts`;
 CREATE TABLE `pdl_alerts` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `pdl_id` bigint unsigned NOT NULL,
-  `alert_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `alert_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `scheduled_date` datetime NOT NULL,
   `reminder_date` datetime DEFAULT NULL,
-  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `created_by` bigint unsigned NOT NULL,
   `assigned_to` bigint unsigned DEFAULT NULL,
   `reminder_sent_to` json DEFAULT NULL,
@@ -382,20 +385,20 @@ DROP TABLE IF EXISTS `personnel`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `personnel` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `fname` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `mname` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `lname` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `contactnum` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `username` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `position` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `agency` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `lname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `contactnum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `position` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `agency` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '1 for active, 0 for inactive',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `personnel_username_unique` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -407,14 +410,14 @@ CREATE TABLE `physical_characteristics` (
   `characteristic_id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `height` decimal(8,2) DEFAULT NULL,
   `weight` decimal(8,2) DEFAULT NULL,
-  `build` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `complexion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `hair_color` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `eye_color` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `identification_marks` text COLLATE utf8mb4_unicode_ci,
-  `mark_location` text COLLATE utf8mb4_unicode_ci,
-  `remark` text COLLATE utf8mb4_unicode_ci,
-  `pc_remark` text COLLATE utf8mb4_unicode_ci,
+  `build` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `complexion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `hair_color` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `eye_color` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `identification_marks` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `mark_location` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `pc_remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `pdl_id` bigint unsigned NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -423,15 +426,43 @@ CREATE TABLE `physical_characteristics` (
   CONSTRAINT `physical_characteristics_pdl_id_foreign` FOREIGN KEY (`pdl_id`) REFERENCES `pdl` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `request_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `request_logs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `method` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status_code` int DEFAULT NULL,
+  `request_headers` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `request_body` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `response_headers` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `response_body` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `success_message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `error_message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `personnel_id` bigint unsigned DEFAULT NULL,
+  `duration` double NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `request_logs_method_index` (`method`),
+  KEY `request_logs_status_code_index` (`status_code`),
+  KEY `request_logs_personnel_id_index` (`personnel_id`),
+  KEY `request_logs_created_at_index` (`created_at`),
+  CONSTRAINT `request_logs_personnel_id_foreign` FOREIGN KEY (`personnel_id`) REFERENCES `personnel` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `sessions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `sessions` (
-  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint unsigned DEFAULT NULL,
-  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` text COLLATE utf8mb4_unicode_ci,
-  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `last_activity` int NOT NULL,
   PRIMARY KEY (`id`),
   KEY `sessions_user_id_index` (`user_id`),
@@ -443,10 +474,10 @@ DROP TABLE IF EXISTS `system_notifications`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `system_notifications` (
   `notification_id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `notification_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'general',
-  `action_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `notification_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'general',
+  `action_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `personnel_id` bigint unsigned NOT NULL,
   `pdl_id` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -480,9 +511,9 @@ DROP TABLE IF EXISTS `time_allowances`;
 CREATE TABLE `time_allowances` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `pdl_id` bigint unsigned NOT NULL,
-  `type` enum('gcta','tastm') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` enum('gcta','tastm') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `days` int NOT NULL,
-  `reason` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `awarded_by` bigint unsigned NOT NULL,
   `awarded_at` timestamp NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -499,13 +530,13 @@ DROP TABLE IF EXISTS `verifications`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `verifications` (
   `verification_id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `reason` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `personnel_id` bigint unsigned NOT NULL,
   `pdl_id` bigint unsigned NOT NULL,
-  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `feedback` text COLLATE utf8mb4_unicode_ci,
+  `feedback` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `reviewed_by` bigint unsigned DEFAULT NULL,
   `reviewed_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`verification_id`),
@@ -575,3 +606,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (83,'2025_10_17_192
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (84,'2025_10_17_200511_update_court_order_table',37);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (85,'2025_10_17_230806_update_activity_table',38);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (86,'2025_10_18_001054_update_change_divorce_to_anullment_table',39);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (87,'2025_10_19_155121_create_request_logs_table',40);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (88,'2025_10_19_164339_update_cell',41);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (89,'2025_10_19_170515_update_court',42);

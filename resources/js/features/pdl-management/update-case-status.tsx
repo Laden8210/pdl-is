@@ -27,13 +27,16 @@ interface UpdateCaseStatusProps {
 }
 
 const caseStatusOptions = [
-    { value: 'open', label: 'Open', icon: Clock, color: 'destructive' },
+
+    { value: 'bonded', label: 'Bonded', icon: User, color: 'destructive' },
+    { value: 'transferred', label: 'Transferred to another jail', icon: User, color: 'destructive' },
+    { value: 'served', label: 'Served Sentence', icon: User, color: 'destructive' },
+    { value: 'dismissed', label: 'Dismissed', icon: User, color: 'destructive' },
     { value: 'pending', label: 'Pending', icon: Clock, color: 'default' },
     { value: 'convicted', label: 'Convicted', icon: CheckCircle, color: 'secondary' },
     { value: 'deceased', label: 'Deceased', icon: Skull, color: 'destructive' },
-    { value: 'dismissed', label: 'Dismissed', icon: FileX, color: 'secondary' },
     { value: 'on_trial', label: 'On Trial', icon: Clock, color: 'default' },
-    { value: 'arraignment', label: 'Arraignment', icon: User, color: 'destructive' },
+
 ];
 
 export function UpdateCaseStatus({ caseInfo }: UpdateCaseStatusProps) {

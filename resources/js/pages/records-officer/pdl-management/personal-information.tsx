@@ -246,6 +246,7 @@ export default function PersonalInformation() {
                                     </TableHead>
                                     <TableHead>Address</TableHead>
                                     <TableHead>Encoded By</TableHead>
+
                                     <TableHead
                                         className="cursor-pointer hover:bg-muted/50"
                                         onClick={() => handleSort('agency')}
@@ -286,6 +287,7 @@ export default function PersonalInformation() {
                                                 ? pdl.verifications[0].status.charAt(0).toUpperCase() + pdl.verifications[0].status.slice(1)
                                                 : 'No Verification'}
                                         </TableCell>
+
                                         <TableCell>
                                             {pdl.archived_at ? (
                                                 <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800">
