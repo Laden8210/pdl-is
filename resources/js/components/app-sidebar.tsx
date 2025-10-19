@@ -196,6 +196,12 @@ const mainNavItems: NavItem[] = [
         href: '/admin/user-pdl-archive',
         userType: 'admin',
     },
+    {
+        title: 'Request Logs',
+        href: '/admin/request-logs',
+        icon: Calendar,
+        userType: 'admin',
+    },
 
     {
         title: 'Law Enforcement Dashboard',

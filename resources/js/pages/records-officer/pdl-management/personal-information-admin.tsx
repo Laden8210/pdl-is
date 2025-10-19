@@ -411,6 +411,7 @@ export default function PersonalInformation() {
                                     </TableHead>
                                     <TableHead>Address</TableHead>
                                     <TableHead>Encoded By</TableHead>
+                                    <TableHead>Agency</TableHead>
                                     <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -438,6 +439,7 @@ export default function PersonalInformation() {
                                                 ? `${verification.pdl.personnel.fname} ${verification.pdl.personnel.lname}`
                                                 : '—'}
                                         </TableCell>
+                                            <TableCell>{verification.pdl.personnel ? `${verification.pdl.personnel.agency}` : '—'}</TableCell>
                                         <TableCell className="space-x-1">
                                             <ViewPdlInformation pdl={verification.pdl} />
                                             {!isAdmin && (
@@ -458,6 +460,8 @@ export default function PersonalInformation() {
                                                     Edit
                                                 </Button>
                                             )}
+
+
                                         </TableCell>
                                     </TableRow>
                                 ))}

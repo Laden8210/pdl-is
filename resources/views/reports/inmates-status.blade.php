@@ -139,11 +139,18 @@
             vertical-align: bottom;
         }
 
+
+        .signature-label {
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+
         .signature-line {
             border-bottom: 1px solid #000;
             width: 200px;
             margin: 0 auto 5px auto;
-            height: 20px;
+            height: 10px;
         }
 
         .signature-label {
@@ -174,7 +181,7 @@
                     Tel #: {{ $data['contact']['tel'] }}; Email Address: {{ $data['contact']['email'] }}
                 </div>
                 <div class="title">{{ $data['title'] }}</div>
-                <div class="date">As of {{ $data['as_of_date'] }}</div>
+                <div class="date">As of {{ $data['start_date'] }} to {{ $data['end_date'] }}</div>
             </div>
             <div class="logo-right">
                 @if(file_exists(public_path('scof.jpg')))
@@ -245,10 +252,12 @@
 
     <div class="signature-section">
         <div class="signature-left">
+            <div class="signature-label">{{ $data['prepared_by'] }}</div>
             <div class="signature-line"></div>
             <div class="signature-label">Prepared by:</div>
         </div>
         <div class="signature-right">
+            <div class="signature-label">{{ $data['noted_by'] }}</div>
             <div class="signature-line"></div>
             <div class="signature-label">Noted by:</div>
         </div>

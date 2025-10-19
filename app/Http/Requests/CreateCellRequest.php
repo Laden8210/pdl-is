@@ -18,6 +18,7 @@ class CreateCellRequest extends FormRequest
             'capacity'    => 'required|integer|min:1',
             'gender'      => 'required|in:male,female',
             'description' => 'nullable|string|max:500',
+            'cell_type'   => 'required|in:isolation,female,male,trustee,kitchen boys',
             'status'      => 'required|in:active,inactive',
         ];
     }
@@ -41,6 +42,8 @@ class CreateCellRequest extends FormRequest
 
             'status.required' => 'The status is required.',
             'status.in'       => 'The status must be either active or inactive.',
+            'cell_type.required' => 'The cell type is required.',
+            'cell_type.in'       => 'The cell type must be either isolation, female, male, trustee, or kitchen boys.',
         ];
     }
 }

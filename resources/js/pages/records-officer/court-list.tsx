@@ -56,6 +56,8 @@ export default function CourtList() {
                                 <TableRow>
                                     <TableHead>ID</TableHead>
                                     <TableHead>Branch Code</TableHead>
+                                    <TableHead>Branch</TableHead>
+                                    <TableHead>Station</TableHead>
                                     <TableHead>Court Type</TableHead>
                                     <TableHead>Location</TableHead>
 
@@ -65,10 +67,12 @@ export default function CourtList() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {courts.map((court) => (
+                              {courts.map((court: Court) => (
                                     <TableRow key={court.court_id}>
                                         <TableCell>{court.court_id}</TableCell>
                                         <TableCell>{court.branch_code}</TableCell>
+                                        <TableCell>{court.branch}</TableCell>
+                                        <TableCell>{court.station}</TableCell>
                                         <TableCell>{court.court_type}</TableCell>
                                         <TableCell>{court.location}</TableCell>
 

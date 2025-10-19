@@ -20,6 +20,7 @@ class Cells extends Model
         'gender',
         'description',
         'status',
+        'cell_type',
     ];
 
     public function assignments()

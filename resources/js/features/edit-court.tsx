@@ -10,6 +10,8 @@ export function EditCourt({ court }: { court: Court }) {
     const { data, setData, put, processing, errors, reset } = useForm({
         court_id: court.court_id, // Make sure this is included
         branch_code: court.branch_code,
+        branch: court.branch,
+        station: court.station,
         court_type: court.court_type,
         location: court.location,
     });
@@ -62,6 +64,32 @@ export function EditCourt({ court }: { court: Court }) {
                             />
                             {errors.branch_code && (
                                 <p className="text-sm text-red-600 mt-1">{errors.branch_code}</p>
+                            )}
+                        </div>
+                        <div>
+                            <Label htmlFor="branch">Branch</Label>
+                            <Input
+                                id="branch"
+                                name="branch"
+                                value={data.branch}
+                                onChange={handleChange}
+                                required
+                            />
+                            {errors.branch && (
+                                <p className="text-sm text-red-600 mt-1">{errors.branch}</p>
+                            )}
+                        </div>
+                        <div>
+                            <Label htmlFor="station">Station</Label>
+                            <Input
+                                id="station"
+                                name="station"
+                                value={data.station}
+                                onChange={handleChange}
+                                required
+                            />
+                            {errors.station && (
+                                <p className="text-sm text-red-600 mt-1">{errors.station}</p>
                             )}
                         </div>
                         <div>

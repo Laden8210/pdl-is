@@ -45,14 +45,18 @@ interface ReportData {
 interface PageProps {
     reportData?: ReportData;
     filters?: {
-        as_of_date?: string;
+        start_date?: string;
+        end_date?: string;
     };
 }
 
 export default function InmatesStatusReport({ reportData, filters }: PageProps) {
     const { data, setData, post, processing } = useForm({
-        as_of_date: filters?.as_of_date || new Date().toISOString().split('T')[0],
+        start_date: filters?.start_date || new Date().toISOString().split('T')[0],
         export_pdf: false,
+        end_date: filters?.end_date || new Date().toISOString().split('T')[0],
+        prepared_by: '',
+        noted_by: '',
     });
 
     const handleGenerate = (exportPdf: boolean = false) => {
@@ -62,9 +66,12 @@ export default function InmatesStatusReport({ reportData, filters }: PageProps) 
 
     const handleExport = () => {
         const params = new URLSearchParams();
-        params.append('as_of_date', data.as_of_date);
-
+        params.append('start_date', data.start_date);
+        params.append('end_date', data.end_date);
+        params.append('prepared_by', data.prepared_by);
+        params.append('noted_by', data.noted_by);
         console.log(params.toString());
+
         console.log(route('reports.inmates-status.export') + '?' + params.toString());
         window.location.href = route('reports.inmates-status.export') + '?' + params.toString();
     };
@@ -85,7 +92,7 @@ export default function InmatesStatusReport({ reportData, filters }: PageProps) 
                     <div className="flex items-center space-x-2">
                         <Calendar className="h-5 w-5 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">
-                            {reportData ? `As of ${reportData.as_of_date}` : 'Select Date'}
+                            {reportData ? `From ${new Date(reportData.start_date).toLocaleDateString()} to ${new Date(reportData.end_date).toLocaleDateString()}` : 'Select Date'}
                         </span>
                     </div>
                 </div>
@@ -101,12 +108,39 @@ export default function InmatesStatusReport({ reportData, filters }: PageProps) 
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="as_of_date">As of Date</Label>
+                                <Label htmlFor="start_date">Start Date</Label>
                                 <Input
-                                    id="as_of_date"
+                                    id="start_date"
                                     type="date"
-                                    value={data.as_of_date}
-                                    onChange={(e) => setData('as_of_date', e.target.value)}
+                                    value={data.start_date}
+                                    onChange={(e) => setData('start_date', e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="end_date">End Date</Label>
+                                <Input
+                                    id="end_date"
+                                    type="date"
+                                    value={data.end_date}
+                                    onChange={(e) => setData('end_date', e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="prepared_by">Prepared By</Label>
+                                <Input
+                                    id="prepared_by"
+                                    value={data.prepared_by}
+                                    onChange={(e) => setData('prepared_by', e.target.value)}
+                                    placeholder="e.g., PEMS Edwin P. Arroyo"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="noted_by">Noted By</Label>
+                                <Input
+                                    id="noted_by"
+                                    value={data.noted_by}
+                                    onChange={(e) => setData('noted_by', e.target.value)}
+                                    placeholder="e.g., PEMS Edwin P. Arroyo"
                                 />
                             </div>
 
@@ -312,10 +346,12 @@ export default function InmatesStatusReport({ reportData, filters }: PageProps) 
                             <CardContent className="p-6">
                                 <div className="flex justify-between">
                                     <div className="text-center">
+                                        <p className="text-sm font-medium">{data.prepared_by}</p>
                                         <div className="border-b border-gray-300 w-48 mb-2"></div>
                                         <p className="text-sm font-medium">Prepared by:</p>
                                     </div>
                                     <div className="text-center">
+                                        <p className="text-sm font-medium">{data.prepared_by}</p>
                                         <div className="border-b border-gray-300 w-48 mb-2"></div>
                                         <p className="text-sm font-medium">Noted by:</p>
                                     </div>

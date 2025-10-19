@@ -26,11 +26,14 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SearchResultsController;
 use App\Http\Controllers\CourtController;
 use App\Http\Controllers\AgencyController;
+use App\Http\Controllers\RequestLogController;
 
 Route::get('/', [AuthController::class, 'index'])->name('home');
 
 // Admin Routes - Protected by auth and admin middleware
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+
+    Route::get('/request-logs', [RequestLogController::class, 'index'])->name('request-logs.index');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management.index');

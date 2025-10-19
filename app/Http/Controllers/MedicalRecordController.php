@@ -32,6 +32,12 @@ class MedicalRecordController extends Controller
                         });
                 });
             })
+            ->whereHas('pdl', function ($pdlQuery) {
+                $pdlQuery->whereNull('archive_status')
+                ->whereDoesntHave('verifications', function ($verificationQuery) {
+                    $verificationQuery->where('status', 'approved');
+                });
+            })
             ->latest()
             ->get();
 

@@ -70,6 +70,7 @@ export interface Cells {
     capacity: number;
     gender: 'male' | 'female';
     description?: string | null;
+    cell_type?: string | null;
     status: string;
     created_at?: string;
     updated_at?: string;
@@ -153,6 +154,7 @@ export interface PhysicalCharacteristic {
     pdl?: {
         fname: string;
         lname: string;
+        agency: string;
         id: number;
     };
 }
@@ -177,10 +179,55 @@ export interface Agency {
 export interface Court {
     court_id: number;
     branch_code: string;
+    branch: string;
+    station: string;
     court_type: string;
     location: string;
     created_at: string;
     updated_at: string;
     added_by: string;
     added_at: string;
+}
+
+
+export interface RequestLog {
+    id: number;
+    method: string;
+    url: string;
+    status_code: number;
+    request_headers: any;
+    request_body: any;
+    response_headers: any;
+    response_body: any;
+    success_message: string | null;
+    error_message: string | null;
+    ip_address: string;
+    user_agent: string;
+    user_id: number | null;
+    user_name: string | null;
+    user_email?: string | null;
+    duration: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface RequestLogsPageProps {
+    request_logs: {
+        data: RequestLog[];
+        links: any[];
+        from: number;
+        to: number;
+        total: number;
+    };
+    filters: {
+        search?: string;
+        method?: string;
+        status?: string;
+        user_id?: string;
+    };
+}
+
+export interface RequestLogsTableProps {
+    logs: RequestLogsPageProps['request_logs'];
+    filters: RequestLogsPageProps['filters'];
 }

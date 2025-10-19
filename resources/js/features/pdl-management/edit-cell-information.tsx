@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { FormEventHandler } from 'react';
 import { usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
+import { Textarea } from '@/components/ui/textarea';
 type Props = {
     cell: {
         cell_id: number;
@@ -29,6 +30,7 @@ type Props = {
         gender: 'male' | 'female';
         description: string;
         status: string;
+        cell_type?: string;
     };
 };
 
@@ -40,6 +42,7 @@ export function UpdateCellInformation({ cell }: Props) {
         gender: cell.gender,
         description: cell.description ?? '',
         status: cell.status,
+        cell_type: cell.cell_type ?? 'isolation',
     });
 
     const { props } = usePage<PageProps>();
@@ -145,9 +148,9 @@ export function UpdateCellInformation({ cell }: Props) {
                             <Label htmlFor="description">Description</Label>
 
                             {/* isolation, female, male, trustee, kitchen boys */}
-                            <Select value={data.description} onValueChange={(value) => setData('description', value)}>
+                            <Select value={data.cell_type} onValueChange={(value) => setData('cell_type', value)}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select description" />
+                                    <SelectValue placeholder="Select cell type" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="isolation">Isolation</SelectItem>
@@ -157,6 +160,11 @@ export function UpdateCellInformation({ cell }: Props) {
                                     <SelectItem value="kitchen boys">Kitchen Boys</SelectItem>
                                 </SelectContent>
                             </Select>
+                        </div>
+                        <div className="md:col-span-2">
+                            <Label htmlFor="description">Description</Label>
+                            <Textarea id="description" name="description" value={data.description} onChange={(e) => setData('description', e.target.value)} rows={3}
+                            placeholder="Enter description" />
                         </div>
                     </div>
 

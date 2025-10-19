@@ -62,7 +62,7 @@ class SearchController extends Controller
             ]);
         }
 
-    
+
 
         if($query == 'court order') {
             $results = CourtOrder::with('pdl')
@@ -179,7 +179,13 @@ class SearchController extends Controller
             ->where(function ($q) use ($searchTerm) {
                 $q->where('court_order_id', 'LIKE', $searchTerm)
                 ->orWhere('order_type', 'LIKE', $searchTerm)
-                  ->orWhere('court_branch', 'LIKE', $searchTerm)
+                ->orWhereHas('court_branch', function ($courtBranchQuery) use ($searchTerm) {
+                    $courtBranchQuery->where('branch_code', 'LIKE', $searchTerm)
+                    ->orWhere('branch', 'LIKE', $searchTerm)
+                    ->orWhere('station', 'LIKE', $searchTerm)
+                    ->orWhere('court_type', 'LIKE', $searchTerm)
+                    ->orWhere('location', 'LIKE', $searchTerm);
+                })
                   ->orWhere('remarks', 'LIKE', $searchTerm)
                   ->orWhereHas('pdl', function ($pdlQuery) use ($searchTerm) {
                       $pdlQuery->where('fname', 'LIKE', $searchTerm)

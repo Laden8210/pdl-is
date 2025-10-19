@@ -33,6 +33,12 @@ class CaseInformationController extends Controller
                         });
                 });
             })
+            ->whereHas('pdl', function ($pdlQuery) {
+                $pdlQuery->whereNull('archive_status')
+                ->whereDoesntHave('verifications', function ($verificationQuery) {
+                    $verificationQuery->where('status', 'approved');
+                });
+            })
             ->latest()
             ->get();
 
@@ -109,7 +115,7 @@ class CaseInformationController extends Controller
 
 
         $request->validate([
-            'case_status' => 'required|in:open,pending,convicted,deceased,dismissed,on_trial,arraignment',
+            'case_status' => 'required|in:bonded,transferred,served,dismissed,pending,convicted,deceased,on_trial',
         ]);
 
         $case = CaseInformation::findOrFail($caseId);
