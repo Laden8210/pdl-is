@@ -301,7 +301,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pdl-management/custody/{pdl}', [App\Http\Controllers\CustodyController::class, 'update'])->name('admin.custody.update');
     // Search Results Pages
     Route::get('/search/results', [SearchResultsController::class, 'show'])->name('search.results');
-    Route::put('/pdl-management/personal-information/{pdl_id}', [PDLManagementController::class, 'update_personal_information'])->name('pdl-management.personal-information.update');
+    Route::post('/pdl-management/personal-information/{pdl_id}', [PDLManagementController::class, 'update_personal_information'])->name('pdl-management.personal-information.update');
     Route::post('/pdl/{pdl}/archive', [App\Http\Controllers\PdlArchiveController::class, 'archive'])->name('pdl.archive');
     Route::post('/pdl/{pdl}/unarchive', [App\Http\Controllers\PdlArchiveController::class, 'unarchive'])->name('pdl.unarchive');
     Route::post('/pdl/{pdl}/custody-dates', [App\Http\Controllers\PdlArchiveController::class, 'updateCustodyDates'])->name('pdl.custody-dates');
