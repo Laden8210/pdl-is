@@ -9,8 +9,11 @@ import { Eye } from 'lucide-react';
 
 import { AddCaseInformation } from './add-case-information';
 import { CustodyManagement } from '../custody/custody-management';
+import { usePage } from '@inertiajs/react';
 
 export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
+    const auth = usePage().props.auth;
+
     const handleDownload = () => {
         const params = new URLSearchParams();
         params.append('pdl_id', pdl.id.toString());
@@ -36,7 +39,10 @@ export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
 
                             <h3 className="text-lg font-medium">Basic Information</h3>
                             <div className='flex items-center gap-2'>
-                                <CustodyManagement pdl={pdl} />
+
+                                {auth?.user?.position !== 'law-enforcement' && (
+                                    <CustodyManagement pdl={pdl} />
+                                )}
                                 <Button variant="outline" onClick={handleDownload}>Download PDL Information</Button>
                             </div>
 
