@@ -358,6 +358,8 @@ Route::get('storage/court_documents/{filename}', function ($filename) {
     if (!file_exists($path)) {
         abort(404);
     }
+
+    return response()->file($path);
 });
 
 Route::get('storage/mugshots/{filename}', function ($filename) {
@@ -366,6 +368,19 @@ Route::get('storage/mugshots/{filename}', function ($filename) {
     if (!file_exists($path)) {
         abort(404);
     }
+
+    return response()->file($path);
+});
+
+
+Route::get('storage/medical_documents/{filename}', function ($filename) {
+    $path = storage_path('app/public/medical_documents/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
 });
 
 require __DIR__ . '/auth.php';

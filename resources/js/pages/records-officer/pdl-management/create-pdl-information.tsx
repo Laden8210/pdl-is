@@ -4,7 +4,7 @@ import { Head } from '@inertiajs/react';
 
 import { useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -548,11 +548,31 @@ export default function CreatePDLInformation() {
     };
 
     const handleCourtOrderChange = (index: number, field: string, value: string | File | null) => {
+        // Prevent accidental empty strings
+        if (field === 'court_id' && value === '') {
+            console.log('Prevented empty court_id');
+            return;
+        }
+
         const newCourtOrders = [...data.court_orders];
         newCourtOrders[index] = { ...newCourtOrders[index], [field]: value };
         setData('court_orders', newCourtOrders);
+        console.log('Court order updated:', newCourtOrders[index]);
     };
 
+    const restoreCourtOrderIfEmpty = (index: number) => {
+        if (!data.court_orders[index]?.court_id && dataRef.current?.court_orders[index]?.court_id) {
+            // Restore from ref if current data lost the value
+            setData('court_orders', dataRef.current.court_orders);
+            console.log('Restored court order data from backup');
+        }
+    };
+
+    useEffect(() => {
+        if (activeCourtOrderIndex !== undefined) {
+            restoreCourtOrderIfEmpty(activeCourtOrderIndex);
+        }
+    }, [activeCourtOrderIndex]);
     const handleAddNewMedicalRecord = () => {
         setData('medical_records', [
             ...data.medical_records,
@@ -589,11 +609,30 @@ export default function CreatePDLInformation() {
     };
 
     const handleCaseChange = (index: number, field: string, value: string | boolean) => {
+        // Prevent resetting certain fields to empty
+        if ((field === 'case_status' || field === 'crime_committed') && value === '') {
+            console.log(`Prevented empty ${field}`);
+            return;
+        }
+
         const newCases = [...data.cases];
         newCases[index] = { ...newCases[index], [field]: value };
         setData('cases', newCases);
     };
-
+    const restoreCaseIfEmpty = (index: number) => {
+        if (!data.cases[index]?.case_status && dataRef.current?.cases[index]?.case_status) {
+            // Restore entire case from ref if current data lost values
+            const newCases = [...data.cases];
+            newCases[index] = dataRef.current.cases[index];
+            setData('cases', newCases);
+            console.log('Restored case data from backup');
+        }
+    };
+    useEffect(() => {
+        if (activeCaseIndex !== undefined) {
+            restoreCaseIfEmpty(activeCaseIndex);
+        }
+    }, [activeCaseIndex]);
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
@@ -778,7 +817,10 @@ export default function CreatePDLInformation() {
         ],
         mugshot: null,
     });
-
+    const dataRef = useRef(data);
+    useEffect(() => {
+        dataRef.current = data;
+    }, [data]);
     const { props } = usePage();
     const { auth } = props;
     const { courts } = props;
@@ -1438,7 +1480,7 @@ export default function CreatePDLInformation() {
                                                 <SelectContent>
                                                     {(courts as any[]).map((court: any) => (
                                                         <SelectItem key={court.court_id} value={court.court_id.toString()}>
-                                                            {court.branch_code}
+                                                            {court.branch_code} - {court.branch_name || court.branch_code}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -1557,8 +1599,8 @@ export default function CreatePDLInformation() {
                                                         <CommandList>
                                                             <CommandEmpty>
                                                                 <div className="p-2 text-sm text-muted-foreground">
-                                                                    No crime found. Press Enter to add "{data.cases[activeCaseIndex]?.crime_committed || ''}"
-                                                                    as custom crime.
+                                                                    No crime found. Press Enter to add "
+                                                                    {data.cases[activeCaseIndex]?.crime_committed || ''}" as custom crime.
                                                                 </div>
                                                             </CommandEmpty>
                                                             {criminalCaseTypes.map((category) => (
@@ -1687,7 +1729,6 @@ export default function CreatePDLInformation() {
                                         <Textarea
                                             id="case_remarks"
                                             value={data.cases[activeCaseIndex]?.case_remarks || ''}
-
                                             onChange={(e) => handleCaseChange(activeCaseIndex, 'case_remarks', e.target.value)}
                                             rows={3}
                                             placeholder="Enter case-related remarks..."
