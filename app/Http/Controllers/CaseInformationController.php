@@ -16,6 +16,7 @@ class CaseInformationController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search', '');
+        $agency = Auth::user()->agency;
 
         $cases = CaseInformation::with('pdl:id,fname,lname')
             ->when($search, function ($query, $search) {
@@ -33,11 +34,15 @@ class CaseInformationController extends Controller
                         });
                 });
             })
-            ->whereHas('pdl', function ($pdlQuery) {
+            ->whereHas('pdl', function ($pdlQuery) use ($agency) {
                 $pdlQuery->whereNull('archive_status')
+                ->whereHas('personnel', function ($personnelQuery) use ($agency) {
+                    $personnelQuery->where('agency', $agency);
+                })
                 ->whereDoesntHave('verifications', function ($verificationQuery) {
                     $verificationQuery->where('status', 'approved');
                 });
+
             })
             ->latest()
             ->get();
