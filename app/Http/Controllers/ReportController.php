@@ -12,6 +12,7 @@ use App\Models\Verifications;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Court;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ReportController extends Controller
 {
@@ -2261,48 +2262,118 @@ class ReportController extends Controller
             return redirect()->back()->with('error', 'PDL not found.');
         }
 
-        $fileName = 'pdl-information_' . $pdl->id . '.pdf';
+        $fileName = 'pdl-information_' . $pdl->id . '_' . now()->format('Y-m-d') . '.pdf';
 
-        $imageBase64 = null;
+        // Use Storage facade for better compatibility
+        $imageBase64 = $this->getPdlMugshotBase64($pdl);
 
-        if ($pdl->mugshot_path && file_exists(public_path('storage/' . $pdl->mugshot_path))) {
-            try {
-                $imagePath = public_path('storage/' . $pdl->mugshot_path);
-                $imageData = file_get_contents($imagePath);
-                $imageBase64 = base64_encode($imageData);
-            } catch (\Exception $e) {
-                Log::error('Failed to load mugshot image for PDL ' . $pdl->id . ': ' . $e->getMessage());
-                // Continue without image - don't break the entire report
-            }
-        } else {
-            Log::warning('Mugshot path not found or invalid for PDL ' . $pdl->id . ': ' . $pdl->mugshot_path);
-        }
-
-        if (!$imageBase64) {
-            try {
-                $placeholderPath = public_path('images/default-avatar.jpg');
-                if (file_exists($placeholderPath)) {
-                    $imageData = file_get_contents($placeholderPath);
-                    $imageBase64 = base64_encode($imageData);
-                }
-            } catch (\Exception $e) {
-                // If placeholder also fails, continue without any image
-                Log::error('Failed to load placeholder image: ' . $e->getMessage());
-            }
-        }
         $html = view('reports.pdl-information', [
             'pdl' => $pdl,
-            'image' => $imageBase64
+            'image' => $imageBase64,
+            'hasImage' => !is_null($imageBase64)
         ])->render();
 
-        $dompdf = new \Dompdf\Dompdf();
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->loadHtml($html);
-        $dompdf->render();
+        return $this->generatePDF($html, $fileName);
+    }
 
-        return response($dompdf->output(), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
-        ]);
+    private function getPdlMugshotBase64(Pdl $pdl): ?string
+    {
+        if (!$pdl->mugshot_path) {
+            Log::warning('No mugshot path for PDL ' . $pdl->id);
+            return $this->getDefaultAvatarBase64();
+        }
+
+        try {
+            // Try using Storage facade first
+            if (Storage::disk('public')->exists($pdl->mugshot_path)) {
+                $imageData = Storage::disk('public')->get($pdl->mugshot_path);
+                return base64_encode($imageData);
+            }
+
+            // Fallback to direct path
+            $publicPath = public_path('storage/' . $pdl->mugshot_path);
+            if (file_exists($publicPath)) {
+                $imageData = file_get_contents($publicPath);
+                return base64_encode($imageData);
+            }
+
+            Log::warning('Mugshot not found for PDL ' . $pdl->id . ' at path: ' . $pdl->mugshot_path);
+            return $this->getDefaultAvatarBase64();
+
+        } catch (\Exception $e) {
+            Log::error('Error loading mugshot for PDL ' . $pdl->id . ': ' . $e->getMessage());
+            return $this->getDefaultAvatarBase64();
+        }
+    }
+
+    private function getDefaultAvatarBase64(): ?string
+    {
+        try {
+            $placeholderPaths = [
+                public_path('images/default-avatar.jpg'),
+                public_path('images/default-avatar.png'),
+                public_path('default-avatar.jpg'),
+                base_path('public/images/default-avatar.jpg'),
+            ];
+
+            foreach ($placeholderPaths as $path) {
+                if (file_exists($path)) {
+                    $imageData = file_get_contents($path);
+                    return base64_encode($imageData);
+                }
+            }
+
+            // Create a simple placeholder image programmatically
+            return $this->createSimplePlaceholder();
+
+        } catch (\Exception $e) {
+            Log::error('Failed to load placeholder image: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    private function createSimplePlaceholder(): string
+    {
+        // Create a simple 1x1 transparent pixel as fallback
+        $transparentPixel = base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+        return base64_encode($transparentPixel);
+    }
+
+    private function generatePDF(string $html, string $fileName)
+    {
+        try {
+            $dompdf = new \Dompdf\Dompdf();
+
+            // Enhanced PDF configuration for server compatibility
+            $options = new \Dompdf\Options();
+            $options->set([
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => true,
+                'isPhpEnabled' => true,
+                'defaultFont' => 'DejaVu Sans', // Better font compatibility
+                'tempDir' => storage_path('temp'), // Ensure temp directory exists
+                'fontDir' => storage_path('fonts'),
+                'fontCache' => storage_path('fonts'),
+                'logOutputFile' => storage_path('logs/dompdf.html'),
+                'defaultMediaType' => 'print',
+                'defaultPaperSize' => 'A4',
+                'defaultPaperOrientation' => 'portrait',
+            ]);
+
+            $dompdf->setOptions($options);
+            $dompdf->setPaper('A4', 'portrait');
+
+            $dompdf->loadHtml($html, 'UTF-8');
+            $dompdf->render();
+
+            return response($dompdf->output(), 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('PDF generation failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to generate PDF report. Please try again.');
+        }
     }
 }
