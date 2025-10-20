@@ -172,6 +172,8 @@ class PDLManagementController extends Controller
         $search = $request->input('search');
         $perPage = $request->input('perPage', 10);
 
+        $agency = Auth::user()->agency;
+
         $pdls = Pdl::select('id', 'fname', 'lname', 'birthdate')->get();
 
         $orders = CourtOrder::with('pdl:id,fname,lname', 'court:court_id,branch_code,branch,station,court_type,location')
@@ -198,6 +200,11 @@ class PDLManagementController extends Controller
                     ->whereDoesntHave('verifications', function ($verificationQuery) {
                         $verificationQuery->where('status', 'approved');
                     });
+            })
+            ->whereHas('pdl', function ($pdlQuery) use ($agency) {
+                $pdlQuery->whereHas('personnel', function ($personnelQuery) use ($agency) {
+                    $personnelQuery->where('agency', $agency);
+                });
             })
             ->orderBy('order_type', 'asc')
             ->latest()
