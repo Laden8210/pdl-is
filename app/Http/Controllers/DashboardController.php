@@ -559,8 +559,10 @@ class DashboardController extends Controller
                 $query->where('agency', $agency);
             });
         })
-        ->whereDoesntHave('verifications', function ($q) {
-            $q->where('status', 'approved');
+        ->whereHas('pdl', function ($query) use ($agency) {
+            $query->whereDoesntHave('verifications', function ($q) {
+                $q->where('status', 'approved');
+            });
         })
         ->count();
         $totalCourtOrders = CourtOrder::whereHas('pdl', function ($query) use ($agency) {
@@ -568,8 +570,10 @@ class DashboardController extends Controller
                 $query->where('agency', $agency);
             });
         })
-        ->whereDoesntHave('verifications', function ($q) {
-            $q->where('status', 'approved');
+        ->whereHas('pdl', function ($query) use ($agency) {
+            $query->whereDoesntHave('verifications', function ($q) {
+                $q->where('status', 'approved');
+            });
         })
         ->count();
         $highSecurityPDL = CaseInformation::where('security_classification', 'Maximum')
