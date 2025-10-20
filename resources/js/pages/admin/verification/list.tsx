@@ -35,6 +35,8 @@ export default function VerificationList() {
     userRole: string;
   };
 
+  console.log(verifications);
+
   const [searchInput, setSearchInput] = useState(filters.search || '');
 
   const refetchVerifications = () => {

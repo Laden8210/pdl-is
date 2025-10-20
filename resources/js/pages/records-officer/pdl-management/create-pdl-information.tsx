@@ -715,6 +715,7 @@ export default function CreatePDLInformation() {
         lname: string;
         mname: string;
         alias: string;
+        suffix: string;
         birthdate: string;
         age: string;
         gender: string;
@@ -765,6 +766,7 @@ export default function CreatePDLInformation() {
         lname: '',
         mname: '',
         alias: '',
+        suffix: '',
         birthdate: '',
         age: '',
         gender: '',
@@ -951,6 +953,15 @@ export default function CreatePDLInformation() {
                                     </Label>
                                     <Input id="alias" name="alias" value={data.alias} onChange={handleChange} placeholder="Enter alias (if any)" />
                                 </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="suffix">
+                                        Suffix
+
+                                    </Label>
+                                    <Input id="suffix" name="suffix" value={data.suffix} onChange={handleChange} placeholder="Enter suffix (if any)" />
+                                </div>
+
                                 <div className="space-y-2">
                                     <Label>
                                         Date of Birth <span className="text-red-500">*</span>
@@ -1666,12 +1677,15 @@ export default function CreatePDLInformation() {
                                                     <SelectValue placeholder="Select status" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="on_trial">On Trial</SelectItem>
-                                                    <SelectItem value="bonded">Bonded</SelectItem>
-                                                    <SelectItem value="transferred_to_another_jail">Transferred to another jail</SelectItem>
-                                                    <SelectItem value="served_sentence">Served Sentence</SelectItem>
-                                                    <SelectItem value="convicted">Convicted</SelectItem>
 
+
+
+                                                    <SelectItem value="on_trial">On Trial</SelectItem>
+                                                    <SelectItem value="convicted">Convicted</SelectItem>
+                                                    <SelectItem value="deceased">Deceased</SelectItem>
+                                                    <SelectItem value="bonded">Bonded</SelectItem>
+                                                    <SelectItem value="transferred">Transferred</SelectItem>
+                                                    <SelectItem value="served_sentence">Served Sentence</SelectItem>
                                                     <SelectItem value="dismissed">Dismissed</SelectItem>
 
                                                     {(auth as any)?.user?.position === 'law-enforcement' && (

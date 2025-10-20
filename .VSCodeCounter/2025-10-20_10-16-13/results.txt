@@ -1,0 +1,611 @@
+Date : 2025-10-20 10:16:13
+Directory : c:\xampp\htdocs\pdl-is
+Total : 480 files,  69100 codes, 3020 comments, 5592 blanks, all 77712 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| TypeScript JSX     |        171 |     30,778 |        740 |      2,473 |     33,991 |
+| JSON               |          7 |     21,700 |          0 |          6 |     21,706 |
+| PHP                |        178 |     14,763 |      1,821 |      2,827 |     19,411 |
+| MS SQL             |          1 |        609 |          0 |          3 |        612 |
+| TypeScript         |          8 |        470 |         20 |         62 |        552 |
+| JavaScript         |        105 |        458 |        332 |        134 |        924 |
+| CSS                |          2 |        155 |         14 |         46 |        215 |
+| YAML               |          2 |         70 |          5 |         22 |         97 |
+| XML                |          3 |         52 |          0 |          3 |         55 |
+| JSON with Comments |          1 |         26 |         88 |          9 |        123 |
+| Markdown           |          1 |         16 |          0 |          6 |         22 |
+| Ignore             |          1 |          3 |          0 |          1 |          4 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                                     | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                        |        480 |     69,100 |      3,020 |      5,592 |     77,712 |
+| . (Files)                                                                                                                |         12 |     20,051 |         95 |         30 |     20,176 |
+| .github                                                                                                                  |          2 |         70 |          5 |         22 |         97 |
+| .github\workflows                                                                                                        |          2 |         70 |          5 |         22 |         97 |
+| app                                                                                                                      |         79 |      9,169 |        830 |      1,670 |     11,669 |
+| app\Console                                                                                                              |          3 |        107 |         46 |         36 |        189 |
+| app\Console\Commands                                                                                                     |          3 |        107 |         46 |         36 |        189 |
+| app\Http                                                                                                                 |         51 |      7,421 |        559 |      1,272 |      9,252 |
+| app\Http\Controllers                                                                                                     |         31 |      6,324 |        348 |      1,039 |      7,711 |
+| app\Http\Controllers (Files)                                                                                             |         21 |      5,122 |        312 |        798 |      6,232 |
+| app\Http\Controllers\Admin                                                                                               |          4 |        314 |          5 |         71 |        390 |
+| app\Http\Controllers\Auth                                                                                                |          1 |         64 |          0 |         21 |         85 |
+| app\Http\Controllers\LawEnforcement                                                                                      |          1 |         11 |          0 |          6 |         17 |
+| app\Http\Controllers\RecordOfficer                                                                                       |          4 |        813 |         31 |        143 |        987 |
+| app\Http\Middleware                                                                                                      |          9 |        535 |        122 |        115 |        772 |
+| app\Http\Requests                                                                                                        |         11 |        562 |         89 |        118 |        769 |
+| app\Http\Requests (Files)                                                                                                |          5 |        272 |         18 |         53 |        343 |
+| app\Http\Requests\Auth                                                                                                   |          1 |         72 |         31 |         21 |        124 |
+| app\Http\Requests\PDL                                                                                                    |          2 |         79 |          8 |         22 |        109 |
+| app\Http\Requests\Profile                                                                                                |          2 |        116 |         27 |         17 |        160 |
+| app\Http\Requests\Settings                                                                                               |          1 |         23 |          5 |          5 |         33 |
+| app\Jobs                                                                                                                 |          1 |         19 |          0 |          6 |         25 |
+| app\Models                                                                                                               |         21 |      1,025 |        100 |        257 |      1,382 |
+| app\Providers                                                                                                            |          1 |         19 |          6 |          7 |         32 |
+| app\Services                                                                                                             |          2 |        578 |        119 |         92 |        789 |
+| bootstrap                                                                                                                |          2 |         41 |          2 |          8 |         51 |
+| config                                                                                                                   |         11 |        502 |        579 |        203 |      1,284 |
+| database                                                                                                                 |         56 |      2,124 |        357 |        289 |      2,770 |
+| database\factories                                                                                                       |          1 |         25 |         14 |          6 |         45 |
+| database\migrations                                                                                                      |         52 |      1,419 |        336 |        267 |      2,022 |
+| database\schema                                                                                                          |          1 |        609 |          0 |          3 |        612 |
+| database\seeders                                                                                                         |          2 |         71 |          7 |         13 |         91 |
+| public                                                                                                                   |        109 |      2,239 |        329 |        139 |      2,707 |
+| public (Files)                                                                                                           |          3 |         29 |          4 |          9 |         42 |
+| public\build                                                                                                             |        105 |      2,194 |        325 |        124 |      2,643 |
+| public\build (Files)                                                                                                     |          1 |      1,816 |          0 |          0 |      1,816 |
+| public\build\assets                                                                                                      |        104 |        378 |        325 |        124 |        827 |
+| public\images                                                                                                            |          1 |         16 |          0 |          6 |         22 |
+| resources                                                                                                                |        193 |     34,312 |        775 |      3,001 |     38,088 |
+| resources\css                                                                                                            |          1 |        154 |         14 |         45 |        213 |
+| resources\js                                                                                                             |        178 |     31,224 |        760 |      2,533 |     34,517 |
+| resources\js (Files)                                                                                                     |          2 |         40 |          5 |         10 |         55 |
+| resources\js\components                                                                                                  |         59 |      4,974 |         46 |        502 |      5,522 |
+| resources\js\components (Files)                                                                                          |         23 |      1,857 |         34 |        185 |      2,076 |
+| resources\js\components\ui                                                                                               |         36 |      3,117 |         12 |        317 |      3,446 |
+| resources\js\features                                                                                                    |         48 |      8,041 |        204 |        715 |      8,960 |
+| resources\js\features (Files)                                                                                            |          4 |        488 |          5 |         30 |        523 |
+| resources\js\features\court-hearing                                                                                      |          1 |        333 |          7 |         30 |        370 |
+| resources\js\features\custody                                                                                            |          1 |        199 |          6 |         23 |        228 |
+| resources\js\features\pdl-management                                                                                     |         31 |      4,836 |        151 |        439 |      5,426 |
+| resources\js\features\request-log                                                                                        |          2 |        507 |         15 |         45 |        567 |
+| resources\js\features\time-allowance                                                                                     |          2 |        523 |          4 |         45 |        572 |
+| resources\js\features\user-management                                                                                    |          6 |        778 |          5 |         83 |        866 |
+| resources\js\features\verification                                                                                       |          1 |        377 |         11 |         20 |        408 |
+| resources\js\hooks                                                                                                       |          5 |        285 |         21 |         66 |        372 |
+| resources\js\layouts                                                                                                     |          8 |        249 |          3 |         35 |        287 |
+| resources\js\layouts (Files)                                                                                             |          2 |         22 |          0 |          6 |         28 |
+| resources\js\layouts\app                                                                                                 |          2 |         60 |          2 |         10 |         72 |
+| resources\js\layouts\auth                                                                                                |          3 |        107 |          0 |         11 |        118 |
+| resources\js\layouts\settings                                                                                            |          1 |         60 |          1 |          8 |         69 |
+| resources\js\lib                                                                                                         |          2 |         19 |          0 |          4 |         23 |
+| resources\js\pages                                                                                                       |         51 |     17,400 |        479 |      1,177 |     19,056 |
+| resources\js\pages (Files)                                                                                               |          3 |      1,008 |         57 |         76 |      1,141 |
+| resources\js\pages\admin                                                                                                 |         21 |      4,869 |        105 |        387 |      5,361 |
+| resources\js\pages\admin\archive                                                                                         |          1 |      1,001 |         27 |         36 |      1,064 |
+| resources\js\pages\admin\court-hearing                                                                                   |          1 |         86 |          2 |         11 |         99 |
+| resources\js\pages\admin\pdl                                                                                             |          2 |        530 |         10 |         28 |        568 |
+| resources\js\pages\admin\profile-management                                                                              |          1 |        166 |          3 |         16 |        185 |
+| resources\js\pages\admin\report                                                                                          |          9 |      2,552 |         60 |        207 |      2,819 |
+| resources\js\pages\admin\request-logs                                                                                    |          1 |         34 |          1 |          6 |         41 |
+| resources\js\pages\admin\settings                                                                                        |          3 |        240 |          0 |         48 |        288 |
+| resources\js\pages\admin\time-allowance                                                                                  |          1 |        100 |          0 |          9 |        109 |
+| resources\js\pages\admin\user-management                                                                                 |          1 |         79 |          0 |         14 |         93 |
+| resources\js\pages\admin\verification                                                                                    |          1 |         81 |          2 |         12 |         95 |
+| resources\js\pages\certificates                                                                                          |          3 |        890 |         18 |         54 |        962 |
+| resources\js\pages\law-enforcement                                                                                       |          1 |        497 |         16 |         26 |        539 |
+| resources\js\pages\law-enforcement\dashboard                                                                             |          1 |        497 |         16 |         26 |        539 |
+| resources\js\pages\records-officer                                                                                       |         21 |      9,270 |        275 |        595 |     10,140 |
+| resources\js\pages\records-officer (Files)                                                                               |          1 |         89 |          0 |         15 |        104 |
+| resources\js\pages\records-officer\dashboard                                                                             |          1 |        528 |         15 |         27 |        570 |
+| resources\js\pages\records-officer\jail-events                                                                           |          1 |        473 |         12 |         47 |        532 |
+| resources\js\pages\records-officer\pdl-archives                                                                          |          1 |        113 |          8 |         16 |        137 |
+| resources\js\pages\records-officer\pdl-management                                                                        |         16 |      7,902 |        237 |        475 |      8,614 |
+| resources\js\pages\records-officer\profile-management                                                                    |          1 |        165 |          3 |         15 |        183 |
+| resources\js\pages\search                                                                                                |          2 |        866 |          8 |         39 |        913 |
+| resources\js\types                                                                                                       |          3 |        216 |          2 |         24 |        242 |
+| resources\views                                                                                                          |         14 |      2,934 |          1 |        423 |      3,358 |
+| resources\views (Files)                                                                                                  |          2 |         65 |          0 |         13 |         78 |
+| resources\views\reports                                                                                                  |         12 |      2,869 |          1 |        410 |      3,280 |
+| routes                                                                                                                   |          4 |        315 |         15 |        115 |        445 |
+| tests                                                                                                                    |         12 |        277 |         33 |        115 |        425 |
+| tests (Files)                                                                                                            |          2 |         15 |         33 |         11 |         59 |
+| tests\Feature                                                                                                            |          9 |        258 |          0 |        102 |        360 |
+| tests\Feature (Files)                                                                                                    |          2 |         15 |          0 |          8 |         23 |
+| tests\Feature\Auth                                                                                                       |          5 |        145 |          0 |         63 |        208 |
+| tests\Feature\Settings                                                                                                   |          2 |         98 |          0 |         31 |        129 |
+| tests\Unit                                                                                                               |          1 |          4 |          0 |          2 |          6 |
++--------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                                                                 | language           | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| c:\xampp\htdocs\pdl-is\.github\workflows\lint.yml                                                                        | YAML               |         31 |          5 |         10 |         46 |
+| c:\xampp\htdocs\pdl-is\.github\workflows\tests.yml                                                                       | YAML               |         39 |          0 |         12 |         51 |
+| c:\xampp\htdocs\pdl-is\.prettierignore                                                                                   | Ignore             |          3 |          0 |          1 |          4 |
+| c:\xampp\htdocs\pdl-is\.prettierrc                                                                                       | JSON               |         19 |          0 |          1 |         20 |
+| c:\xampp\htdocs\pdl-is\app\Console\Commands\CleanupLoginAttempts.php                                                     | PHP                |         17 |         13 |         10 |         40 |
+| c:\xampp\htdocs\pdl-is\app\Console\Commands\SendEventReminders.php                                                       | PHP                |         66 |         19 |         15 |        100 |
+| c:\xampp\htdocs\pdl-is\app\Console\Commands\SendPdlReminders.php                                                         | PHP                |         24 |         14 |         11 |         49 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\Admin\CourtHearingCalendarController.php                                     | PHP                |         64 |          4 |          9 |         77 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\Admin\ProfileManagementController.php                                        | PHP                |         38 |          0 |         16 |         54 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\Admin\UserManagementController.php                                           | PHP                |        116 |          0 |         31 |        147 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\Admin\VerificationController.php                                             | PHP                |         96 |          1 |         15 |        112 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\AgencyController.php                                                         | PHP                |         17 |          0 |         10 |         27 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\Auth\AuthController.php                                                      | PHP                |         64 |          0 |         21 |         85 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\CaseInformationController.php                                                | PHP                |        113 |          1 |         26 |        140 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\CellAssignmentController.php                                                 | PHP                |        220 |         12 |         49 |        281 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\CertificateController.php                                                    | PHP                |        176 |         37 |         39 |        252 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\Controller.php                                                               | PHP                |          5 |          1 |          3 |          9 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\CourtController.php                                                          | PHP                |         40 |          0 |          6 |         46 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\CustodyController.php                                                        | PHP                |        168 |         33 |         44 |        245 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\DashboardController.php                                                      | PHP                |        909 |         46 |         69 |      1,024 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\LawEnforcement\ProfileManagementController.php                               | PHP                |         11 |          0 |          6 |         17 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\MedicalDocumentController.php                                                | PHP                |          6 |          1 |          4 |         11 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\MedicalRecordController.php                                                  | PHP                |         97 |          0 |         17 |        114 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\NotificationController.php                                                   | PHP                |         17 |          1 |          7 |         25 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\PdlAlertController.php                                                       | PHP                |        144 |         30 |         30 |        204 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\PdlArchiveController.php                                                     | PHP                |        104 |         20 |         25 |        149 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\PhysicalCharacteristicController.php                                         | PHP                |        108 |          0 |         16 |        124 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\RecordOfficer\JailEventsController.php                                       | PHP                |        141 |          7 |         27 |        175 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\RecordOfficer\PDLArchiveController.php                                       | PHP                |         12 |          0 |          5 |         17 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\RecordOfficer\PDLManagementController.php                                    | PHP                |        621 |         24 |         97 |        742 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\RecordOfficer\ProfileManagementController.php                                | PHP                |         39 |          0 |         14 |         53 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\ReportController.php                                                         | PHP                |      1,985 |         96 |        326 |      2,407 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\RequestLogController.php                                                     | PHP                |         76 |          4 |         12 |         92 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\SearchController.php                                                         | PHP                |        324 |         12 |         32 |        368 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\SearchResultsController.php                                                  | PHP                |        307 |          9 |         35 |        351 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\SearchTestController.php                                                     | PHP                |         26 |          1 |          5 |         32 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\TimeAllowanceController.php                                                  | PHP                |        148 |          1 |         21 |        170 |
+| c:\xampp\htdocs\pdl-is\app\Http\Controllers\UserPDLArchiveController.php                                                 | PHP                |        132 |          7 |         22 |        161 |
+| c:\xampp\htdocs\pdl-is\app\Http\Middleware\Authenticate.php                                                              | PHP                |         22 |          7 |          6 |         35 |
+| c:\xampp\htdocs\pdl-is\app\Http\Middleware\EnsureUserIsAdmin.php                                                         | PHP                |         35 |         10 |          9 |         54 |
+| c:\xampp\htdocs\pdl-is\app\Http\Middleware\EnsureUserIsLawEnforcement.php                                                | PHP                |         35 |         10 |          9 |         54 |
+| c:\xampp\htdocs\pdl-is\app\Http\Middleware\EnsureUserIsRecordOfficer.php                                                 | PHP                |         35 |         10 |          9 |         54 |
+| c:\xampp\htdocs\pdl-is\app\Http\Middleware\HandleAppearance.php                                                          | PHP                |         14 |          5 |          5 |         24 |
+| c:\xampp\htdocs\pdl-is\app\Http\Middleware\HandleInertiaRequests.php                                                     | PHP                |         33 |         19 |          7 |         59 |
+| c:\xampp\htdocs\pdl-is\app\Http\Middleware\LogRequestsMiddleware.php                                                     | PHP                |         12 |          5 |          4 |         21 |
+| c:\xampp\htdocs\pdl-is\app\Http\Middleware\ShareNotifications.php                                                        | PHP                |        104 |         11 |         14 |        129 |
+| c:\xampp\htdocs\pdl-is\app\Http\Middleware\SystemLogRequestsMiddleware.php                                               | PHP                |        245 |         45 |         52 |        342 |
+| c:\xampp\htdocs\pdl-is\app\Http\Requests\Auth\LoginRequest.php                                                           | PHP                |         72 |         31 |         21 |        124 |
+| c:\xampp\htdocs\pdl-is\app\Http\Requests\CreateCellRequest.php                                                           | PHP                |         40 |          0 |         10 |         50 |
+| c:\xampp\htdocs\pdl-is\app\Http\Requests\CreatePDLOnePageRequest.php                                                     | PHP                |        140 |          9 |         24 |        173 |
+| c:\xampp\htdocs\pdl-is\app\Http\Requests\EditCellRequest.php                                                             | PHP                |         35 |          0 |          6 |         41 |
+| c:\xampp\htdocs\pdl-is\app\Http\Requests\PDL\CreatePdlRequest.php                                                        | PHP                |         52 |          0 |         16 |         68 |
+| c:\xampp\htdocs\pdl-is\app\Http\Requests\PDL\TransferRequest.php                                                         | PHP                |         27 |          8 |          6 |         41 |
+| c:\xampp\htdocs\pdl-is\app\Http\Requests\Profile\CreateUserRequest.php                                                   | PHP                |         55 |         14 |          7 |         76 |
+| c:\xampp\htdocs\pdl-is\app\Http\Requests\Profile\UpdateProfileRequest.php                                                | PHP                |         61 |         13 |         10 |         84 |
+| c:\xampp\htdocs\pdl-is\app\Http\Requests\Settings\ProfileUpdateRequest.php                                               | PHP                |         23 |          5 |          5 |         33 |
+| c:\xampp\htdocs\pdl-is\app\Http\Requests\StoreCellAssignmentRequest.php                                                  | PHP                |         15 |          9 |          5 |         29 |
+| c:\xampp\htdocs\pdl-is\app\Http\Requests\UpdateUserRequest.php                                                           | PHP                |         42 |          0 |          8 |         50 |
+| c:\xampp\htdocs\pdl-is\app\Jobs\LogRequestJob.php                                                                        | PHP                |         19 |          0 |          6 |         25 |
+| c:\xampp\htdocs\pdl-is\app\Models\Activity.php                                                                           | PHP                |         34 |          1 |         10 |         45 |
+| c:\xampp\htdocs\pdl-is\app\Models\Agency.php                                                                             | PHP                |         13 |          0 |          5 |         18 |
+| c:\xampp\htdocs\pdl-is\app\Models\CaseInformation.php                                                                    | PHP                |         28 |          0 |          8 |         36 |
+| c:\xampp\htdocs\pdl-is\app\Models\CellAssignment.php                                                                     | PHP                |         24 |          0 |          8 |         32 |
+| c:\xampp\htdocs\pdl-is\app\Models\CellTransferLog.php                                                                    | PHP                |         41 |          0 |         12 |         53 |
+| c:\xampp\htdocs\pdl-is\app\Models\Cells.php                                                                              | PHP                |         24 |          0 |          7 |         31 |
+| c:\xampp\htdocs\pdl-is\app\Models\Certificate.php                                                                        | PHP                |        144 |         54 |         31 |        229 |
+| c:\xampp\htdocs\pdl-is\app\Models\Court.php                                                                              | PHP                |         62 |          7 |         12 |         81 |
+| c:\xampp\htdocs\pdl-is\app\Models\CourtOrder.php                                                                         | PHP                |         41 |          0 |         11 |         52 |
+| c:\xampp\htdocs\pdl-is\app\Models\LoginAttempt.php                                                                       | PHP                |         85 |         21 |         25 |        131 |
+| c:\xampp\htdocs\pdl-is\app\Models\MedicalRecord.php                                                                      | PHP                |         28 |          0 |          8 |         36 |
+| c:\xampp\htdocs\pdl-is\app\Models\PasswordReset.php                                                                      | PHP                |         17 |          0 |          7 |         24 |
+| c:\xampp\htdocs\pdl-is\app\Models\Pdl.php                                                                                | PHP                |        158 |         13 |         34 |        205 |
+| c:\xampp\htdocs\pdl-is\app\Models\PdlAlert.php                                                                           | PHP                |         74 |          4 |         14 |         92 |
+| c:\xampp\htdocs\pdl-is\app\Models\Personnel.php                                                                          | PHP                |         73 |          0 |          9 |         82 |
+| c:\xampp\htdocs\pdl-is\app\Models\PhysicalCharacteristic.php                                                             | PHP                |         26 |          0 |          7 |         33 |
+| c:\xampp\htdocs\pdl-is\app\Models\RequestLog.php                                                                         | PHP                |         45 |          0 |         13 |         58 |
+| c:\xampp\htdocs\pdl-is\app\Models\SystemNotification.php                                                                 | PHP                |         33 |          0 |         12 |         45 |
+| c:\xampp\htdocs\pdl-is\app\Models\SystemNotificationReadBy.php                                                           | PHP                |         22 |          0 |          9 |         31 |
+| c:\xampp\htdocs\pdl-is\app\Models\TimeAllowance.php                                                                      | PHP                |         25 |          0 |          8 |         33 |
+| c:\xampp\htdocs\pdl-is\app\Models\Verifications.php                                                                      | PHP                |         28 |          0 |          7 |         35 |
+| c:\xampp\htdocs\pdl-is\app\Providers\AppServiceProvider.php                                                              | PHP                |         19 |          6 |          7 |         32 |
+| c:\xampp\htdocs\pdl-is\app\Services\CertificateService.php                                                               | PHP                |        170 |         44 |         40 |        254 |
+| c:\xampp\htdocs\pdl-is\app\Services\NotificationService.php                                                              | PHP                |        408 |         75 |         52 |        535 |
+| c:\xampp\htdocs\pdl-is\bootstrap\app.php                                                                                 | PHP                |         37 |          2 |          5 |         44 |
+| c:\xampp\htdocs\pdl-is\bootstrap\providers.php                                                                           | PHP                |          4 |          0 |          3 |          7 |
+| c:\xampp\htdocs\pdl-is\components.json                                                                                   | JSON               |         21 |          0 |          1 |         22 |
+| c:\xampp\htdocs\pdl-is\composer.json                                                                                     | JSON               |         87 |          0 |          1 |         88 |
+| c:\xampp\htdocs\pdl-is\composer.lock                                                                                     | JSON               |      9,527 |          0 |          1 |      9,528 |
+| c:\xampp\htdocs\pdl-is\config\app.php                                                                                    | PHP                |         22 |         82 |         23 |        127 |
+| c:\xampp\htdocs\pdl-is\config\auth.php                                                                                   | PHP                |         28 |         74 |         14 |        116 |
+| c:\xampp\htdocs\pdl-is\config\cache.php                                                                                  | PHP                |         57 |         34 |         18 |        109 |
+| c:\xampp\htdocs\pdl-is\config\database.php                                                                               | PHP                |        109 |         43 |         23 |        175 |
+| c:\xampp\htdocs\pdl-is\config\filesystems.php                                                                            | PHP                |         36 |         32 |         13 |         81 |
+| c:\xampp\htdocs\pdl-is\config\inertia.php                                                                                | PHP                |         21 |         23 |         12 |         56 |
+| c:\xampp\htdocs\pdl-is\config\logging.php                                                                                | PHP                |         79 |         33 |         21 |        133 |
+| c:\xampp\htdocs\pdl-is\config\mail.php                                                                                   | PHP                |         55 |         43 |         19 |        117 |
+| c:\xampp\htdocs\pdl-is\config\queue.php                                                                                  | PHP                |         52 |         44 |         17 |        113 |
+| c:\xampp\htdocs\pdl-is\config\services.php                                                                               | PHP                |         20 |         11 |          8 |         39 |
+| c:\xampp\htdocs\pdl-is\config\session.php                                                                                | PHP                |         23 |        160 |         35 |        218 |
+| c:\xampp\htdocs\pdl-is\database\factories\UserFactory.php                                                                | PHP                |         25 |         14 |          6 |         45 |
+| c:\xampp\htdocs\pdl-is\database\migrations\0001_01_01_000000_create_users_table.php                                      | PHP                |         24 |          6 |          5 |         35 |
+| c:\xampp\htdocs\pdl-is\database\migrations\0001_01_01_000001_create_cache_table.php                                      | PHP                |         25 |          6 |          5 |         36 |
+| c:\xampp\htdocs\pdl-is\database\migrations\0001_01_01_000002_create_jobs_table.php                                       | PHP                |         46 |          6 |          6 |         58 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_06_30_024800_personnel.php                                               | PHP                |         28 |          6 |          6 |         40 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_07_12_193317_create_personal_information_table.php                       | PHP                |         36 |          0 |          6 |         42 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_07_14_011931_add_user_status.php                                         | PHP                |         16 |          7 |          4 |         27 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_07_20_163428_add-cell-assignment.php                                     | PHP                |         30 |          7 |          7 |         44 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_07_20_182009_add-court-order.php                                         | PHP                |         27 |          7 |          4 |         38 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_07_20_205501_add-case-information.php                                    | PHP                |         56 |          7 |          8 |         71 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_08_11_155343_activity.php                                                | PHP                |         25 |          6 |          7 |         38 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_08_12_065404_add-verification.php                                        | PHP                |         32 |          3 |          5 |         40 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_08_15_145929_update-personnel.php                                        | PHP                |         18 |          6 |          4 |         28 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_08_15_154308_system-notification.php                                     | PHP                |         36 |          6 |          5 |         47 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_08_22_204000_time_allowances.php                                         | PHP                |         24 |          0 |          4 |         28 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_12_085038_add-forgot-password.php                                     | PHP                |         21 |          7 |          7 |         35 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_175912_add_notification_type_to_system_notifications_table.php     | PHP                |         20 |          6 |          4 |         30 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_183719_add_timestamps_to_system_notifications_read_by_table.php    | PHP                |         19 |          6 |          4 |         29 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_184015_add_gender_to_cells_table.php                               | PHP                |         19 |          6 |          4 |         29 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_184225_update_cells_gender_enum_to_male_female_only.php            | PHP                |         21 |          8 |          5 |         34 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_185315_create_pdl_alerts_table.php                                 | PHP                |         29 |          6 |          4 |         39 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_191732_add_drug_related_to_case_information_table.php              | PHP                |         19 |          6 |          4 |         29 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_192900_create_medical_documents_table.php                          | PHP                |         27 |          6 |          4 |         37 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_195725_add_document_path_to_court_orders_table.php                 | PHP                |         20 |          6 |          4 |         30 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_203245_create_login_attempts_table.php                             | PHP                |         24 |          7 |          5 |         36 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_204048_create_certificates_table.php                               | PHP                |         43 |          7 |          5 |         55 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_223030_add_archiving_fields_to_pdls_table.php                      | PHP                |         45 |          6 |          5 |         56 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_224304_add_court_order_fields_to_pdl_table.php                     | PHP                |         13 |         13 |          4 |         30 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_225139_move_archiving_fields_to_case_information_table.php         | PHP                |         75 |         10 |          8 |         93 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_16_225451_move_archiving_fields_to_court_orders_table.php             | PHP                |         73 |         10 |          8 |         91 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_19_181009_add_archive_fields_to_pdl_table.php                         | PHP                |         35 |          6 |          5 |         46 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_19_182031_add_court_order_fields_to_pdl_archive.php                   | PHP                |         35 |          6 |          5 |         46 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_19_194756_make_pdl_id_nullable_in_system_notifications_table.php      | PHP                |         17 |          8 |          4 |         29 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_20_000752_add_middlename.php                                          | PHP                |         19 |          6 |          4 |         29 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_21_163812_remove_court_order_laboratory_results.php                   | PHP                |         25 |          6 |          6 |         37 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_21_164451_update_court_orders_table_for_one_page_form.php             | PHP                |         28 |          9 |          6 |         43 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_21_164508_update_medical_records_table_for_one_page_form.php          | PHP                |         28 |          9 |          5 |         42 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_21_164526_update_physical_characteristics_table_for_one_page_form.php | PHP                |         30 |          8 |          5 |         43 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_21_170940_update_medical_record_and_remove_medical_record_tbl.php     | PHP                |         22 |          6 |          6 |         34 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_21_200659_remove_archive_case_number.php                              | PHP                |         13 |          8 |          4 |         25 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_21_200714_remove_archive_case_number.php                              | PHP                |         19 |          6 |          4 |         29 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_09_21_200724_remove_archive_case_number.php                              | PHP                |         13 |          8 |          4 |         25 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_10_09_151517_create_cell_transfer_logs_table.php                         | PHP                |         30 |          6 |          5 |         41 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_10_09_165010_add_pdl_ids_to_activity_table.php                           | PHP                |         24 |          8 |          6 |         38 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_10_14_012334_add_mugshot_to_pdl_table.php                                | PHP                |         20 |          6 |          4 |         30 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_10_17_184140_add_agency_table.php                                        | PHP                |         19 |          6 |          4 |         29 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_10_17_192704_add_court_table.php                                         | PHP                |         21 |          3 |          6 |         30 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_10_17_200511_update_court_order_table.php                                | PHP                |         13 |         10 |          5 |         28 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_10_17_230806_update_activity_table.php                                   | PHP                |         22 |          7 |          7 |         36 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_10_18_001054_update_change_divorce_to_anullment_table.php                | PHP                |         20 |          9 |          8 |         37 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_10_19_155121_create_request_logs_table.php                               | PHP                |         35 |          0 |          5 |         40 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_10_19_164339_update_cell.php                                             | PHP                |         19 |          6 |          4 |         29 |
+| c:\xampp\htdocs\pdl-is\database\migrations\2025_10_19_170515_update_court.php                                            | PHP                |         21 |          6 |          4 |         31 |
+| c:\xampp\htdocs\pdl-is\database\schema\mysql-schema.sql                                                                  | MS SQL             |        609 |          0 |          3 |        612 |
+| c:\xampp\htdocs\pdl-is\database\seeders\DatabaseSeeder.php                                                               | PHP                |         11 |          4 |          4 |         19 |
+| c:\xampp\htdocs\pdl-is\database\seeders\PersonnelSeeder.php                                                              | PHP                |         60 |          3 |          9 |         72 |
+| c:\xampp\htdocs\pdl-is\eslint.config.js                                                                                  | JavaScript         |         42 |          1 |          2 |         45 |
+| c:\xampp\htdocs\pdl-is\package-lock.json                                                                                 | JSON               |     10,143 |          0 |          1 |     10,144 |
+| c:\xampp\htdocs\pdl-is\package.json                                                                                      | JSON               |         87 |          0 |          1 |         88 |
+| c:\xampp\htdocs\pdl-is\phpunit.xml                                                                                       | XML                |         33 |          0 |          1 |         34 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\PieChart-BKSYQMwV.js                                                          | JavaScript         |         67 |         11 |          1 |         79 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\accordion-CI9yjvea.js                                                         | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\alert-H5bhuK7p.js                                                             | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\app-0i_fFd18.js                                                               | JavaScript         |         76 |         35 |         13 |        124 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\app-DhVVAe0s.css                                                              | CSS                |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\app-layout-DMq9_fqY.js                                                        | JavaScript         |         46 |         32 |          8 |         86 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\appearance-BNSZixrX.js                                                        | JavaScript         |          4 |         12 |          1 |         17 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\archive-B9Uombcr.js                                                           | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\archive-KkLxy3_l.js                                                           | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\archived-BGHQU89u.js                                                          | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\arrow-left-Bf-TA_WP.js                                                        | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\badge-DDEXAs5P.js                                                             | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\button-OH02krXJ.js                                                            | JavaScript         |          5 |         16 |          1 |         22 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\calendar-BX--AMhk.js                                                          | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\card-CY_EzAZa.js                                                              | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\case-information-ClPNQ3Bs.js                                                  | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\cell-activity-log-DYjqU8-O.js                                                 | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\cell-assignment-CD6Y6yK2.js                                                   | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\cell-management-DTA1l98O.js                                                   | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\certificate-of-detention-YgG1I2Cn.js                                          | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\checkbox-CWIJLNTr.js                                                          | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\command-C04kKPjx.js                                                           | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\court-list-DIy9cpDY.js                                                        | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\court-order-B1MdKM_N.js                                                       | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\create-BHYT9rG1.js                                                            | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\create-event-5xhP2mbc.js                                                      | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\create-pdl-information-BnvlZo87.js                                            | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\custody-management-C054GtZ8.js                                                | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\dashboard-CeMoNjFa.js                                                         | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\dashboard-D6LFiJQV.js                                                         | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\dashboard-Py903Y_-.js                                                         | JavaScript         |          3 |          8 |          1 |         12 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\data-table-CdXOgC0P.js                                                        | JavaScript         |          6 |         16 |          1 |         23 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\dateUtils-Iw3XMDmk.js                                                         | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\detail-jXiElUBF.js                                                            | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\download-DNe8aGal.js                                                          | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\dropdown-menu-3aHMrs_F.js                                                     | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\drug-clearing-certificate-BASoiXys.js                                         | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\drug-related-cases-monthly-CHu5kbJv.js                                        | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\edit-case-information-CfxVE24M.js                                             | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\edit-court-order-OqPJJkNx.js                                                  | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\edit-medical-record-DyCjCRJg.js                                               | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\edit-physical-characteristic-c8sQJvIJ.js                                      | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\eye-YhM80ZuI.js                                                               | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\eye-off-Ds1NgvJP.js                                                           | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\forgot-password-DMI4vcoN.js                                                   | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\format-B3rlCQGj.js                                                            | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\gcta-tastm-report-DajtQ5Q2.js                                                 | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\health-assessment-D-XTkDfT.js                                                 | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\image-pSNkJrkG.js                                                             | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\index-B_D8OfiT.js                                                             | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\index-BhBvCQmn.js                                                             | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\index-BuqPUp1W.js                                                             | JavaScript         |         22 |         15 |          1 |         38 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\index-C0U5jhjx.js                                                             | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\index-CpJ_UQcW.js                                                             | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\index-CuXwdDn1.js                                                             | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\index-D_lPPXtr.js                                                             | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\index-cUzlZSPW.js                                                             | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\inmates-status-CAlU7G8b.js                                                    | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\inmates-status-daily-D5QR8nn0.js                                              | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\input-Ck-TdrSf.js                                                             | JavaScript         |          3 |          8 |          1 |         12 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\input-error-CxlRydsG.js                                                       | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\jail-events-D0mdgVbk.js                                                       | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\label-CS0UIooq.js                                                             | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\layout-Srf2JIfJ.js                                                            | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\list-CZqNLXGI.js                                                              | JavaScript         |          3 |          8 |          1 |         12 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\list-DBV2ttjJ.js                                                              | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\list-DCR3LN4I.js                                                              | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\list-Dh2joUoj.js                                                              | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\list-of-pdl-reports-OGZvat9Y.js                                               | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\loader-circle-BL-pLoWm.js                                                     | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\lock-D0E-lloR.js                                                              | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\medical-records-zVsmPdzi.js                                                   | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\no-records-certificate-CYLhZ4Ih.js                                            | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\password-CORK0mcR.js                                                          | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\pdl-archives-Dl1Wx2o3.js                                                      | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\personal-information-DQwFUjlQ.js                                              | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\personal-information-admin-B5__GcrF.js                                        | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\physical-characteristics-CKbBTa4c.js                                          | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\plus-CW2GUMnA.js                                                              | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\population-report-BAT0d8M7.js                                                 | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\profie-Yqrxi9bi.js                                                            | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\profile-06zDjjIk.js                                                           | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\profile-management-77Dgwhm-.js                                                | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\radio-group-DEwBk1-o.js                                                       | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\results-CtOwn4aZ.js                                                           | JavaScript         |          3 |          8 |          1 |         12 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\scale-Bjeu-qsv.js                                                             | JavaScript         |          5 |         16 |          1 |         22 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\select-Cbe0A_wq.js                                                            | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\separator-BvKtsuET.js                                                         | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\shield-WprgJKiJ.js                                                            | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\show-CjrMYuO4.js                                                              | JavaScript         |          3 |          8 |          1 |         12 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\square-pen-tveyayPY.js                                                        | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\table-k_TbSi63.js                                                             | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\tabs-D8NqiNnX.js                                                              | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\textarea-Diy51N5h.js                                                          | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\transition-C5NAs8xx.js                                                        | JavaScript         |          5 |          0 |          1 |          6 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\trash-2-CA4fYNQR.js                                                           | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\trending-up-DGNvTdpQ.js                                                       | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\triangle-alert-_AUliq2N.js                                                    | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\update-pdl-information-4kz3-Le3.js                                            | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\usePSGCLocation-CQjEVx4Z.js                                                   | JavaScript         |          6 |          4 |          2 |         12 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\user-IpuL6Ol5.js                                                              | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\users-CJDzaCO4.js                                                             | JavaScript         |          8 |         28 |          1 |         37 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\view-pdl-information-CKWzbjKH.js                                              | JavaScript         |          2 |          4 |          1 |          7 |
+| c:\xampp\htdocs\pdl-is\public\build\assets\welcome-Cbpe7U6Z.js                                                           | JavaScript         |          1 |          0 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\public\build\manifest.json                                                                        | JSON               |      1,816 |          0 |          0 |      1,816 |
+| c:\xampp\htdocs\pdl-is\public\favicon.svg                                                                                | XML                |          3 |          0 |          1 |          4 |
+| c:\xampp\htdocs\pdl-is\public\images\README.md                                                                           | Markdown           |         16 |          0 |          6 |         22 |
+| c:\xampp\htdocs\pdl-is\public\index.php                                                                                  | PHP                |         10 |          4 |          7 |         21 |
+| c:\xampp\htdocs\pdl-is\public\logo.svg                                                                                   | XML                |         16 |          0 |          1 |         17 |
+| c:\xampp\htdocs\pdl-is\resources\css\app.css                                                                             | CSS                |        154 |         14 |         45 |        213 |
+| c:\xampp\htdocs\pdl-is\resources\js\app.tsx                                                                              | TypeScript JSX     |         18 |          0 |          6 |         24 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\app-content.tsx                                                           | TypeScript JSX     |         15 |          0 |          4 |         19 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\app-header.tsx                                                            | TypeScript JSX     |        171 |          2 |         10 |        183 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\app-logo-icon.tsx                                                         | TypeScript JSX     |         12 |          0 |          2 |         14 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\app-logo.tsx                                                              | TypeScript JSX     |         20 |          0 |          2 |         22 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\app-shell.tsx                                                             | TypeScript JSX     |         14 |          0 |          5 |         19 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\app-sidebar-header.tsx                                                    | TypeScript JSX     |        692 |         30 |         53 |        775 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\app-sidebar.tsx                                                           | TypeScript JSX     |        314 |          1 |         35 |        350 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\appearance-dropdown.tsx                                                   | TypeScript JSX     |         50 |          0 |          4 |         54 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\appearance-tabs.tsx                                                       | TypeScript JSX     |         31 |          0 |          4 |         35 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\breadcrumbs.tsx                                                           | TypeScript JSX     |         33 |          0 |          2 |         35 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\data-table.tsx                                                            | TypeScript JSX     |         73 |          0 |          7 |         80 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\delete-user.tsx                                                           | TypeScript JSX     |         76 |          0 |         14 |         90 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\heading-small.tsx                                                         | TypeScript JSX     |          8 |          0 |          1 |          9 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\heading.tsx                                                               | TypeScript JSX     |          8 |          0 |          1 |          9 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\icon.tsx                                                                  | TypeScript JSX     |          9 |          0 |          3 |         12 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\input-error.tsx                                                           | TypeScript JSX     |          9 |          0 |          2 |         11 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\nav-footer.tsx                                                            | TypeScript JSX     |         33 |          0 |          2 |         35 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\nav-main.tsx                                                              | TypeScript JSX     |         79 |          0 |          7 |         86 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\nav-user.tsx                                                              | TypeScript JSX     |         34 |          0 |          6 |         40 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\pagination-controls.tsx                                                   | TypeScript JSX     |         43 |          0 |          6 |         49 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\text-link.tsx                                                             | TypeScript JSX     |         17 |          0 |          3 |         20 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\accordion.tsx                                                          | TypeScript JSX     |         58 |          0 |          7 |         65 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\alert-dialog.tsx                                                       | TypeScript JSX     |        126 |          0 |         14 |        140 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\alert.tsx                                                              | TypeScript JSX     |         62 |          0 |          7 |         69 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\avatar.tsx                                                             | TypeScript JSX     |         46 |          0 |          6 |         52 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\badge.tsx                                                              | TypeScript JSX     |         63 |          0 |          6 |         69 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\breadcrumb.tsx                                                         | TypeScript JSX     |         99 |          0 |         11 |        110 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\button.tsx                                                             | TypeScript JSX     |         54 |          0 |          6 |         60 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\calendar.tsx                                                           | TypeScript JSX     |        202 |          0 |         10 |        212 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\card.tsx                                                               | TypeScript JSX     |         60 |          0 |          9 |         69 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\checkbox.tsx                                                           | TypeScript JSX     |         27 |          0 |          4 |         31 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\collapsible.tsx                                                        | TypeScript JSX     |         27 |          0 |          5 |         32 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\command.tsx                                                            | TypeScript JSX     |        171 |          0 |         12 |        183 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\dialog.tsx                                                             | TypeScript JSX     |        130 |          0 |         14 |        144 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\dropdown-menu.tsx                                                      | TypeScript JSX     |        238 |          0 |         18 |        256 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\icon.tsx                                                               | TypeScript JSX     |         11 |          0 |          4 |         15 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\input.tsx                                                              | TypeScript JSX     |         27 |          0 |          6 |         33 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\label.tsx                                                              | TypeScript JSX     |         19 |          0 |          4 |         23 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\navigation-menu.tsx                                                    | TypeScript JSX     |        157 |          0 |         12 |        169 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\placeholder-pattern.tsx                                                | TypeScript JSX     |         17 |          0 |          4 |         21 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\popover.tsx                                                            | TypeScript JSX     |         40 |          0 |          7 |         47 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\progress.tsx                                                           | TypeScript JSX     |         23 |          0 |          4 |         27 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\radio-group.tsx                                                        | TypeScript JSX     |         39 |          0 |          5 |         44 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\scroll-area.tsx                                                        | TypeScript JSX     |         52 |          0 |          5 |         57 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\select.tsx                                                             | TypeScript JSX     |        167 |          0 |         13 |        180 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\separator.tsx                                                          | TypeScript JSX     |         23 |          0 |          4 |         27 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\sheet.tsx                                                              | TypeScript JSX     |        125 |          0 |         13 |        138 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\sidebar.tsx                                                            | TypeScript JSX     |        656 |         12 |         54 |        722 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\skeleton.tsx                                                           | TypeScript JSX     |         11 |          0 |          3 |         14 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\sonner.tsx                                                             | TypeScript JSX     |         25 |          0 |          5 |         30 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\switch.tsx                                                             | TypeScript JSX     |         26 |          0 |          4 |         30 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\table.tsx                                                              | TypeScript JSX     |        104 |          0 |         11 |        115 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\tabs.tsx                                                               | TypeScript JSX     |         58 |          0 |          7 |         65 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\textarea.tsx                                                           | TypeScript JSX     |         15 |          0 |          4 |         19 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\toggle-group.tsx                                                       | TypeScript JSX     |         65 |          0 |          7 |         72 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\toggle.tsx                                                             | TypeScript JSX     |         41 |          0 |          5 |         46 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\ui\tooltip.tsx                                                            | TypeScript JSX     |         53 |          0 |          7 |         60 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\user-info.tsx                                                             | TypeScript JSX     |         20 |          0 |          3 |         23 |
+| c:\xampp\htdocs\pdl-is\resources\js\components\user-menu-content.tsx                                                     | TypeScript JSX     |         96 |          1 |          9 |        106 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\cancel-event.tsx                                                            | TypeScript JSX     |        100 |          1 |          7 |        108 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\court-hearing\create-event.tsx                                              | TypeScript JSX     |        333 |          7 |         30 |        370 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\create-court.tsx                                                            | TypeScript JSX     |        115 |          0 |          6 |        121 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\custody\custody-management.tsx                                              | TypeScript JSX     |        199 |          6 |         23 |        228 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\edit-court.tsx                                                              | TypeScript JSX     |        128 |          1 |          7 |        136 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\add-case-information.tsx                                     | TypeScript JSX     |        253 |         19 |         28 |        300 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\case-information-columns.tsx                                 | TypeScript JSX     |        111 |          0 |          4 |        115 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\cell-assignment-columns.tsx                                  | TypeScript JSX     |         51 |          1 |          3 |         55 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\cell-management-columns.tsx                                  | TypeScript JSX     |         82 |          0 |          5 |         87 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\cell-transfer-log-columns.tsx                                | TypeScript JSX     |         60 |          0 |          3 |         63 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\court_order_columns.tsx                                      | TypeScript JSX     |        124 |          0 |         13 |        137 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\create-case-information.tsx                                  | TypeScript JSX     |        302 |         20 |         22 |        344 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\create-cell-assignment.tsx                                   | TypeScript JSX     |        246 |         14 |         26 |        286 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\create-cell-information.tsx                                  | TypeScript JSX     |        160 |          1 |         19 |        180 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\create-court-order.tsx                                       | TypeScript JSX     |        365 |         12 |         26 |        403 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\create-medical-record.tsx                                    | TypeScript JSX     |        138 |          6 |         13 |        157 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\create-pdl-personal-information.tsx                          | TypeScript JSX     |        175 |          0 |         18 |        193 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\create-physical-characteristic.tsx                           | TypeScript JSX     |        168 |         11 |         19 |        198 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\delete-case-information.tsx                                  | TypeScript JSX     |         79 |          0 |          6 |         85 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\delete-court-order.tsx                                       | TypeScript JSX     |         79 |          0 |          6 |         85 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\delete-medical-record.tsx                                    | TypeScript JSX     |         79 |          0 |          6 |         85 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\delete-physical-characteristic.tsx                           | TypeScript JSX     |         67 |          0 |          6 |         73 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\edit-case-information.tsx                                    | TypeScript JSX     |        291 |         19 |         22 |        332 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\edit-cell-assignment.tsx                                     | TypeScript JSX     |        123 |          0 |         16 |        139 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\edit-cell-information.tsx                                    | TypeScript JSX     |        164 |          1 |         21 |        186 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\edit-court-order.tsx                                         | TypeScript JSX     |        388 |         14 |         26 |        428 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\edit-medical-record.tsx                                      | TypeScript JSX     |        104 |          7 |         13 |        124 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\edit-pdl-personal-information.tsx                            | TypeScript JSX     |        178 |          0 |         16 |        194 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\edit-physical-characteristic.tsx                             | TypeScript JSX     |        185 |         11 |         18 |        214 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\medical-record-columns.tsx                                   | TypeScript JSX     |        100 |          0 |          6 |        106 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\physical-characteristic-columns.tsx                          | TypeScript JSX     |         79 |          0 |          3 |         82 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\transfer-cell.tsx                                            | TypeScript JSX     |        162 |          8 |         20 |        190 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\transfer-pdl.tsx                                             | TypeScript JSX     |         96 |          0 |         12 |        108 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\update-case-status.tsx                                       | TypeScript JSX     |        129 |          1 |         22 |        152 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\view-cell-activity-log.tsx                                   | TypeScript JSX     |         15 |          0 |          3 |         18 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\pdl-management\view-pdl-information.tsx                                     | TypeScript JSX     |        283 |          6 |         18 |        307 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\request-log\request-logs-table.tsx                                          | TypeScript JSX     |        306 |         10 |         26 |        342 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\request-log\requestlog-details-dialog.tsx                                   | TypeScript JSX     |        201 |          5 |         19 |        225 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\reschedule-event.tsx                                                        | TypeScript JSX     |        145 |          3 |         10 |        158 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\time-allowance\manage-time-allowance.tsx                                    | TypeScript JSX     |        190 |          2 |         19 |        211 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\time-allowance\time-allowance-records.tsx                                   | TypeScript JSX     |        333 |          2 |         26 |        361 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\user-management\create-agency.tsx                                           | TypeScript JSX     |         72 |          0 |          9 |         81 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\user-management\create-user.tsx                                             | TypeScript JSX     |        190 |          2 |         20 |        212 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\user-management\delete-user.tsx                                             | TypeScript JSX     |         80 |          0 |         11 |         91 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\user-management\edit-user.tsx                                               | TypeScript JSX     |        204 |          1 |         23 |        228 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\user-management\reset-password-dialog.tsx                                   | TypeScript JSX     |        143 |          2 |         13 |        158 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\user-management\user-columns.tsx                                            | TypeScript JSX     |         89 |          0 |          7 |         96 |
+| c:\xampp\htdocs\pdl-is\resources\js\features\verification\verification-card.tsx                                          | TypeScript JSX     |        377 |         11 |         20 |        408 |
+| c:\xampp\htdocs\pdl-is\resources\js\hooks\use-appearance.tsx                                                             | TypeScript JSX     |         48 |          3 |         21 |         72 |
+| c:\xampp\htdocs\pdl-is\resources\js\hooks\use-initials.tsx                                                               | TypeScript JSX     |         11 |          0 |          5 |         16 |
+| c:\xampp\htdocs\pdl-is\resources\js\hooks\use-mobile-navigation.ts                                                       | TypeScript         |          6 |          1 |          2 |          9 |
+| c:\xampp\htdocs\pdl-is\resources\js\hooks\use-mobile.tsx                                                                 | TypeScript JSX     |         15 |          0 |          8 |         23 |
+| c:\xampp\htdocs\pdl-is\resources\js\hooks\usePSGCLocation.ts                                                             | TypeScript         |        205 |         17 |         30 |        252 |
+| c:\xampp\htdocs\pdl-is\resources\js\layouts\app-layout.tsx                                                               | TypeScript JSX     |         14 |          0 |          4 |         18 |
+| c:\xampp\htdocs\pdl-is\resources\js\layouts\app\app-header-layout.tsx                                                    | TypeScript JSX     |         13 |          0 |          2 |         15 |
+| c:\xampp\htdocs\pdl-is\resources\js\layouts\app\app-sidebar-layout.tsx                                                   | TypeScript JSX     |         47 |          2 |          8 |         57 |
+| c:\xampp\htdocs\pdl-is\resources\js\layouts\auth-layout.tsx                                                              | TypeScript JSX     |          8 |          0 |          2 |         10 |
+| c:\xampp\htdocs\pdl-is\resources\js\layouts\auth\auth-card-layout.tsx                                                    | TypeScript JSX     |         34 |          0 |          3 |         37 |
+| c:\xampp\htdocs\pdl-is\resources\js\layouts\auth\auth-simple-layout.tsx                                                  | TypeScript JSX     |         31 |          0 |          4 |         35 |
+| c:\xampp\htdocs\pdl-is\resources\js\layouts\auth\auth-split-layout.tsx                                                   | TypeScript JSX     |         42 |          0 |          4 |         46 |
+| c:\xampp\htdocs\pdl-is\resources\js\layouts\settings\layout.tsx                                                          | TypeScript JSX     |         60 |          1 |          8 |         69 |
+| c:\xampp\htdocs\pdl-is\resources\js\lib\dateUtils.ts                                                                     | TypeScript         |         14 |          0 |          2 |         16 |
+| c:\xampp\htdocs\pdl-is\resources\js\lib\utils.ts                                                                         | TypeScript         |          5 |          0 |          2 |          7 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\archive\list.tsx                                                         | TypeScript JSX     |      1,001 |         27 |         36 |      1,064 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\court-hearing\calendar.tsx                                               | TypeScript JSX     |         86 |          2 |         11 |         99 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\pdl\archive.tsx                                                          | TypeScript JSX     |        294 |          6 |         17 |        317 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\pdl\archived.tsx                                                         | TypeScript JSX     |        236 |          4 |         11 |        251 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\profile-management\profie.tsx                                            | TypeScript JSX     |        166 |          3 |         16 |        185 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\certificate-of-detention.tsx                                      | TypeScript JSX     |        270 |          6 |         30 |        306 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\drug-clearing-certificate.tsx                                     | TypeScript JSX     |        335 |          6 |         22 |        363 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\drug-related-cases-monthly.tsx                                    | TypeScript JSX     |        291 |          8 |         20 |        319 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\gcta-tastm-report.tsx                                             | TypeScript JSX     |        197 |          1 |         19 |        217 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\inmates-status-daily.tsx                                          | TypeScript JSX     |        444 |         15 |         28 |        487 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\inmates-status.tsx                                                | TypeScript JSX     |        363 |         10 |         23 |        396 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\list-of-pdl-reports.tsx                                           | TypeScript JSX     |        152 |          0 |         14 |        166 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\no-records-certificate.tsx                                        | TypeScript JSX     |        353 |         14 |         34 |        401 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\report\population-report.tsx                                             | TypeScript JSX     |        147 |          0 |         17 |        164 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\request-logs\index.tsx                                                   | TypeScript JSX     |         34 |          1 |          6 |         41 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\settings\appearance.tsx                                                  | TypeScript JSX     |         25 |          0 |          6 |         31 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\settings\password.tsx                                                    | TypeScript JSX     |        108 |          0 |         21 |        129 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\settings\profile.tsx                                                     | TypeScript JSX     |        107 |          0 |         21 |        128 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\time-allowance\list.tsx                                                  | TypeScript JSX     |        100 |          0 |          9 |        109 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\user-management\list.tsx                                                 | TypeScript JSX     |         79 |          0 |         14 |         93 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\admin\verification\list.tsx                                                    | TypeScript JSX     |         81 |          2 |         12 |         95 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\certificates\create.tsx                                                        | TypeScript JSX     |        278 |          6 |         20 |        304 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\certificates\index.tsx                                                         | TypeScript JSX     |        279 |          3 |         16 |        298 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\certificates\show.tsx                                                          | TypeScript JSX     |        333 |          9 |         18 |        360 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\dashboard.tsx                                                                  | TypeScript JSX     |        644 |         20 |         33 |        697 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\forgot-password.tsx                                                            | TypeScript JSX     |        156 |          7 |         20 |        183 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\law-enforcement\dashboard\dashboard.tsx                                        | TypeScript JSX     |        497 |         16 |         26 |        539 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\court-list.tsx                                                 | TypeScript JSX     |         89 |          0 |         15 |        104 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\dashboard\dashboard.tsx                                        | TypeScript JSX     |        528 |         15 |         27 |        570 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\jail-events\jail-events.tsx                                    | TypeScript JSX     |        473 |         12 |         47 |        532 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-archives\pdl-archives.tsx                                  | TypeScript JSX     |        113 |          8 |         16 |        137 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\case-information.tsx                            | TypeScript JSX     |        141 |          3 |         14 |        158 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\cell-activity-log.tsx                           | TypeScript JSX     |        154 |          0 |         14 |        168 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\cell-assignment.tsx                             | TypeScript JSX     |        159 |          4 |         16 |        179 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\cell-management.tsx                             | TypeScript JSX     |         71 |          0 |          8 |         79 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\court-order.tsx                                 | TypeScript JSX     |         85 |          3 |         11 |         99 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\create-pdl-information.tsx                      | TypeScript JSX     |      2,283 |         66 |        101 |      2,450 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\edit-case-information.tsx                       | TypeScript JSX     |        326 |         18 |         21 |        365 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\edit-court-order.tsx                            | TypeScript JSX     |        407 |         12 |         30 |        449 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\edit-medical-record.tsx                         | TypeScript JSX     |        155 |          5 |         17 |        177 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\edit-physical-characteristic.tsx                | TypeScript JSX     |        206 |         10 |         22 |        238 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\health-assessment.tsx                           | TypeScript JSX     |         73 |          1 |          7 |         81 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\medical-records.tsx                             | TypeScript JSX     |        139 |          2 |         14 |        155 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\personal-information-admin.tsx                  | TypeScript JSX     |        716 |         18 |         48 |        782 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\personal-information.tsx                        | TypeScript JSX     |        346 |          8 |         25 |        379 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\physical-characteristics.tsx                    | TypeScript JSX     |        129 |          2 |         14 |        145 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\pdl-management\update-pdl-information.tsx                      | TypeScript JSX     |      2,512 |         85 |        113 |      2,710 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\records-officer\profile-management\profile-management.tsx                      | TypeScript JSX     |        165 |          3 |         15 |        183 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\search\detail.tsx                                                              | TypeScript JSX     |        579 |          5 |         21 |        605 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\search\results.tsx                                                             | TypeScript JSX     |        287 |          3 |         18 |        308 |
+| c:\xampp\htdocs\pdl-is\resources\js\pages\welcome.tsx                                                                    | TypeScript JSX     |        208 |         30 |         23 |        261 |
+| c:\xampp\htdocs\pdl-is\resources\js\ssr.tsx                                                                              | TypeScript JSX     |         22 |          5 |          4 |         31 |
+| c:\xampp\htdocs\pdl-is\resources\js\types\global.d.ts                                                                    | TypeScript         |          4 |          0 |          2 |          6 |
+| c:\xampp\htdocs\pdl-is\resources\js\types\index.d.ts                                                                     | TypeScript         |        212 |          1 |         21 |        234 |
+| c:\xampp\htdocs\pdl-is\resources\js\types\vite-env.d.ts                                                                  | TypeScript         |          0 |          1 |          1 |          2 |
+| c:\xampp\htdocs\pdl-is\resources\views\app.blade.php                                                                     | PHP                |         25 |          0 |          9 |         34 |
+| c:\xampp\htdocs\pdl-is\resources\views\reports\certificate-of-detention.blade.php                                        | PHP                |        187 |          0 |         30 |        217 |
+| c:\xampp\htdocs\pdl-is\resources\views\reports\drug-cases-monthly.blade.php                                              | PHP                |        201 |          0 |         23 |        224 |
+| c:\xampp\htdocs\pdl-is\resources\views\reports\drug-clearing-certificate.blade.php                                       | PHP                |        215 |          0 |         36 |        251 |
+| c:\xampp\htdocs\pdl-is\resources\views\reports\gcta-tastm.blade.php                                                      | PHP                |        366 |          1 |         68 |        435 |
+| c:\xampp\htdocs\pdl-is\resources\views\reports\inmate-status-report.blade.php                                            | PHP                |        259 |          0 |         31 |        290 |
+| c:\xampp\htdocs\pdl-is\resources\views\reports\inmates-status-daily.blade.php                                            | PHP                |        345 |          0 |         35 |        380 |
+| c:\xampp\htdocs\pdl-is\resources\views\reports\inmates-status.blade.php                                                  | PHP                |        241 |          0 |         30 |        271 |
+| c:\xampp\htdocs\pdl-is\resources\views\reports\no-records-certificate.blade.php                                          | PHP                |        198 |          0 |         34 |        232 |
+| c:\xampp\htdocs\pdl-is\resources\views\reports\pdl-information.blade.php                                                 | PHP                |        283 |          0 |         40 |        323 |
+| c:\xampp\htdocs\pdl-is\resources\views\reports\pdl-list.blade.php                                                        | PHP                |        181 |          0 |         22 |        203 |
+| c:\xampp\htdocs\pdl-is\resources\views\reports\pdl-report.blade.php                                                      | PHP                |        240 |          0 |         50 |        290 |
+| c:\xampp\htdocs\pdl-is\resources\views\reports\population-report.blade.php                                               | PHP                |        153 |          0 |         11 |        164 |
+| c:\xampp\htdocs\pdl-is\resources\views\test-logo.blade.php                                                               | PHP                |         40 |          0 |          4 |         44 |
+| c:\xampp\htdocs\pdl-is\routes\auth.php                                                                                   | PHP                |         15 |          0 |          8 |         23 |
+| c:\xampp\htdocs\pdl-is\routes\console.php                                                                                | PHP                |          8 |          1 |          4 |         13 |
+| c:\xampp\htdocs\pdl-is\routes\settings.php                                                                               | PHP                |         16 |          0 |          6 |         22 |
+| c:\xampp\htdocs\pdl-is\routes\web.php                                                                                    | PHP                |        276 |         14 |         97 |        387 |
+| c:\xampp\htdocs\pdl-is\test-psgc-api.js                                                                                  | JavaScript         |         39 |          6 |          9 |         54 |
+| c:\xampp\htdocs\pdl-is\tests\Feature\Auth\AuthenticationTest.php                                                         | PHP                |         30 |          0 |         13 |         43 |
+| c:\xampp\htdocs\pdl-is\tests\Feature\Auth\EmailVerificationTest.php                                                      | PHP                |         34 |          0 |         14 |         48 |
+| c:\xampp\htdocs\pdl-is\tests\Feature\Auth\PasswordConfirmationTest.php                                                   | PHP                |         23 |          0 |         11 |         34 |
+| c:\xampp\htdocs\pdl-is\tests\Feature\Auth\PasswordResetTest.php                                                          | PHP                |         42 |          0 |         20 |         62 |
+| c:\xampp\htdocs\pdl-is\tests\Feature\Auth\RegistrationTest.php                                                           | PHP                |         16 |          0 |          5 |         21 |
+| c:\xampp\htdocs\pdl-is\tests\Feature\DashboardTest.php                                                                   | PHP                |         10 |          0 |          5 |         15 |
+| c:\xampp\htdocs\pdl-is\tests\Feature\ExampleTest.php                                                                     | PHP                |          5 |          0 |          3 |          8 |
+| c:\xampp\htdocs\pdl-is\tests\Feature\Settings\PasswordUpdateTest.php                                                     | PHP                |         33 |          0 |          9 |         42 |
+| c:\xampp\htdocs\pdl-is\tests\Feature\Settings\ProfileUpdateTest.php                                                      | PHP                |         65 |          0 |         22 |         87 |
+| c:\xampp\htdocs\pdl-is\tests\Pest.php                                                                                    | PHP                |          9 |         32 |          7 |         48 |
+| c:\xampp\htdocs\pdl-is\tests\TestCase.php                                                                                | PHP                |          6 |          1 |          4 |         11 |
+| c:\xampp\htdocs\pdl-is\tests\Unit\ExampleTest.php                                                                        | PHP                |          4 |          0 |          2 |          6 |
+| c:\xampp\htdocs\pdl-is\tsconfig.json                                                                                     | JSON with Comments |         26 |         88 |          9 |        123 |
+| c:\xampp\htdocs\pdl-is\vite.config.ts                                                                                    | TypeScript         |         24 |          0 |          2 |         26 |
+| Total                                                                                                                    |                    |     69,100 |      3,020 |      5,592 |     77,712 |
++--------------------------------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+

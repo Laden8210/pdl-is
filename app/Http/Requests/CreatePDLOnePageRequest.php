@@ -17,6 +17,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'fname' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'lname' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'alias' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
+            'suffix' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'mname' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
             'birthdate' => 'required|date',
             'age' => 'required|integer|min:18',
@@ -69,7 +70,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'cases.*.crime_committed' => 'required|string',
             'cases.*.date_committed' => 'required|date',
             'cases.*.time_committed' => 'required|date_format:H:i',
-            'cases.*.case_status' => 'required|string|in:on_trial,bonded,transferred_to_another_jail,served_sentence,convicted,dismissed,arraignment',
+            'cases.*.case_status' => 'required|string|in:on_trial,bonded,transferred,served_sentence,convicted,dismissed,arraignment',
 
             'cases.*.case_remarks' => 'nullable|string',
             'cases.*.security_classification' => 'required|string|in:low,medium,high,maximum',
@@ -89,7 +90,8 @@ class CreatePDLOnePageRequest extends FormRequest
             'lname.regex' => 'Last name must be a valid string',
             'alias.max' => 'Alias must not exceed 255 characters',
             'alias.regex' => 'Alias must be a valid string',
-
+            'suffix.max' => 'Suffix must not exceed 255 characters',
+            'suffix.regex' => 'Suffix must be a valid string',
             'birthdate.required' => 'Birthdate is required',
             'birthdate.date' => 'Birthdate must be a valid date',
                 'age.required' => 'Age is required',
@@ -164,7 +166,7 @@ class CreatePDLOnePageRequest extends FormRequest
             'cases.*.time_committed.required' => 'Time committed is required for all cases',
             'cases.*.time_committed.date_format' => 'Time committed must be in HH:MM format',
             'cases.*.case_status.required' => 'Case status is required for all cases',
-            'cases.*.case_status.in' => 'Case status must be open, pending, convicted, deceased, dismissed, or on trial',
+            'cases.*.case_status.in' => 'Case status must be on trial, convicted, deceased, bonded, transferred, served sentence, or dismissed',
             'cases.*.security_classification.required' => 'Security classification is required for all cases',
             'cases.*.security_classification.in' => 'Security classification must be low, medium, high, or maximum',
         ];
