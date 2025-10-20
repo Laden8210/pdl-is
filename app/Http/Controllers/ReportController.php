@@ -2265,6 +2265,19 @@ class ReportController extends Controller
 
         $imageBase64 = null;
 
+        if ($pdl->mugshot_path && file_exists(public_path('storage/' . $pdl->mugshot_path))) {
+            try {
+                $imagePath = public_path('storage/' . $pdl->mugshot_path);
+                $imageData = file_get_contents($imagePath);
+                $imageBase64 = base64_encode($imageData);
+            } catch (\Exception $e) {
+                Log::error('Failed to load mugshot image for PDL ' . $pdl->id . ': ' . $e->getMessage());
+                // Continue without image - don't break the entire report
+            }
+        } else {
+            Log::warning('Mugshot path not found or invalid for PDL ' . $pdl->id . ': ' . $pdl->mugshot_path);
+        }
+
         if (!$imageBase64) {
             try {
                 $placeholderPath = public_path('images/default-avatar.jpg');
