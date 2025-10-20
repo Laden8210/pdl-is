@@ -15,7 +15,7 @@ class PhysicalCharacteristicController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search', '');
-
+        $agency = Auth::user()->agency;
         $characteristics = PhysicalCharacteristic::with('pdl:id,fname,lname')
             ->when($search, function ($query, $search) {
                 $searchTerm = strtolower(trim($search));
@@ -34,8 +34,11 @@ class PhysicalCharacteristicController extends Controller
                         });
                 });
             })
-            ->whereHas('pdl', function ($pdlQuery) {
+            ->whereHas('pdl', function ($pdlQuery) use ($agency) {
                 $pdlQuery->whereNull('archive_status')
+                ->whereHas('personnel', function ($personnelQuery) use ($agency) {
+                    $personnelQuery->where('agency', $agency);
+                })
                 ->whereDoesntHave('verifications', function ($verificationQuery) {
                     $verificationQuery->where('status', 'approved');
                 });
