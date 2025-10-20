@@ -6,166 +6,173 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
-import { useState, useMemo } from 'react';
 import { cell_assignment_columns } from '@/features/pdl-management/cell-assignment-columns';
 import { CreateCellAssignment } from '@/features/pdl-management/create-cell-assignment';
 import { TransferCell } from '@/features/pdl-management/transfer-cell';
-import { Cells, Pdl } from '@/types';
+import AppLayout from '@/layouts/app-layout';
+import { Cells, Pdl, type BreadcrumbItem } from '@/types';
+import { Head, router, usePage } from '@inertiajs/react';
+import { useMemo, useState } from 'react';
 
 interface PageProps {
-  assignments: {
-    assignment_id: number;
-    cell: {
-      cell_id: number;
-      cell_name: string;
-      gender: 'male' | 'female';
+    assignments: {
+        assignment_id: number;
+        cell: {
+            cell_id: number;
+            cell_name: string;
+            gender: 'male' | 'female';
+        };
+        pdl: {
+            id: number;
+            fname: string;
+            lname: string;
+            gender: 'Male' | 'Female';
+        };
+        created_at: string;
+    }[];
+    cells: Cells[];
+    pdls: Pdl[];
+    filters: {
+        search: string;
     };
-    pdl: {
-      id: number;
-      fname: string;
-      lname: string;
-      gender: 'Male' | 'Female';
-    };
-    created_at: string;
-  }[];
-  cells: Cells[];
-  pdls: Pdl[];
-  filters: {
-    search: string;
-  };
 }
 
 export default function CellAssignment() {
-  const { props } = usePage<PageProps>();
-  const { assignments, cells, pdls, filters } = props;
-  const [searchInput, setSearchInput] = useState(filters.search || '');
-  const [genderFilter, setGenderFilter] = useState<string>('all');
+    const { props } = usePage<PageProps>();
+    const { auth } = props;
+    const { assignments, cells, pdls, filters } = props;
+    const [searchInput, setSearchInput] = useState(filters.search || '');
+    const [genderFilter, setGenderFilter] = useState<string>('all');
 
-  const assignmentData = assignments.map(assignment => ({
-    assignment_id: assignment.assignment_id,
-    cell_number: assignment.cell.cell_name,
-    cell_id: assignment.cell.cell_id,
-    cell_gender: assignment.cell.gender,
-    pdl_id: assignment.pdl.id,
-    pdl_name: `${assignment.pdl.fname} ${assignment.pdl.lname}`,
-    pdl_gender: assignment.pdl.gender,
-    assigned_date: assignment.created_at
-  }));
+    const assignmentData = assignments.map((assignment) => ({
+        assignment_id: assignment.assignment_id,
+        cell_number: assignment.cell.cell_name,
+        cell_id: assignment.cell.cell_id,
+        cell_gender: assignment.cell.gender,
+        pdl_id: assignment.pdl.id,
+        pdl_name: `${assignment.pdl.fname} ${assignment.pdl.lname}`,
+        pdl_gender: assignment.pdl.gender,
+        assigned_date: assignment.created_at,
+    }));
 
+    // Filter assignments based on search and gender
+    const filteredAssignmentData = useMemo(() => {
+        let filtered = assignmentData;
 
-  // Filter assignments based on search and gender
-  const filteredAssignmentData = useMemo(() => {
-    let filtered = assignmentData;
+        // Apply search filter
+        if (searchInput) {
+            filtered = filtered.filter(
+                (assignment) =>
+                    assignment.cell_number.toLowerCase().includes(searchInput.toLowerCase()) ||
+                    assignment.pdl_name.toLowerCase().includes(searchInput.toLowerCase()),
+            );
+        }
 
-    // Apply search filter
-    if (searchInput) {
-      filtered = filtered.filter(assignment =>
-        assignment.cell_number.toLowerCase().includes(searchInput.toLowerCase()) ||
-        assignment.pdl_name.toLowerCase().includes(searchInput.toLowerCase())
-      );
-    }
+        // Apply gender filter
+        if (genderFilter !== 'all') {
+            filtered = filtered.filter((assignment) => assignment.cell_gender === genderFilter);
+        }
 
-    // Apply gender filter
-    if (genderFilter !== 'all') {
-      filtered = filtered.filter(assignment => assignment.cell_gender === genderFilter);
-    }
+        return filtered;
+    }, [assignmentData, searchInput, genderFilter]);
 
-    return filtered;
-  }, [assignmentData, searchInput, genderFilter]);
+    const handleSearch = () => {
+        router.get('/admin/pdl-management/cell-assignment', {
+            search: searchInput,
+        });
+    };
 
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Cell Management',
+            href: '/cell-management',
+        },
+        {
+            title: 'Assignments',
+            href: '/record-officer/pdl-management/cell-assignment',
+        },
+    ];
 
-  const handleSearch = () => {
-    router.get('/admin/pdl-management/cell-assignment', {
-      search: searchInput,
-    });
-  };
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Cell Assignment Management" />
 
-  const breadcrumbs: BreadcrumbItem[] = [
-    {
-      title: 'Cell Management',
-      href: '/cell-management',
-    },
-    {
-      title: 'Assignments',
-      href: '/record-officer/pdl-management/cell-assignment',
-    },
-  ];
+            <div className="flex flex-col gap-6 p-4">
+                <h1 className="text-2xl font-bold">Cell Assignments</h1>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>
+                            <div className="flex items-center justify-between">
+                                <span>Cell Assignment List</span>
+                                <div className="flex items-center space-x-2">
+                                    {auth?.user?.position === 'admin' && (
+                                        <Button variant="outline" onClick={() => router.get('/admin/pdl-management/cell-activity-log')}>
+                                            View Activity Log
+                                        </Button>
+                                    )}
+                                    {auth?.user?.position === 'record-officer' && (
+                                        <Button variant="outline" onClick={() => router.get('/record-officer/pdl-management/cell-activity-log')}>
+                                            View Activity Log
+                                        </Button>
+                                    )}
 
-  return (
-    <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Cell Assignment Management" />
+                                    <CreateCellAssignment cells={cells} pdls={pdls} />
+                                </div>
+                            </div>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="mb-4 flex items-center space-x-4">
+                            <Label htmlFor="search" className="text-sm font-medium">
+                                Search Assignments
+                            </Label>
+                            <Input
+                                id="search"
+                                placeholder="Search by cell number or PDL name"
+                                className="w-64"
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                            />
+                            <Button variant="outline" onClick={handleSearch}>
+                                Search
+                            </Button>
+                        </div>
 
-      <div className="flex flex-col gap-6 p-4">
-        <h1 className="text-2xl font-bold">Cell Assignments</h1>
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <div className="flex items-center justify-between">
-                <span>Cell Assignment List</span>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => router.get('/record-officer/pdl-management/cell-activity-log')}
-                  >
-                    View Activity Log
-                  </Button>
-                  <CreateCellAssignment cells={cells} pdls={pdls} />
-                </div>
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="mb-4 flex items-center space-x-4">
-              <Label htmlFor="search" className="text-sm font-medium">
-                Search Assignments
-              </Label>
-              <Input
-                id="search"
-                placeholder="Search by cell number or PDL name"
-                className="w-64"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              />
-              <Button variant="outline" onClick={handleSearch}>
-                Search
-              </Button>
+                        <div className="mb-4 flex items-center space-x-4">
+                            <Label htmlFor="gender-filter" className="text-sm font-medium">
+                                Filter by Gender
+                            </Label>
+                            <Select value={genderFilter} onValueChange={setGenderFilter}>
+                                <SelectTrigger className="w-48">
+                                    <SelectValue placeholder="Select gender filter" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Genders</SelectItem>
+                                    <SelectItem value="male">Male Only</SelectItem>
+                                    <SelectItem value="female">Female Only</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <DataTable
+                            columns={cell_assignment_columns.map((col) =>
+                                col.id === 'actions'
+                                    ? {
+                                          ...col,
+                                          cell: ({ row }) => (
+                                              <div className="flex items-center space-x-2">
+                                                  <TransferCell assignment={row.original} cells={cells} />
+                                              </div>
+                                          ),
+                                      }
+                                    : col,
+                            )}
+                            data={filteredAssignmentData}
+                        />
+                    </CardContent>
+                </Card>
             </div>
-
-            <div className="mb-4 flex items-center space-x-4">
-              <Label htmlFor="gender-filter" className="text-sm font-medium">
-                Filter by Gender
-              </Label>
-              <Select value={genderFilter} onValueChange={setGenderFilter}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Select gender filter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Genders</SelectItem>
-                  <SelectItem value="male">Male Only</SelectItem>
-                  <SelectItem value="female">Female Only</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <DataTable
-              columns={cell_assignment_columns.map(col =>
-                col.id === 'actions'
-                  ? { ...col, cell: ({ row }) => (
-                      <div className="flex items-center space-x-2">
-                        <TransferCell assignment={row.original} cells={cells} />
-                      </div>
-                    )}
-                  : col
-              )}
-              data={filteredAssignmentData}
-            />
-          </CardContent>
-        </Card>
-      </div>
-    </AppLayout>
-  );
+        </AppLayout>
+    );
 }

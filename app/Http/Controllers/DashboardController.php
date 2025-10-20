@@ -541,7 +541,7 @@ class DashboardController extends Controller
                 $query->where('agency', $agency);
             })
             ->count();
-        $activeCases = CaseInformation::where('case_status', 'Active')
+        $activeCases = CaseInformation::whereBetween('case_status', ['on_trial', 'pending', 'active', 'on trial'])
             ->whereHas('pdl', function ($query) use ($agency) {
                 $query->whereHas('personnel', function ($query) use ($agency) {
                     $query->where('agency', $agency);
@@ -549,7 +549,13 @@ class DashboardController extends Controller
             })
             ->count();
         $totalCases = CaseInformation::count();
-        $pendingCourtOrdersCount = CourtOrder::where('order_date', '>=', now()->subDays(30))->count();
+        $pendingCourtOrdersCount = CourtOrder::where('order_date', '>=', now()->subDays(30))
+        ->whereHas('pdl', function ($query) use ($agency) {
+            $query->whereHas('personnel', function ($query) use ($agency) {
+                $query->where('agency', $agency);
+            });
+        })
+        ->count();
         $totalCourtOrders = CourtOrder::whereHas('pdl', function ($query) use ($agency) {
             $query->whereHas('personnel', function ($query) use ($agency) {
                 $query->where('agency', $agency);

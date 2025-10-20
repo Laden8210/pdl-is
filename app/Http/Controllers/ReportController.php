@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Court;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
@@ -1390,6 +1391,7 @@ class ReportController extends Controller
         $notedBy = $request->noted_by;
         // Get all PDLs with their court orders and court information
         $pdls = Pdl::whereBetween('created_at', [$startDate, $endDate])
+
             ->whereNull('deleted_at')
             ->with(['cases', 'courtOrders.court'])
             ->get();
@@ -1399,22 +1401,37 @@ class ReportController extends Controller
         $totalFemale = 0;
         $totalCICL = 0;
 
-        // Get all courts grouped by court_type
+        // Get all courts grouped by court_type unique by pdl_id
         $courts = Court::withCount([
             'courtOrders as male_count' => function ($query) use ($startDate, $endDate) {
                 $query->whereHas('pdl', function ($q) {
-                    $q->where('gender', 'Male');
-                })->whereBetween('order_date', [$startDate, $endDate]);
+                    $q->where('gender', 'Male')
+                      ->whereHas('verifications', function ($query) {
+                          $query->where('status', 'approved');
+                      });
+                })
+                ->whereBetween('order_date', [$startDate, $endDate])
+                ->select(DB::raw('COUNT(DISTINCT pdl_id)')); // Count distinct PDls
             },
             'courtOrders as female_count' => function ($query) use ($startDate, $endDate) {
                 $query->whereHas('pdl', function ($q) {
-                    $q->where('gender', 'Female');
-                })->whereBetween('order_date', [$startDate, $endDate]);
+                    $q->where('gender', 'Female')
+                      ->whereHas('verifications', function ($query) {
+                          $query->where('status', 'approved');
+                      });
+                })
+                ->whereBetween('order_date', [$startDate, $endDate])
+                ->select(DB::raw('COUNT(DISTINCT pdl_id)')); // Count distinct PDls
             },
             'courtOrders as cicl_count' => function ($query) use ($startDate, $endDate) {
                 $query->whereHas('pdl', function ($q) {
-                    $q->where('age', '<', 18); // CICL - Children in Conflict with the Law
-                })->whereBetween('order_date', [$startDate, $endDate]);
+                    $q->where('age', '<', 18)
+                      ->whereHas('verifications', function ($query) {
+                          $query->where('status', 'approved');
+                      });
+                })
+                ->whereBetween('order_date', [$startDate, $endDate])
+                ->select(DB::raw('COUNT(DISTINCT pdl_id)')); // Count distinct PDls
             }
         ])->get();
 
@@ -1532,17 +1549,27 @@ class ReportController extends Controller
         $courts = Court::withCount([
             'courtOrders as male_count' => function ($query) use ($startDate, $endDate) {
                 $query->whereHas('pdl', function ($q) {
-                    $q->where('gender', 'Male');
-                })->whereBetween('order_date', [$startDate, $endDate]);
+                    $q->where('gender', 'Male')
+                    ->whereHas('verifications', function ($query) {
+                        $query->where('status', 'approved');
+                    });
+                })
+                ->whereBetween('order_date', [$startDate, $endDate]);
             },
             'courtOrders as female_count' => function ($query) use ($startDate, $endDate) {
                 $query->whereHas('pdl', function ($q) {
-                    $q->where('gender', 'Female');
+                    $q->where('gender', 'Female')
+                    ->whereHas('verifications', function ($query) {
+                        $query->where('status', 'approved');
+                    });
                 })->whereBetween('order_date', [$startDate, $endDate]);
             },
             'courtOrders as cicl_count' => function ($query) use ($startDate, $endDate) {
                 $query->whereHas('pdl', function ($q) {
-                    $q->where('age', '<', 18); // CICL - Children in Conflict with the Law
+                    $q->where('age', '<', 18) // CICL - Children in Conflict with the Law
+                    ->whereHas('verifications', function ($query) {
+                        $query->where('status', 'approved');
+                    });
                 })->whereBetween('order_date', [$startDate, $endDate]);
             }
         ])->get();
