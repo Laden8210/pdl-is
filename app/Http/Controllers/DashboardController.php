@@ -537,9 +537,7 @@ class DashboardController extends Controller
             ->whereDoesntHave('verifications', function ($q) {
                 $q->where('status', 'approved'); // exclude those with approved verification
             })
-            ->whereHas('personnel', function ($query) use ($agency) {
-                $query->where('agency', $agency);
-            })
+
             ->count();
         $activeCases = CaseInformation::whereBetween('case_status', ['on_trial', 'pending', 'active', 'on t'])
             ->whereHas('pdl', function ($query) use ($agency) {
@@ -561,12 +559,19 @@ class DashboardController extends Controller
                 $query->where('agency', $agency);
             });
         })
+        ->whereDoesntHave('verifications', function ($q) {
+            $q->where('status', 'approved');
+        })
         ->count();
         $totalCourtOrders = CourtOrder::whereHas('pdl', function ($query) use ($agency) {
             $query->whereHas('personnel', function ($query) use ($agency) {
                 $query->where('agency', $agency);
             });
-        })->count();
+        })
+        ->whereDoesntHave('verifications', function ($q) {
+            $q->where('status', 'approved');
+        })
+        ->count();
         $highSecurityPDL = CaseInformation::where('security_classification', 'Maximum')
             ->whereHas('pdl', function ($query) use ($agency) {
                 $query->whereHas('personnel', function ($query) use ($agency) {
