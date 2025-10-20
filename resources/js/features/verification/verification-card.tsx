@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Pdl, Personnel, Verification } from '@/types';
+import { CourtOrder, Pdl, Personnel, Verification } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { useState } from 'react';
@@ -17,7 +17,7 @@ interface VerificationCardProps {
     verification: Verification & {
         pdl: Pdl & {
             physical_characteristics?: any[];
-            court_orders?: any[];
+            court_orders?: CourtOrder[];
             medical_records?: any[];
             cases?: any[];
         };
@@ -157,7 +157,10 @@ export default function VerificationCard({ verification, onUpdate, updateRoute =
                                             {[verification.pdl.brgy, verification.pdl.city, verification.pdl.province].filter(Boolean).join(', ')}
                                         </div>
                                         <div>
-                                            <span className="text-muted-foreground">Status:</span> <Badge>{verification.pdl.status || 'N/A'}</Badge>
+                                            <span className="text-muted-foreground">Ethnic Group:</span> {verification.pdl.ethnic_group}
+                                        </div>
+                                        <div>
+                                            <span className="text-muted-foreground">Civil Status:</span> {verification.pdl.civil_status}
                                         </div>
                                     </div>
                                 </div>
@@ -212,9 +215,6 @@ export default function VerificationCard({ verification, onUpdate, updateRoute =
                                                 verification.pdl.court_orders.map((order, index) => (
                                                     <div key={index} className="grid grid-cols-2 gap-2 text-sm">
                                                         <div>
-                                                            <span className="text-muted-foreground">Order #:</span> {order.court_order_number}
-                                                        </div>
-                                                        <div>
                                                             <span className="text-muted-foreground">Type:</span> {order.order_type}
                                                         </div>
                                                         <div>
@@ -226,7 +226,9 @@ export default function VerificationCard({ verification, onUpdate, updateRoute =
                                                             {format(new Date(order.received_date), 'MMM dd, yyyy')}
                                                         </div>
                                                         <div>
-                                                            <span className="text-muted-foreground">Court Branch:</span> {order.court_branch}
+                                                            <span className="text-muted-foreground">Court Branch:</span> {order.court.branch_code} -{' '}
+                                                            {order.court.branch} - {order.court.station} - {order.court.court_type} -{' '}
+                                                            {order.court.location}
                                                         </div>
                                                         <div>
                                                             <span className="text-muted-foreground">Document Type:</span> {order.document_type}
@@ -234,7 +236,11 @@ export default function VerificationCard({ verification, onUpdate, updateRoute =
 
                                                         <div>
                                                             <span className="text-muted-foreground">Document:</span>
-                                                            <Button variant="outline" size="sm" onClick={() => window.open(`/storage/${order.document_path}`, '_blank')}>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => window.open(`/storage/${order.document_path}`, '_blank')}
+                                                            >
                                                                 Preview
                                                             </Button>
                                                         </div>
@@ -279,7 +285,11 @@ export default function VerificationCard({ verification, onUpdate, updateRoute =
                                                         </div>
                                                         <div className="col-span-2">
                                                             <span className="text-muted-foreground">Document:</span>
-                                                            <Button variant="outline" size="sm" onClick={() => window.open(`/storage/${record.file_path}`, '_blank')}>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => window.open(`/storage/${record.file_path}`, '_blank')}
+                                                            >
                                                                 Preview
                                                             </Button>
                                                         </div>

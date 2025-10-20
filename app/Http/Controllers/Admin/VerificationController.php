@@ -20,6 +20,7 @@ class VerificationController extends Controller
                 $query->with([
                     'physicalCharacteristics',
                     'courtOrders',
+                    'courtOrders.court',
                     'medicalRecords',
                     'cases',
                     'personnel:id,fname,lname'
@@ -65,6 +66,11 @@ class VerificationController extends Controller
                         'court_orders' => $verification->pdl->courtOrders,
                         'medical_records' => $verification->pdl->medicalRecords,
                         'cases' => $verification->pdl->cases,
+                        'ethnic_group' => $verification->pdl->ethnic_group,
+                        'civil_status' => $verification->pdl->civil_status,
+                        'brgy' => $verification->pdl->brgy,
+                        'city' => $verification->pdl->city,
+                        'province' => $verification->pdl->province,
                     ] : null,
                     'created_at' => $verification->created_at,
                 ];

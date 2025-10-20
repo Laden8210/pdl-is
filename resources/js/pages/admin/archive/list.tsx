@@ -3,9 +3,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -15,7 +17,7 @@ import AppLayout from '@/layouts/app-layout';
 import { PageProps, type BreadcrumbItem } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { ArchiveRestore, Eye, FileText, Plus, Search, X } from 'lucide-react';
+import { ArchiveRestore, Check, ChevronsUpDown, Eye, FileText, Plus, Search, X } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -245,12 +247,16 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
     const [unarchiveReason, setUnarchiveReason] = useState('');
     const [unarchiveRemarks, setUnarchiveRemarks] = useState('');
     const [crimeCommittedOpen, setCrimeCommittedOpen] = useState(false);
-    const { post: postUnarchive, processing: unarchiveProcessing, setData: setUnarchiveData } = useForm();
+
     const { post: postRestorePersonnel, processing: restorePersonnelProcessing } = useForm();
 
-    const handleUnarchive = (pdl: any) => {
-        setPdlToUnarchive(pdl);
-        setNewCases([
+    const {
+        post: postUnarchive,
+        processing: unarchiveProcessing,
+        data: unarchiveData,
+        setData: setUnarchiveData,
+    } = useForm({
+        cases: [
             {
                 case_number: '',
                 crime_committed: '',
@@ -261,14 +267,42 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
                 security_classification: 'medium',
                 drug_related: false,
             },
-        ]);
+        ] as any[],
+        unarchive_reason: '',
+        unarchive_remarks: '',
+    });
+
+    const handleUnarchive = (pdl: any) => {
+        setPdlToUnarchive(pdl);
+        const initialCases = [
+            {
+                case_number: '',
+                crime_committed: '',
+                date_committed: '',
+                time_committed: '',
+                case_status: 'open',
+                case_remarks: '',
+                security_classification: 'medium',
+                drug_related: false,
+            },
+        ];
+
+        setNewCases(initialCases);
         setUnarchiveReason('');
         setUnarchiveRemarks('');
+
+        // Also set the form data
+        setUnarchiveData({
+            cases: initialCases,
+            unarchive_reason: '',
+            unarchive_remarks: '',
+        });
+
         setUnarchiveDialogOpen(true);
     };
 
     const addNewCase = () => {
-        setNewCases([
+        const updatedCases = [
             ...newCases,
             {
                 case_number: '',
@@ -280,8 +314,12 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
                 security_classification: 'medium',
                 drug_related: false,
             },
-        ]);
+        ];
+        setNewCases(updatedCases);
+        // Also update form data
+        setUnarchiveData(prev => ({ ...prev, cases: updatedCases }));
     };
+
 
     const removeCase = (index: number) => {
         if (newCases.length > 1) {
@@ -293,15 +331,12 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
         const updatedCases = [...newCases];
         updatedCases[index] = { ...updatedCases[index], [field]: value };
         setNewCases(updatedCases);
+        // Also update form data
+        setUnarchiveData(prev => ({ ...prev, cases: updatedCases }));
     };
 
     const confirmUnarchive = () => {
         if (pdlToUnarchive) {
-            setUnarchiveData({
-                cases: newCases,
-                unarchive_reason: unarchiveReason,
-                unarchive_remarks: unarchiveRemarks,
-            });
 
             postUnarchive(route('user-pdl-archive.unarchive', pdlToUnarchive.id), {
                 onSuccess: () => {
@@ -310,7 +345,6 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
                     setNewCases([]);
                     setUnarchiveReason('');
                     setUnarchiveRemarks('');
-                    // The page will refresh automatically due to redirect
                 },
                 onError: (errors) => {
                     console.error('Unarchive errors:', errors);
@@ -723,7 +757,7 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
 
                 {/* Unarchive Confirmation Dialog */}
                 <Dialog open={unarchiveDialogOpen} onOpenChange={setUnarchiveDialogOpen}>
-                    <DialogContent className="max-h-[90vh] max-w-md overflow-auto">
+                    <DialogContent className="max-h-[90vh] overflow-auto" style={{ width: '500px' }}>
                         <DialogHeader>
                             <DialogTitle>Confirm Unarchive</DialogTitle>
                             <DialogDescription>Are you sure you want to unarchive this PDL record?</DialogDescription>
@@ -759,8 +793,8 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
                                         </Label>
                                         <Textarea
                                             id="unarchive_reason"
-                                            value={unarchiveReason}
-                                            onChange={(e) => setUnarchiveReason(e.target.value)}
+                                            value={unarchiveData.unarchive_reason}
+                                            onChange={(e) => setUnarchiveData('unarchive_reason', e.target.value)}
                                             placeholder="Enter the reason for unarchiving this PDL..."
                                             rows={3}
                                         />
@@ -769,8 +803,8 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
                                         <Label htmlFor="unarchive_remarks">Additional Remarks</Label>
                                         <Textarea
                                             id="unarchive_remarks"
-                                            value={unarchiveRemarks}
-                                            onChange={(e) => setUnarchiveRemarks(e.target.value)}
+                                            value={unarchiveData.unarchive_remarks}
+                                            onChange={(e) => setUnarchiveData('unarchive_remarks', e.target.value)}
                                             placeholder="Enter any additional remarks or notes..."
                                             rows={2}
                                         />
@@ -812,7 +846,7 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
                                                 <AccordionContent>
                                                     <div className="space-y-4 pt-4">
                                                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                            <div>
+                                                            <div className="col-span-2">
                                                                 <Label htmlFor={`case_number_${index}`}>
                                                                     Case Number <span className="text-red-500">*</span>
                                                                 </Label>
@@ -823,22 +857,68 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
                                                                     placeholder="Enter case number"
                                                                 />
                                                             </div>
-                                                            <div>
+                                                            <div className="col-span-2">
                                                                 <Label htmlFor={`crime_committed_${index}`}>
                                                                     Crime Committed <span className="text-red-500">*</span>
                                                                 </Label>
-                                                                <Select>
-                                                                    <SelectTrigger>
-                                                                        <SelectValue placeholder="Select crime committed" />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        {criminalCaseTypes.flatMap((category) => category.cases.map((crime) => ({ value: crime, label: crime, category: category.category }))).map((crime) => (
-                                                                            <SelectItem key={crime.value} value={crime.value}>
-                                                                                {crime.label}
-                                                                            </SelectItem>
-                                                                        ))}
-                                                                    </SelectContent>
-                                                                </Select>
+                                                                <Popover open={crimeCommittedOpen} onOpenChange={setCrimeCommittedOpen}>
+                                                                    <PopoverTrigger asChild>
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            role="combobox"
+                                                                            aria-expanded={crimeCommittedOpen}
+                                                                            className="w-full justify-between"
+                                                                        >
+                                                                            {caseItem.crime_committed || 'Select or type crime committed...'}
+                                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                                        </Button>
+                                                                    </PopoverTrigger>
+                                                                    <PopoverContent className="w-full p-0" align="start">
+                                                                        <Command>
+                                                                            <CommandInput
+                                                                                placeholder="Search crimes or type custom..."
+                                                                                value={caseItem.crime_committed}
+                                                                                onValueChange={(value) => updateCase(index, 'crime_committed', value)}
+                                                                            />
+                                                                            <CommandList>
+                                                                                <CommandEmpty>
+                                                                                    <div className="p-2 text-sm text-muted-foreground">
+                                                                                        No crime found. Press Enter to add "
+                                                                                        {caseItem.crime_committed || ''}" as custom crime.
+                                                                                    </div>
+                                                                                </CommandEmpty>
+                                                                                {criminalCaseTypes.map((category) => (
+                                                                                    <CommandGroup key={category.category} heading={category.category}>
+                                                                                        {category.cases.map((crime) => (
+                                                                                            <CommandItem
+                                                                                                key={crime}
+                                                                                                value={crime}
+                                                                                                onSelect={(currentValue) => {
+                                                                                                    updateCase(
+                                                                                                        index,
+                                                                                                        'crime_committed',
+                                                                                                        currentValue,
+                                                                                                    );
+                                                                                                    setCrimeCommittedOpen(false);
+                                                                                                }}
+                                                                                            >
+                                                                                                <Check
+                                                                                                    className={`mr-2 h-4 w-4 ${
+                                                                                                        caseItem.crime_committed?.crime_committed ===
+                                                                                                        crime
+                                                                                                            ? 'opacity-100'
+                                                                                                            : 'opacity-0'
+                                                                                                    }`}
+                                                                                                />
+                                                                                                {crime}
+                                                                                            </CommandItem>
+                                                                                        ))}
+                                                                                    </CommandGroup>
+                                                                                ))}
+                                                                            </CommandList>
+                                                                        </Command>
+                                                                    </PopoverContent>
+                                                                </Popover>
                                                             </div>
                                                             <div>
                                                                 <Label htmlFor={`date_committed_${index}`}>

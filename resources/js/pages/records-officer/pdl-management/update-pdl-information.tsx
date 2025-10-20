@@ -428,6 +428,7 @@ export default function UpdatePDLInformation() {
         lname: string;
         mname: string;
         alias: string;
+        suffix: string;
         birthdate: string;
         age: string;
         gender: string;
@@ -485,6 +486,7 @@ export default function UpdatePDLInformation() {
         lname: pdl.lname || '',
         alias: pdl.alias || '',
         mname: pdl.mname || '',
+        suffix: pdl.suffix || '',
         birthdate: pdl.birthdate || '',
         age: pdl.age ? pdl.age.toString() : '',
         gender: pdl.gender || '',
@@ -959,7 +961,6 @@ export default function UpdatePDLInformation() {
             case 'pending':
                 return 'default';
             default:
-                return 'default';
         }
     };
 
@@ -994,6 +995,16 @@ export default function UpdatePDLInformation() {
                                 <div className="space-y-2">
                                     <Label htmlFor="alias">Alias</Label>
                                     <Input id="alias" name="alias" value={data.alias} onChange={handleChange} placeholder="Enter alias (if any)" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="suffix">Suffix</Label>
+                                    <Input
+                                        id="suffix"
+                                        name="suffix"
+                                        value={data.suffix}
+                                        onChange={handleChange}
+                                        placeholder="Enter suffix (if any)"
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>
@@ -1718,13 +1729,12 @@ export default function UpdatePDLInformation() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="on_trial">On Trial</SelectItem>
-                                                    <SelectItem value="bonded">Bonded</SelectItem>
-                                                    <SelectItem value="transferred_to_another_jail">Transferred to another jail</SelectItem>
-                                                    <SelectItem value="served_sentence">Served Sentence</SelectItem>
                                                     <SelectItem value="convicted">Convicted</SelectItem>
-
+                                                    <SelectItem value="deceased">Deceased</SelectItem>
+                                                    <SelectItem value="bonded">Bonded</SelectItem>
+                                                    <SelectItem value="transferred">Transferred</SelectItem>
+                                                    <SelectItem value="served_sentence">Served Sentence</SelectItem>
                                                     <SelectItem value="dismissed">Dismissed</SelectItem>
-
                                                     {auth?.user?.position === 'law-enforcement' && (
                                                         <SelectItem value="arraignment">Arraignment</SelectItem>
                                                     )}
