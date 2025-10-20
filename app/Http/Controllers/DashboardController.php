@@ -539,10 +539,15 @@ class DashboardController extends Controller
             })
 
             ->count();
-        $activeCases = CaseInformation::whereBetween('case_status', ['on_trial', 'pending', 'active', 'on t'])
+        $activeCases = CaseInformation::whereBetween('case_status', ['on_trial', 'pending', 'active', 'on trial'])
             ->whereHas('pdl', function ($query) use ($agency) {
                 $query->whereHas('personnel', function ($query) use ($agency) {
                     $query->where('agency', $agency);
+                });
+            })
+            ->whereHas('pdl', function ($query) use ($agency) {
+                $query->whereDoesntHave('verifications', function ($q) {
+                    $q->where('status', 'approved');
                 });
             })
             ->count();
@@ -938,7 +943,7 @@ class DashboardController extends Controller
             });
         })
         ->whereHas('pdl', function ($query) use ($agency) {
-            $query->whereDoesntHave('verifications', function ($q) {
+            $query->whereHas('verifications', function ($q) {
                 $q->where('status', 'approved');
             });
         })
@@ -950,11 +955,10 @@ class DashboardController extends Controller
                 });
             })
             ->whereHas('pdl', function ($query) use ($agency) {
-                $query->whereDoesntHave('verifications', function ($q) {
+                $query->whereHas('verifications', function ($q) {
                     $q->where('status', 'approved');
                 });
             })
-
             ->count();
         $recordsCreatedThisMonth = Pdl::whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
