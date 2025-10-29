@@ -64,7 +64,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     Route::get('/report/inmate-population', [ReportController::class, 'populationReport'])->name('reports.population');
     Route::get('/report/inmate-population/generate', [ReportController::class, 'generatePopulationReport'])->name('reports.population.generate');
-    Route::post('/report/inmate-population/generate', [ReportController::class, 'generatePopulationReport'])->name('reports.population.generate');
+    Route::post('/report/inmate-population/generate', [ReportController::class, 'generatereport/no-records-certificatePopulationReport'])->name('reports.population.generate');
 
     Route::get('/report/gcta-and-tastm', [ReportController::class, 'gctaTastmReport'])->name('reports.gcta-tastm');
     Route::get('/report/gcta-and-tastm/generate', [ReportController::class, 'generateGCTATASTM'])->name('reports.gcta-tastm.export');

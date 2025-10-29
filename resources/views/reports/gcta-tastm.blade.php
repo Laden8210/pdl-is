@@ -15,7 +15,6 @@
             margin: 0 auto;
         }
 
-
         .header {
             text-align: center;
             margin-bottom: 20px;
@@ -29,7 +28,8 @@
             margin-bottom: 10px;
         }
 
-        .logo-left, .logo-right {
+        .logo-left,
+        .logo-right {
             display: table-cell;
             width: 15%;
             vertical-align: middle;
@@ -97,7 +97,6 @@
             margin-bottom: 20px;
         }
 
-
         .to-whom {
             font-weight: bold;
             margin-bottom: 10px;
@@ -116,6 +115,8 @@
 
         .computation-section {
             margin-bottom: 20px;
+            width: 100%;
+
         }
 
         .computation-line {
@@ -123,12 +124,20 @@
             align-items: center;
             margin-bottom: 5px;
             font-family: monospace;
+            text-align: right;
+            width: 100%;
+
+            padding: 2px 0;
         }
 
+  
+
         .computation-label {
-            width: 200px;
-            min-width: 200px;
-            text-align: left;
+            text-align: right;
+        }
+
+        .computation-value {
+            text-align: right;
         }
 
         .computation-date {
@@ -141,11 +150,21 @@
             text-align: center;
         }
 
-        .separator-line {
-            border-top: 1px solid #000;
-            margin: 5px 0;
-            width: 100px;
+
+        .computation-section {
+            margin-bottom: 20px;
+            width: 100%;
         }
+
+        .computation-line {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-family: monospace;
+            width: 100%;
+            clear: both;
+        }
+
 
         .gcta-table {
             margin: 20px 0;
@@ -177,15 +196,11 @@
             width: 8%;
         }
 
-        .col-earned {
+        .col-earned-gcta {
             width: 20%;
         }
 
-        .col-gcta {
-            width: 20%;
-        }
-
-        .col-tastm {
+        .col-earned-tastm {
             width: 20%;
         }
 
@@ -214,25 +229,18 @@
             margin: 20px 0;
         }
 
-        .signature-section {
-            margin-top: 40px;
-            text-align: right;
+        .totals-row {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 5px;
         }
 
-        .signature-line {
-            border-bottom: 1px solid #000;
-            width: 250px;
-            margin: 0 0 5px auto;
-            height: 20px;
-        }
-
-        .signature-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .signature-title {
-            font-size: 10px;
+        .total-box {
+            border-top: 1px solid #000;
+            width: 15%;
+            margin-right: 5%;
+            text-align: center;
+            padding-top: 2px;
         }
 
         /* Print-specific styles */
@@ -249,6 +257,21 @@
             .gcta-table {
                 page-break-inside: avoid;
             }
+        }
+
+          .signature-section {
+            margin-top: 40px;
+            text-align: right;
+        }
+
+
+        .signature-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .signature-title {
+            font-size: 10px;
         }
     </style>
 </head>
@@ -287,30 +310,32 @@
             </div>
         </div>
     </div>
-        <div class="certification-title">CERTIFICATION</div>
-        <div class="subtitle">Good Conduct Time Allowance (GCTA) and Time Allowance for Study Teaching and Mentoring
-            (TASTM)</div>
 
-        <div class="to-whom">TO WHOM IT MAY CONCERN:</div>
+    <div class="cert-title">CERTIFICATION</div>
+    <div class="subtitle">Good Conduct Time Allowance (GCTA) and Time Allowance for Study Teaching and Mentoring (TASTM)
+    </div>
 
-        <div class="certification-text">
-            THIS IS TO CERTIFY that convicted prisoner
-            <strong>{{ strtoupper($pdl->fname . ' ' . $pdl->lname) }}</strong>, was detained in this facility since
-            <strong>{{ $commitment_date }}</strong> to date. {{ $pdl->gender == 'Male' ? 'He' : 'She' }} is generally of
-            good behaviour. {{ $pdl->gender == 'Male' ? 'He' : 'She' }} is granted of Good Conduct Time Allowance (GCTA)
-            less <strong>0 year/s to deduct</strong> for {{ $pdl->gender == 'Male' ? 'his' : 'her' }} violation of
-            <strong>none</strong>. {{ $pdl->gender == 'Male' ? 'His' : 'Her' }} net GCTA then is
-            <strong>{{ $total_gcta }} days</strong> or
-            <strong>{{ call_user_func($convertDaysToYMD, $total_gcta) }}</strong> covering said period.
-            {{ $pdl->gender == 'Male' ? 'He' : 'She' }} is also granted of net TASTM of <strong>{{ $total_tastm }}
-                days</strong> or <strong>{{ call_user_func($convertDaysToYMD, $total_tastm) }}</strong> for said
-            period. {{ $pdl->gender == 'Male' ? 'His' : 'Her' }} total detention with GCTA and TASTM then summed to
-            <strong>{{ call_user_func($convertDaysToYMD, $total_allowances) }}</strong>.
-        </div>
+    <div class="to-whom">TO WHOM IT MAY CONCERN:</div>
 
-        <div class="computation-section">
-            <div class="computation-title">Computation of Preventive Imprisonment:</div>
+    <div class="certification-text">
+        THIS IS TO CERTIFY that convicted prisoner
+        <strong>{{ strtoupper($pdl->fname . ' ' . $pdl->lname) }}</strong>, was detained in this facility since
+        <strong>{{ $commitment_date }}</strong> to date. {{ $pdl->gender == 'Male' ? 'He' : 'She' }} is generally of
+        good behaviour. {{ $pdl->gender == 'Male' ? 'He' : 'She' }} is granted of Good Conduct Time Allowance (GCTA)
+        less <strong>0 year/s to deduct</strong> for {{ $pdl->gender == 'Male' ? 'his' : 'her' }} violation of
+        <strong>none</strong>. {{ $pdl->gender == 'Male' ? 'His' : 'Her' }} net GCTA then is
+        <strong>{{ $total_gcta }} days</strong> or
+        <strong>{{ call_user_func($convertDaysToYMD, $total_gcta) }}</strong> covering said period.
+        {{ $pdl->gender == 'Male' ? 'He' : 'She' }} is also granted of net TASTM of <strong>{{ $total_tastm }}
+            days</strong> or <strong>{{ call_user_func($convertDaysToYMD, $total_tastm) }}</strong> for said
+        period. {{ $pdl->gender == 'Male' ? 'His' : 'Her' }} total detention with GCTA and TASTM then summed to
+        <strong>{{ call_user_func($convertDaysToYMD, $total_allowances) }}</strong>.
+    </div>
 
+    <div class="computation-section">
+        <div class="computation-title">Computation of Preventive Imprisonment:</div>
+
+        <div style="width: 100%;">
             <div class="computation-line">
                 <div class="computation-label">Present Date:</div>
                 <div class="computation-date">
@@ -318,6 +343,7 @@
                     <span>{{ $currentDate->format('n') }}</span>
                     <span>{{ $currentDate->format('j') }}</span>
                 </div>
+                <span class="computation-date-separator">-------------------</span>
             </div>
 
             <div class="computation-line">
@@ -326,94 +352,82 @@
                     <span>{{ $commitmentDate->format('Y') }}</span>
                     <span>{{ $commitmentDate->format('n') }}</span>
                     <span>{{ $commitmentDate->format('j') }}</span>
+
                 </div>
+                <span class="computation-date-separator">-------------------</span>
             </div>
 
-            <div class="separator-line"></div>
+
 
             <div class="computation-line">
                 <div class="computation-label">Total Detention</div>
-                <div class="computation-date">
-                    <span>{{ $time_served['years'] }}</span>
-                    <span>{{ $time_served['months'] }}</span>
-                    <span>{{ $time_served['days'] }}</span>
-                </div>
+                <div class="computation-value">{{ $time_served['years'] }} Y {{ $time_served['months'] }} M
+                    {{ $time_served['days'] }} D</div>
+                      <span class="computation-date-separator">-------------------</span>
             </div>
 
             <div class="computation-line">
                 <div class="computation-label">Add GCTA</div>
-                <div>(net GCTA mentioned above)</div>
+                <div class="computation-value">({{ $net_gcta_ymd }})</div>
             </div>
 
-            <div class="separator-line"></div>
+            <div class="separator-line" style="margin-left: 0;"></div>
 
             <div class="computation-line">
                 <div class="computation-label">Total Detention w/ GCTA</div>
-                <div>(Total Detention + GCTA)</div>
+                <div class="computation-value">({{ $total_detention_gcta_ymd }})</div>
+                <span class="computation-date-separator">-------------------</span>
             </div>
 
             <div class="computation-line">
                 <div class="computation-label">Add TASTM</div>
-                <div>(net TASTM)</div>
+                <div class="computation-value">({{ $net_tastm_ymd }})</div>
+                <span class="computation-date-separator">-------------------</span>
             </div>
 
-            <div class="separator-line"></div>
+            <div class="separator-line" style="margin-left: 0;"></div>
 
             <div class="computation-line">
                 <div class="computation-label">Total Detention w/ GCTA & TASTM</div>
-                <div>(Total)</div>
+                <div class="computation-value">({{ $total_detention_gcta_tastm_ymd }})</div>
+                <span class="computation-date-separator">-------------------</span>
             </div>
         </div>
+    </div>
 
-        <table class="gcta-table">
-            <thead>
-                <tr>
-                    <th colspan="3">From</th>
-                    <th colspan="3">To</th>
-                    <th class="col-earned">EARNED</th>
-                    <th class="col-gcta">GCTA</th>
-                    <th class="col-tastm">TASTM</th>
-                </tr>
-            </thead>
-
+    <table class="gcta-table">
+        <thead>
+            <tr>
+                <th colspan="3">From</th>
+                <th colspan="3">To</th>
+                <th class="col-earned-gcta">EARNED GCTA</th>
+                <th class="col-earned-tastm">EARNED TASTM</th>
+            </tr>
+        </thead>
+        <tbody>
             @foreach ($computation_data as $row)
-                <tbody>
-                    <tr>
-                        <td colspan="3">{{ explode(' ', $row['first_column_date'])[0] }}</td>
-                        <td colspan="3">{{ explode(' ', $row['second_column_date'])[0] }}</td>
-                        <td class="col-earned">{{ $row['gcta_calculation'] }} {{ $row['gcta_total'] }}</td>
-                        <td class="col-gcta">{{ $row['tastm_calculation'] }} {{ $row['tastm_total'] }}</td>
-                        <td class="col-tastm">{{ $row['tastm_total'] }}</td>
-                    </tr>
-                </tbody>
+                <tr>
+                    <td colspan="3">{{ explode(' ', $row['first_column_date'])[0] }}</td>
+                    <td colspan="3">{{ explode(' ', $row['second_column_date'])[0] }}</td>
+                    <td class="col-earned-gcta">{{ $row['gcta_calculation'] }} {{ $row['gcta_total'] }}</td>
+                    <td class="col-earned-tastm">{{ $row['tastm_calculation'] }} {{ $row['tastm_total'] }}</td>
+                </tr>
             @endforeach
-        </table>
-
-        <div style="display: flex; justify-content: flex-end; margin: 5px 0;">
-            <div style="border-top: 1px solid #000; width: 15%; margin-right: 15%;"></div>
-            <div style="border-top: 1px solid #000; width: 15%;"></div>
-        </div>
-
-        <div class="data-row">
-            <div class="col col-year"></div>
-            <div class="col col-month"></div>
-            <div class="col col-day"></div>
-            <div class="col col-year"></div>
-            <div class="col col-month"></div>
-            <div class="col col-day"></div>
-            <div class="col col-earned"><strong>{{ number_format($total_gcta) }}</strong></div>
-            <div class="col col-gcta"></div>
-            <div class="col col-tastm"><strong>{{ number_format($total_tastm) }}</strong></div>
-        </div>
-    </div>
-
-    <div class="summary-calculations">
-        <div class="summary-calc">{{ $total_gcta }}/30 = {{ number_format($total_gcta / 30, 1) }}</div>
-        <div class="summary-calc">{{ call_user_func($convertDaysToYMD, $total_gcta) }}</div>
-        <div class="summary-calc"></div>
-        <div class="summary-calc">{{ $total_tastm }}/30 = {{ number_format($total_tastm / 30, 2) }}</div>
-        <div class="summary-calc">{{ call_user_func($convertDaysToYMD, $total_tastm) }}</div>
-    </div>
+            <!-- Totals row -->
+            <tr>
+                <td colspan="6"
+                    style="text-align: left; border: none; border-top: 1px solid #000; padding-left: 10px;">
+                    <strong>TOTAL</strong>
+                </td>
+                <td class="col-earned-gcta" style="border-top: 1px solid #000;">
+                    <strong>{{ number_format($total_gcta) }}</strong>
+                </td>
+                <td class="col-earned-tastm" style="border-top: 1px solid #000;">
+                    <strong>{{ number_format($total_tastm) }}</strong>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
     <div class="concluding-text">
         This certification is issued upon the request of the accused for whatever legal purpose it may serve
@@ -424,8 +438,9 @@
         Issued this {{ now()->format('jS') }} day of {{ now()->format('F Y') }}. Koronadal City, South Cotabato.
     </div>
 
+    
     <div class="signature-section">
-        <div class="signature-line"></div>
+
         <div class="signature-name">{{$full_name ?? 'Provincial Warden'}}</div>
         <div class="signature-title">{{$position ?? 'Provincial Warden'}}</div>
     </div>

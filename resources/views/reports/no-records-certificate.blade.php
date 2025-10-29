@@ -205,7 +205,7 @@
 
         <div class="person-list">
             @foreach($data['persons'] as $index => $person)
-                <div>{{ $index + 1 }}. {{ $person['fname'] }} {{ $person['mname'] }} {{ $person['lname'] }}</div>
+                <div>{{ $index + 1 }}. {{ $person['fname'] }} {{ $person['mname'] }} {{ $person['lname'] }} {{ $person['suffix'] }}</div>
             @endforeach
         </div>
 

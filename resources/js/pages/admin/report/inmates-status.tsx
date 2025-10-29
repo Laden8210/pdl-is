@@ -351,7 +351,7 @@ export default function InmatesStatusReport({ reportData, filters }: PageProps) 
                                         <p className="text-sm font-medium">Prepared by:</p>
                                     </div>
                                     <div className="text-center">
-                                        <p className="text-sm font-medium">{data.prepared_by}</p>
+                                        <p className="text-sm font-medium">{data.noted_by}</p>
                                         <div className="border-b border-gray-300 w-48 mb-2"></div>
                                         <p className="text-sm font-medium">Noted by:</p>
                                     </div>

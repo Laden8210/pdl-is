@@ -44,9 +44,33 @@ export default function ListOfPdlReports() {
 
         window.location.href = route('reports.pdl-list.export') + '?' + params.toString();
     };
-    const handleGenerateReport = (pdlId: number, reportType: string) => {
-        window.open(route('reports.pdl.report', { pdl: pdlId, type: reportType }), '_blank');
-    };
+
+    // Group PDls by their ID to show cases together
+    const groupedPdls = pdls.reduce((acc, pdl) => {
+        if (!acc[pdl.pdl_id]) {
+            acc[pdl.pdl_id] = {
+                pdl_id: pdl.pdl_id,
+                name: pdl.name,
+                date_of_birth: pdl.date_of_birth,
+                age: pdl.age,
+                address: pdl.address,
+                tribe: pdl.tribe,
+                years: pdl.years,
+                cases: []
+            };
+        }
+        acc[pdl.pdl_id].cases.push({
+            id: pdl.id,
+            case_no: pdl.case_no,
+            crime_committed: pdl.crime_committed,
+            date_committed: pdl.date_committed,
+            case_status: pdl.case_status,
+            rtc: pdl.rtc
+        });
+        return acc;
+    }, {});
+
+    const groupedPdlsArray = Object.values(groupedPdls);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -105,12 +129,10 @@ export default function ListOfPdlReports() {
                     <CardHeader>
                         <CardTitle className="text-center">
                             <div className="flex items-center justify-center gap-4 mb-4">
-
                                 <div>
                                     <div className="text-xl font-bold">List of PDL Reports</div>
                                     <div className="text-sm text-gray-600">South Cotabato Rehabilitation and Detention Center</div>
                                 </div>
-
                             </div>
                         </CardTitle>
                     </CardHeader>
@@ -132,21 +154,41 @@ export default function ListOfPdlReports() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {pdls.length > 0 ? (
-                                    pdls.map((pdl) => (
-                                        <TableRow key={pdl.id}>
-                                            <TableCell className="font-medium">{pdl.name}</TableCell>
-                                            <TableCell>{pdl.case_no}</TableCell>
-                                            <TableCell>{pdl.crime_committed}</TableCell>
-                                            <TableCell>{pdl.date_of_birth ? format(new Date(pdl.date_of_birth), 'MMM dd, yyyy') : 'N/A'}</TableCell>
-                                            <TableCell>{pdl.date_committed ? format(new Date(pdl.date_committed), 'MMM dd, yyyy') : 'N/A'}</TableCell>
-                                            <TableCell>{pdl.age ? Math.floor(pdl.age) : 'N/A'}</TableCell>
-                                            <TableCell>{pdl.address || 'N/A'}</TableCell>
-                                            <TableCell>{pdl.tribe}</TableCell>
-                                            <TableCell>{pdl.years ? Math.floor(pdl.years) : 'N/A'}</TableCell>
-                                            <TableCell>{pdl.case_status}</TableCell>
-                                            <TableCell>{pdl.rtc}</TableCell>
-                                        </TableRow>
+                                {groupedPdlsArray.length > 0 ? (
+                                    groupedPdlsArray.map((pdl) => (
+                                        <>
+                                            {pdl.cases.map((caseItem, index) => (
+                                                <TableRow key={caseItem.id}>
+                                                    {index === 0 ? (
+                                                        <>
+                                                            <TableCell rowSpan={pdl.cases.length} className="font-medium">
+                                                                {pdl.name}
+                                                            </TableCell>
+                                                            <TableCell>{caseItem.case_no}</TableCell>
+                                                            <TableCell>{caseItem.crime_committed}</TableCell>
+                                                            <TableCell rowSpan={pdl.cases.length}>
+                                                                {pdl.date_of_birth ? format(new Date(pdl.date_of_birth), 'MMM dd, yyyy') : 'N/A'}
+                                                            </TableCell>
+                                                            <TableCell>{caseItem.date_committed ? format(new Date(caseItem.date_committed), 'MMM dd, yyyy') : 'N/A'}</TableCell>
+                                                            <TableCell rowSpan={pdl.cases.length}>{pdl.age ? Math.floor(pdl.age) : 'N/A'}</TableCell>
+                                                            <TableCell rowSpan={pdl.cases.length}>{pdl.address || 'N/A'}</TableCell>
+                                                            <TableCell rowSpan={pdl.cases.length}>{pdl.tribe}</TableCell>
+                                                            <TableCell rowSpan={pdl.cases.length}>{pdl.years ? Math.floor(pdl.years) : 'N/A'}</TableCell>
+                                                            <TableCell>{caseItem.case_status}</TableCell>
+                                                            <TableCell>{caseItem.rtc}</TableCell>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <TableCell>{caseItem.case_no}</TableCell>
+                                                            <TableCell>{caseItem.crime_committed}</TableCell>
+                                                            <TableCell>{caseItem.date_committed ? format(new Date(caseItem.date_committed), 'MMM dd, yyyy') : 'N/A'}</TableCell>
+                                                            <TableCell>{caseItem.case_status}</TableCell>
+                                                            <TableCell>{caseItem.rtc}</TableCell>
+                                                        </>
+                                                    )}
+                                                </TableRow>
+                                            ))}
+                                        </>
                                     ))
                                 ) : (
                                     <TableRow>

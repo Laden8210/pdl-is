@@ -117,6 +117,19 @@
         .text-right {
             text-align: right;
         }
+
+        .pdl-name {
+            font-weight: bold;
+            background-color: #e8f4fd;
+        }
+
+        .case-row {
+            background-color: #ffffff;
+        }
+
+        .no-border-top {
+            border-top: none;
+        }
     </style>
 </head>
 <body>
@@ -177,21 +190,51 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($pdls as $pdl)
-            <tr>
-                <td>{{ $pdl['Name'] }}</td>
-                <td>{{ $pdl['CaseNo'] }}</td>
-                <td>{{ $pdl['CrimeCommitted'] }}</td>
-                <td>{{ $pdl['Date of Birth'] }}</td>
-                <td>{{ $pdl['Date Committed'] }}</td>
-                <td class="text-center">{{ is_numeric($pdl['Age']) ? floor($pdl['Age']) : 'N/A' }}</td>
-                <td>{{ $pdl['Address'] }}</td>
-                <td>{{ $pdl['Tribe'] }}</td>
-                <td class="text-center">{{ is_numeric($pdl['Years']) ? floor($pdl['Years']) : 'N/A' }}</td>
-                <td>{{ $pdl['CaseStatus'] }}</td>
-                <td>{{ $pdl['RTC'] }}</td>
-            </tr>
+            @php
+                $currentPdlId = null;
+                $pdlCaseCount = 0;
+                $pdlCases = [];
+                
+                // Group cases by PDL
+                foreach($pdls as $pdl) {
+                    if (!isset($pdlCases[$pdl['pdl_id']])) {
+                        $pdlCases[$pdl['pdl_id']] = [];
+                    }
+                    $pdlCases[$pdl['pdl_id']][] = $pdl;
+                }
+            @endphp
+
+            @foreach($pdlCases as $pdlId => $cases)
+                @foreach($cases as $index => $pdl)
+                    <tr class="{{ $index === 0 ? 'pdl-name' : 'case-row no-border-top' }}">
+                        @if($index === 0)
+                            <td rowspan="{{ count($cases) }}" class="pdl-name">{{ $pdl['name'] }}</td>
+                            <td>{{ $pdl['case_no'] }}</td>
+                            <td>{{ $pdl['crime_committed'] }}</td>
+                            <td rowspan="{{ count($cases) }}">{{ $pdl['date_of_birth'] }}</td>
+                            <td>{{ $pdl['date_committed'] }}</td>
+                            <td rowspan="{{ count($cases) }}" class="text-center">{{ is_numeric($pdl['age']) ? floor($pdl['age']) : 'N/A' }}</td>
+                            <td rowspan="{{ count($cases) }}">{{ $pdl['address'] }}</td>
+                            <td rowspan="{{ count($cases) }}">{{ $pdl['tribe'] }}</td>
+                            <td rowspan="{{ count($cases) }}" class="text-center">{{ is_numeric($pdl['years']) ? floor($pdl['years']) : 'N/A' }}</td>
+                            <td>{{ $pdl['case_status'] }}</td>
+                            <td>{{ $pdl['rtc'] }}</td>
+                        @else
+                            <td>{{ $pdl['case_no'] }}</td>
+                            <td>{{ $pdl['crime_committed'] }}</td>
+                            <td>{{ $pdl['date_committed'] }}</td>
+                            <td>{{ $pdl['case_status'] }}</td>
+                            <td>{{ $pdl['rtc'] }}</td>
+                        @endif
+                    </tr>
+                @endforeach
             @endforeach
+
+            @if(count($pdls) === 0)
+            <tr>
+                <td colspan="11" class="text-center">No records found for the selected date range.</td>
+            </tr>
+            @endif
         </tbody>
     </table>
 

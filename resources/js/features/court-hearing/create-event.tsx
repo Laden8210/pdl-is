@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label';
 import { useForm, usePage } from '@inertiajs/react';
 import { Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+
 
 interface Pdl {
     id: number;
@@ -107,11 +107,11 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                 });
                 setSearchTerm('');
                 setShowActivitySuggestions(false);
-                toast.success('Event created successfully');
+
             },
             onError: (errors) => {
                 console.error('Form submission errors:', errors);
-                toast.error('Unable to process request');
+
             },
         });
     };
@@ -176,42 +176,7 @@ export default function CreateEvent({ pdls }: { pdls: Pdl[] }) {
                         <DialogDescription>Fill in the details of the event you want to add.</DialogDescription>
                     </DialogHeader>
 
-                    {Object.keys(errors).length > 0 && (
-                        <div data-alert-container className="relative">
-                            <Alert variant="destructive">
-                                <button
-                                    type="button"
-                                    aria-label="Close"
-                                    onClick={(e) => {
-                                        const container = (e.currentTarget.closest('[data-alert-container]') as HTMLElement) || undefined;
-                                        if (container) container.style.display = 'none';
-                                    }}
-                                    className="absolute top-2 right-2 rounded p-1 text-lg leading-none hover:bg-muted"
-                                >
-                                    ×
-                                </button>
-                                <AlertTitle>Unable to process request</AlertTitle>
-                                <AlertDescription>
-                                    <ul className="list-inside list-disc space-y-1">
-                                        {Object.entries(errors).map(([key, value]) => (
-                                            // use toast.error to show the error
-                                            toast.error(value as string)
-                                        ))}
-                                    </ul>
-                                </AlertDescription>
-                            </Alert>
-                        </div>
-                    )}
 
-                    {showSuccess && successMessage && (
-                        <Alert variant="default" className="relative mb-4">
-                            <AlertTitle>Success</AlertTitle>
-                            <AlertDescription>{successMessage}</AlertDescription>
-                            <button onClick={() => setShowSuccess(false)} className="absolute top-3 right-3">
-                                <X className="h-4 w-4" />
-                            </button>
-                        </Alert>
-                    )}
 
                     <div className="grid gap-4 py-4">
                         <div className="space-y-2">
