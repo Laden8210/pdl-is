@@ -62,14 +62,14 @@ class JailEventsController extends Controller
             'pdl_ids.required' => 'Please select at least one PDL.',
         ]);
 
-        // Check for conflicting events
+
         $conflictingEvents = $this->checkForConflictingEvents($validated['activity_date'], $validated['activity_time'], $validated['pdl_ids']);
 
         if (!empty($conflictingEvents)) {
-            return back()->withErrors([
-                'conflict' => 'Some PDLs have conflicting events at this time. Please check the schedule.',
-                'conflicting_events' => $conflictingEvents
-            ]);
+            return redirect()->back()->withErrors([
+                'error' => 'There are conflicting events for the selected PDL(s).',
+                'details' => $conflictingEvents
+            ])->withInput();
         }
 
         // Create a single activity record with all PDLs

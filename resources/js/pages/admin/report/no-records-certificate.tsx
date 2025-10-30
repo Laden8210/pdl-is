@@ -1,18 +1,16 @@
-import React, { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Download, FileText, User, Plus, X, Building } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
+import { Head, useForm } from '@inertiajs/react';
+import { Building, Download, FileText, Plus, User, X } from 'lucide-react';
 
 interface Person {
     fname: string;
     mname: string;
     lname: string;
+    suffix: string;
     [key: string]: any;
 }
 
@@ -57,7 +55,7 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
         officer_name: string;
         officer_position: string;
     }>({
-        persons: filters?.persons || [{ fname: '', mname: '', lname: '' }],
+        persons: filters?.persons || [{ fname: '', mname: '', lname: '', suffix: '' }],
         requested_by: filters?.requested_by || '',
         requesting_agency: filters?.requesting_agency || '',
         export_pdf: false,
@@ -66,7 +64,7 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
     });
 
     const handleAddPerson = () => {
-        setData('persons', [...data.persons, { fname: '', mname: '', lname: '' }]);
+        setData('persons', [...data.persons, { fname: '', mname: '', lname: '', suffix: '' }]);
     };
 
     const handleRemovePerson = (index: number) => {
@@ -93,6 +91,7 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
             params.append(`persons[${index}][fname]`, person.fname || '');
             params.append(`persons[${index}][mname]`, person.mname || '');
             params.append(`persons[${index}][lname]`, person.lname || '');
+            params.append(`persons[${index}][suffix]`, person.suffix || '');
         });
 
         params.append('requested_by', data.requested_by);
@@ -109,8 +108,6 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
         //window.location.href = route('reports.no-records-certificate.export') + '?' + params.toString();
     };
 
-
-
     return (
         <AppLayout>
             <Head title="Certificate of No Records - South Cotabato Rehabilitation and Detention Center" />
@@ -120,15 +117,11 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold">Certificate of No Records</h1>
-                        <p className="text-muted-foreground">
-                            Generate official certificate stating no records exist for specified persons
-                        </p>
+                        <p className="text-muted-foreground">Generate official certificate stating no records exist for specified persons</p>
                     </div>
                     <div className="flex items-center space-x-2">
                         <FileText className="h-5 w-5 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">
-                            Official Certificate
-                        </span>
+                        <span className="text-sm text-muted-foreground">Official Certificate</span>
                     </div>
                 </div>
 
@@ -136,13 +129,10 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                 <Card>
                     <CardHeader>
                         <CardTitle>Generate Certificate of No Records</CardTitle>
-                        <CardDescription>
-                            Enter the names of persons and requesting information
-                        </CardDescription>
+                        <CardDescription>Enter the names of persons and requesting information</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-6">
-
                             <div className="space-y-4">
                                 <Label className="text-base font-semibold">Officer Name</Label>
                                 <Input
@@ -166,23 +156,20 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                             <div className="space-y-4">
                                 <Label className="text-base font-semibold">Person Names</Label>
                                 {data.persons.map((person, index) => (
-                                    <div key={index} className="space-y-3 p-4 border rounded-lg">
+                                    <div key={index} className="space-y-3 rounded-lg border p-4">
                                         <div className="flex items-center justify-between">
                                             <Label className="text-sm font-medium">Person {index + 1}</Label>
                                             {data.persons.length > 1 && (
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => handleRemovePerson(index)}
-                                                >
+                                                <Button type="button" variant="outline" size="sm" onClick={() => handleRemovePerson(index)}>
                                                     <X className="h-4 w-4" />
                                                 </Button>
                                             )}
                                         </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                                             <div className="space-y-1">
-                                                <Label htmlFor={`fname-${index}`} className="text-xs">First Name</Label>
+                                                <Label htmlFor={`fname-${index}`} className="text-xs">
+                                                    First Name
+                                                </Label>
                                                 <Input
                                                     id={`fname-${index}`}
                                                     placeholder="First Name"
@@ -191,7 +178,9 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                                                 />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label htmlFor={`mname-${index}`} className="text-xs">Middle Name</Label>
+                                                <Label htmlFor={`mname-${index}`} className="text-xs">
+                                                    Middle Name
+                                                </Label>
                                                 <Input
                                                     id={`mname-${index}`}
                                                     placeholder="Middle Name"
@@ -200,7 +189,9 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                                                 />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label htmlFor={`lname-${index}`} className="text-xs">Last Name</Label>
+                                                <Label htmlFor={`lname-${index}`} className="text-xs">
+                                                    Last Name
+                                                </Label>
                                                 <Input
                                                     id={`lname-${index}`}
                                                     placeholder="Last Name"
@@ -208,22 +199,29 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                                                     onChange={(e) => handlePersonFieldChange(index, 'lname', e.target.value)}
                                                 />
                                             </div>
+
+                                            <div className="space-y-1">
+                                                <Label htmlFor={`suffix-${index}`} className="text-xs">
+                                                    Suffix
+                                                </Label>
+                                                <Input
+                                                    id={`suffix-${index}`}
+                                                    placeholder="Suffix (e.g., Jr., Sr., III)"
+                                                    value={person.suffix}
+                                                    onChange={(e) => handlePersonFieldChange(index, 'suffix', e.target.value)}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={handleAddPerson}
-                                    className="w-full"
-                                >
-                                    <Plus className="h-4 w-4 mr-2" />
+                                <Button type="button" variant="outline" onClick={handleAddPerson} className="w-full">
+                                    <Plus className="mr-2 h-4 w-4" />
                                     Add Another Person
                                 </Button>
                             </div>
 
                             {/* Requesting Information */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
                                     <Label htmlFor="requested_by">Requested By</Label>
                                     <Input
@@ -248,18 +246,28 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                             <div className="flex space-x-2">
                                 <Button
                                     onClick={() => handleGenerate(false)}
-                                    disabled={processing || !data.persons.some(person => person.fname.trim() || person.lname.trim()) || !data.requested_by || !data.requesting_agency}
+                                    disabled={
+                                        processing ||
+                                        !data.persons.some((person) => person.fname.trim() || person.lname.trim()) ||
+                                        !data.requested_by ||
+                                        !data.requesting_agency
+                                    }
                                     className="flex-1"
                                 >
-                                    <FileText className="h-4 w-4 mr-2" />
+                                    <FileText className="mr-2 h-4 w-4" />
                                     {processing ? 'Generating...' : 'Generate Certificate'}
                                 </Button>
                                 <Button
                                     onClick={() => handleExport()}
-                                    disabled={processing || !data.persons.some(person => person.fname.trim() || person.lname.trim()) || !data.requested_by || !data.requesting_agency}
+                                    disabled={
+                                        processing ||
+                                        !data.persons.some((person) => person.fname.trim() || person.lname.trim()) ||
+                                        !data.requested_by ||
+                                        !data.requesting_agency
+                                    }
                                     variant="outline"
                                 >
-                                    <Download className="h-4 w-4 mr-2" />
+                                    <Download className="mr-2 h-4 w-4" />
                                     Export PDF
                                 </Button>
                             </div>
@@ -280,8 +288,8 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 {/* Header Information */}
-                                <div className="text-center space-y-2">
-                                    <div className="font-bold text-lg">{certificateData.facility_name}</div>
+                                <div className="space-y-2 text-center">
+                                    <div className="text-lg font-bold">{certificateData.facility_name}</div>
                                     <div className="font-semibold">{certificateData.office}</div>
                                     <div className="font-semibold">{certificateData.unit}</div>
                                     <div>{certificateData.location}</div>
@@ -294,24 +302,22 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
 
                                 {/* Certificate Content */}
                                 <div className="space-y-4">
-                                    <div className="font-bold text-lg text-center underline">
-                                        {certificateData.title}
-                                    </div>
+                                    <div className="text-center text-lg font-bold underline">{certificateData.title}</div>
 
                                     <div className="space-y-3">
                                         <div className="font-bold underline">TO WHOM IT MAY CONCERN:</div>
 
                                         <div className="text-sm leading-relaxed">
                                             <p>
-                                                <strong>THIS IS TO CERTIFY</strong> that this office has no records,
-                                                whatsoever affecting the following persons:
+                                                <strong>THIS IS TO CERTIFY</strong> that this office has no records, whatsoever affecting the
+                                                following persons:
                                             </p>
                                         </div>
 
-                                        <div className="text-sm ml-4">
+                                        <div className="ml-4 text-sm">
                                             {certificateData.persons.map((person, index) => (
                                                 <div key={index} className="mb-1">
-                                                    {index + 1}. {person.fname} {person.mname} {person.lname}
+                                                    {index + 1}. {person.fname} {person.mname} {person.lname} {person.suffix}
                                                 </div>
                                             ))}
                                         </div>
@@ -332,7 +338,7 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                                 </div>
 
                                 {/* Signature Section */}
-                                <div className="text-right mt-8">
+                                <div className="mt-8 text-right">
                                     <div className="font-bold">{data.officer_name ?? certificateData.signed_by.name}</div>
                                     <div>{data.officer_position ?? certificateData.signed_by.position}</div>
                                 </div>
@@ -345,7 +351,7 @@ export default function NoRecordsCertificate({ certificateData, filters }: PageP
                                 <CardTitle>Certificate Details</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div className="space-y-2">
                                         <div className="flex items-center space-x-2">
                                             <User className="h-4 w-4 text-blue-600" />

@@ -201,7 +201,7 @@
                     <div class="republic">Republic of the Philippines</div>
                     <div class="office-name">South Cotabato Rehabilitation and Detention Center</div>
                     <div class="city">City of Koronadal</div>
-                    <div class="contact">Tel #: (083) 228-2445; Email Address: socotrehab@gmail.com</div>
+                    <div class="contact">Tel #: (083) 228-2445; Email Address: socot.scrdcjail@gmail.com</div>
                 </div>
                 <div class="logo-right">
                     <div class="logo-container">
@@ -256,7 +256,7 @@
                     <div class="detail-value">{{ $pdl->alias }}</div>
                     <div class="detail-label-right">Date Committed:</div>
                     <div class="detail-value-right">
-                        @if($pdl->cases->isNotEmpty() && $pdl->cases->first()->date_committed)
+                        @if ($pdl->cases->isNotEmpty() && $pdl->cases->first()->date_committed)
                             {{ $pdl->cases->first()->date_committed->format('F d, Y') }}
                         @else
                             N/A
@@ -269,7 +269,7 @@
                     <div class="detail-value">{{ $pdl->brgy }}</div>
                     <div class="detail-label-right">Time Committed:</div>
                     <div class="detail-value-right">
-                        @if($pdl->cases->isNotEmpty() && $pdl->cases->first()->time_committed)
+                        @if ($pdl->cases->isNotEmpty() && $pdl->cases->first()->time_committed)
                             {{ $pdl->cases->first()->time_committed }}
                         @else
                             N/A
@@ -293,28 +293,56 @@
             </div>
         </div>
 
-        <div class="case-section">
-            @foreach ($pdl->cases as $case)
-                <div class="case-item">
-                    <div class="case-label">Case No:</div>
-                    <div class="case-value">{{ $case->case_number }}</div>
-                </div>
+        <div class="case-section" style="margin-top: 20px; border-top: 1px solid #000; padding-top: 15px;">
+            @if ($pdl->cases->count() > 0)
 
-                <div class="case-item">
-                    <div class="case-label">Crime Committed:</div>
-                    <div class="case-value">{{ $case->crime_committed }}</div>
+
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+                    <thead>
+                        <tr style="background-color: #f5f5f5;">
+                            <th style="border: 1px solid #000; padding: 8px; text-align: left; width: 10%;">Case #</th>
+                            <th style="border: 1px solid #000; padding: 8px; text-align: left; width: 20%;">Case No</th>
+                            <th style="border: 1px solid #000; padding: 8px; text-align: left; width: 30%;">Crime
+                                Committed</th>
+                            <th style="border: 1px solid #000; padding: 8px; text-align: left; width: 15%;">Case Status
+                            </th>
+                            <th style="border: 1px solid #000; padding: 8px; text-align: left; width: 15%;">RTC Branch
+                            </th>
+                            <th style="border: 1px solid #000; padding: 8px; text-align: left; width: 10%;">Date Filed
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($pdl->cases as $index => $case)
+                            <tr
+                                style="{{ $index % 2 == 0 ? 'background-color: #f9f9f9;' : 'background-color: #fff;' }}">
+                                <td style="border: 1px solid #000; padding: 8px; font-weight: bold;">
+                                    {{ $index + 1 }}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">{{ $case->case_number ?? 'N/A' }}
+                                </td>
+                                <td style="border: 1px solid #000; padding: 8px;">{{ $case->crime_committed ?? 'N/A' }}
+                                </td>
+                                <td style="border: 1px solid #000; padding: 8px;">{{ $case->case_status ?? 'N/A' }}
+                                </td>
+                                <td style="border: 1px solid #000; padding: 8px;">
+                                    {{ $case->court_branch ? 'RTC ' . $case->court_branch : 'N/A' }}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">
+                                    @if ($case->date_filed)
+                                        {{ $case->date_filed->format('M d, Y') }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div
+                    style="text-align: center; color: #666; font-style: italic; padding: 20px; border: 1px solid #ddd;">
+                    <p>No case information available.</p>
                 </div>
-                <div class="case-item">
-                    <div class="case-label">Case Status / RTC:</div>
-                    <div class="case-value">
-                        @if($case->case_status)
-                            {{ $case->case_status }} / RTC {{ $case->pdl->court_branch }}
-                        @else
-                            N/A
-                        @endif
-                    </div>
-                </div>
-            @endforeach
+            @endif
         </div>
     </div>
 </body>

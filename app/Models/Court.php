@@ -31,10 +31,10 @@ class Court extends Model
         return $this->hasManyThrough(
             Pdl::class,
             CourtOrder::class,
-            'court_id', // Foreign key on court_orders table
-            'pdl_id',   // Foreign key on pdls table
-            'court_id', // Local key on courts table
-            'pdl_id'    // Local key on court_orders table
+            'court_id',
+            'pdl_id',
+            'court_id',
+            'pdl_id'
         );
     }
 

@@ -37,54 +37,18 @@ class ReportController extends Controller
             ->where('archive_status', '=', null)
             ->orderBy('lname')
             ->get()
-            ->map(function ($pdl) {
-                $mainCase = $pdl
+            ->flatMap(function ($pdl) {
+                $cases = $pdl->cases;
 
-                    ->cases->first();
-                $courtOrder = $pdl->courtOrders->first();
-
-                // Calculate age
-                $age = $pdl->birthdate ? $pdl->birthdate->diffInYears(now()) : 'N/A';
-
-                // Build address
-                $address = trim(($pdl->brgy ?? '') . ', ' . ($pdl->city ?? '') . ', ' . ($pdl->province ?? ''));
-                $address = $address === ', , ' ? 'N/A' : $address;
-
-                // Map case status to proper terminology
-                $caseStatus = $mainCase->case_status ?? 'N/A';
-                $caseStatusMap = [
-                    'open' => 'On-Trial',
-                    'closed' => 'Convicted',
-                    'dismissed' => 'Dismissed',
-                    'deceased' => 'Deceased',
-                    'convicted' => 'Convicted',
-                    'on-trial' => 'On-Trial',
-                    'dismissed' => 'Dismissed',
-                    'deceased' => 'Deceased'
-                ];
-                $caseStatus = $caseStatusMap[strtolower($caseStatus)] ?? $caseStatus;
-                if ($courtOrder && $courtOrder->admission_date && $courtOrder->release_date) {
-                    $totalYear = $courtOrder->admission_date->diffInYears($courtOrder->release_date);
-                } else {
-                    $totalYear = 0;
+                // If no cases, return at least one record for the PDL
+                if ($cases->isEmpty()) {
+                    return $this->formatPdlRecord($pdl, null);
                 }
 
-
-                return [
-                    'id' => $pdl->id,
-                    'name' => $pdl->fname . ' ' . $pdl->lname,
-                    'case_no' => $mainCase->case_number ?? 'N/A',
-                    'crime_committed' => $mainCase->crime_committed ?? 'N/A',
-                    'date_of_birth' => $pdl->birthdate?->format('Y-m-d'),
-                    'date_committed' => ($mainCase && $mainCase->date_committed) ? Carbon::parse($mainCase->date_committed)->format('Y-m-d') : '',
-                    'age' => $age,
-                    'address' => $address,
-                    'tribe' => $pdl->ethnic_group ?? 'N/A',
-                    'years' => $totalYear,
-                    'case_status' => $caseStatus,
-                    'rtc' => $courtOrder?->court?->branch_code ?? 'N/A'
-
-                ];
+                // Return one record per case
+                return $cases->map(function ($case) use ($pdl) {
+                    return $this->formatPdlRecord($pdl, $case);
+                });
             });
 
         return Inertia::render('admin/report/list-of-pdl-reports', [
@@ -94,6 +58,110 @@ class ReportController extends Controller
                 'end_date' => $endDate
             ]
         ]);
+    }
+
+
+    public function export(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date'
+        ]);
+
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        $pdls = Pdl::with(['cases', 'personnel', 'courtOrders'])
+            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
+                return $query->whereHas('cases', function ($q) use ($startDate, $endDate) {
+                    $q->whereBetween('date_committed', [
+                        Carbon::parse($startDate)->startOfDay(),
+                        Carbon::parse($endDate)->endOfDay()
+                    ]);
+                });
+            })
+            ->whereHas('verifications', function ($query) {
+                $query->where('status', 'approved');
+            })
+            ->where('archive_status', '=', null)
+            ->orderBy('lname')
+            ->get()
+            ->flatMap(function ($pdl) {
+                $cases = $pdl->cases;
+
+                // If no cases, return at least one record for the PDL
+                if ($cases->isEmpty()) {
+                    return [$this->formatPdlRecord($pdl, null)];
+                }
+
+                // Return one record per case
+                return $cases->map(function ($case) use ($pdl) {
+                    return $this->formatPdlRecord($pdl, $case);
+                });
+            });
+
+        if ($pdls->isEmpty()) {
+            return redirect()->back()->with('error', 'No records found for the selected date range.');
+        }
+
+        // Generate PDF instead of CSV
+        $fileName = 'pdl_report_' . ($startDate ? $startDate : 'all') . '_to_' . ($endDate ? $endDate : 'all') . '.pdf';
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.pdl-list', [
+            'pdls' => $pdls,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'generatedAt' => now()->format('Y-m-d H:i:s')
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download($fileName);
+    }
+
+    private function formatPdlRecord($pdl, $case)
+    {
+        $courtOrder = $pdl->courtOrders->first();
+
+        // Calculate age
+        $age = $pdl->birthdate ? $pdl->birthdate->diffInYears(now()) : 'N/A';
+
+        // Build address
+        $address = trim(($pdl->brgy ?? '') . ', ' . ($pdl->city ?? '') . ', ' . ($pdl->province ?? ''));
+        $address = $address === ', , ' ? 'N/A' : $address;
+
+        $caseStatus = $case->case_status ?? 'N/A';
+        $caseStatusMap = [
+            'open' => 'On-Trial',
+            'closed' => 'Convicted',
+            'dismissed' => 'Dismissed',
+            'deceased' => 'Deceased',
+            'convicted' => 'Convicted',
+            'on-trial' => 'On-Trial',
+            'dismissed' => 'Dismissed',
+            'deceased' => 'Deceased'
+        ];
+        $caseStatus = $caseStatusMap[strtolower($caseStatus)] ?? $caseStatus;
+
+        if ($courtOrder && $courtOrder->admission_date && $courtOrder->release_date) {
+            $totalYear = $courtOrder->admission_date->diffInYears($courtOrder->release_date);
+        } else {
+            $totalYear = 0;
+        }
+
+        return [
+            'id' => $pdl->id . '-' . ($case ? $case->id : 'no-case'),
+            'pdl_id' => $pdl->id,
+            'name' => $pdl->fname . ' ' . $pdl->lname,
+            'case_no' => $case->case_number ?? 'N/A',
+            'crime_committed' => $case->crime_committed ?? 'N/A',
+            'date_of_birth' => $pdl->birthdate?->format('Y-m-d'),
+            'date_committed' => $case ? ($case->date_committed ? Carbon::parse($case->date_committed)->format('Y-m-d') : '') : '',
+            'age' => $age,
+            'address' => $address,
+            'tribe' => $pdl->ethnic_group ?? 'N/A',
+            'years' => $totalYear,
+            'case_status' => $caseStatus,
+            'rtc' => $courtOrder?->court?->branch_code ?? 'N/A'
+        ];
     }
 
     private function calculateYears($dateCommitted)
@@ -255,93 +323,7 @@ class ReportController extends Controller
         }
     }
 
-    public function export(Request $request)
-    {
-        $request->validate([
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date'
-        ]);
 
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
-
-        $pdls = Pdl::with(['cases', 'personnel', 'courtOrders'])
-            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-                return $query->whereHas('cases', function ($q) use ($startDate, $endDate) {
-                    $q->whereBetween('date_committed', [
-                        Carbon::parse($startDate)->startOfDay(),
-                        Carbon::parse($endDate)->endOfDay()
-                    ]);
-                });
-            })
-            ->whereHas('verifications', function ($query) {
-                $query->where('status', 'approved');
-            })
-            ->where('archive_status', '=', null)
-            ->orderBy('lname')
-            ->get()
-            ->map(function ($pdl) {
-                $mainCase = $pdl->cases->first();
-                $courtOrder = $pdl->courtOrders->first();
-
-                // Calculate age
-                $age = $pdl->birthdate ? $pdl->birthdate->diffInYears(now()) : 'N/A';
-
-                // Build address
-                $address = trim(($pdl->brgy ?? '') . ', ' . ($pdl->city ?? '') . ', ' . ($pdl->province ?? ''));
-                $address = $address === ', , ' ? 'N/A' : $address;
-
-                // Map case status to proper terminology
-                $caseStatus = $mainCase->case_status ?? 'N/A';
-                $caseStatusMap = [
-                    'open' => 'On-Trial',
-                    'closed' => 'Convicted',
-                    'dismissed' => 'Dismissed',
-                    'deceased' => 'Deceased',
-                    'convicted' => 'Convicted',
-                    'on-trial' => 'On-Trial',
-                    'dismissed' => 'Dismissed',
-                    'deceased' => 'Deceased'
-                ];
-                $caseStatus = $caseStatusMap[strtolower($caseStatus)] ?? $caseStatus;
-                if ($courtOrder && $courtOrder->admission_date && $courtOrder->release_date) {
-                    $totalYear = $courtOrder->admission_date->diffInYears($courtOrder->release_date);
-                } else {
-                    $totalYear = 0;
-                }
-
-
-                return [
-                    'Name' => $pdl->fname . ' ' . $pdl->lname,
-                    'CaseNo' => $mainCase->case_number ?? 'N/A',
-                    'CrimeCommitted' => $mainCase->crime_committed ?? 'N/A',
-                    'Date of Birth' => $pdl->birthdate?->format('Y-m-d'),
-                    'Date Committed' => ($mainCase && $mainCase->date_committed) ? Carbon::parse($mainCase->date_committed)->format('Y-m-d') : '',
-                    'Age' => $age,
-                    'Address' => $address,
-                    'Tribe' => $pdl->ethnic_group ?? 'N/A',
-                    'Years' => $totalYear,
-                    'CaseStatus' => $caseStatus,
-                    'RTC' => $courtOrder?->court?->branch_code ?? 'N/A'
-                ];
-            });
-
-        if ($pdls->isEmpty()) {
-            return redirect()->back()->with('error', 'No records found for the selected date range.');
-        }
-
-        // Generate PDF instead of CSV
-        $fileName = 'pdl_report_' . ($startDate ? $startDate : 'all') . '_to_' . ($endDate ? $endDate : 'all') . '.pdf';
-
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.pdl-list', [
-            'pdls' => $pdls,
-            'startDate' => $startDate,
-            'endDate' => $endDate,
-            'generatedAt' => now()->format('Y-m-d H:i:s')
-        ])->setPaper('a4', 'landscape');
-
-        return $pdf->download($fileName);
-    }
 
     public function populationReport()
     {
@@ -385,16 +367,13 @@ class ReportController extends Controller
             ]
         ]);
     }
-
     private function generateAgeSexReport($reportDate)
     {
         $pdls = Pdl::with('cases')
-            ->whereHas('cases', function ($query) use ($reportDate) {
-                $query->where('date_committed', '<=', $reportDate);
-            })
             ->whereHas('verifications', function ($query) {
                 $query->where('status', 'approved');
             })
+            ->where('created_at', '<=', $reportDate)
             ->where('archive_status', '=', null)
             ->get();
 
@@ -417,22 +396,24 @@ class ReportController extends Controller
             $femaleCount = 0;
 
             if ($group === 'UNKNOWN') {
-                $maleCount = $pdls->where('gender', 'Male')->whereNull('birthdate')->count();
-                $femaleCount = $pdls->where('gender', 'Female')->whereNull('birthdate')->count();
-            } else {
-                $minDate = $reportDate->copy()->subYears($range['max']);
-                $maxDate = $reportDate->copy()->subYears($range['min']);
-
+                // Count PDLs with null age
                 $maleCount = $pdls->where('gender', 'Male')
-                    ->whereNotNull('birthdate')
-                    ->where('birthdate', '<=', $maxDate)
-                    ->where('birthdate', '>=', $minDate)
+                    ->whereNull('age')
                     ->count();
 
                 $femaleCount = $pdls->where('gender', 'Female')
-                    ->whereNotNull('birthdate')
-                    ->where('birthdate', '<=', $maxDate)
-                    ->where('birthdate', '>=', $minDate)
+                    ->whereNull('age')
+                    ->count();
+            } else {
+                // Use the age column directly with whereBetween
+                $maleCount = $pdls->where('gender', 'Male')
+                    ->whereNotNull('age')
+                    ->whereBetween('age', [$range['min'], $range['max']])
+                    ->count();
+
+                $femaleCount = $pdls->where('gender', 'Female')
+                    ->whereNotNull('age')
+                    ->whereBetween('age', [$range['min'], $range['max']])
                     ->count();
             }
 
@@ -463,7 +444,6 @@ class ReportController extends Controller
             'report_date' => $reportDate->format('F d, Y')
         ];
     }
-
     private function generateCaseStatusReport($reportDate)
     {
         $cases = CaseInformation::with('pdl')
@@ -743,6 +723,21 @@ class ReportController extends Controller
         // Calculate time served
         $timeServed = $commitmentDate->diff($currentDate);
 
+        // Calculate total detention in days
+        $totalDetentionDays = $commitmentDate->diffInDays($currentDate);
+
+        // Calculate the new required variables
+        $net_gcta_ymd = $this->convertDaysToYMD($totalGCTA);
+        $net_tastm_ymd = $this->convertDaysToYMD($totalTASTM);
+
+        // Calculate total detention with GCTA
+        $total_detention_gcta_days = $totalDetentionDays + $totalGCTA;
+        $total_detention_gcta_ymd = $this->convertDaysToYMD($total_detention_gcta_days);
+
+        // Calculate total detention with GCTA and TASTM
+        $total_detention_gcta_tastm_days = $totalDetentionDays + $totalGCTA + $totalTASTM;
+        $total_detention_gcta_tastm_ymd = $this->convertDaysToYMD($total_detention_gcta_tastm_days);
+
         $data = [
             'verification' => $verification,
             'pdl' => $pdl,
@@ -761,7 +756,12 @@ class ReportController extends Controller
             'total_allowances' => $totalGCTA + $totalTASTM,
             'convertDaysToYMD' => [$this, 'convertDaysToYMD'],
             'full_name' => $full_name,
-            'position' => $position
+            'position' => $position,
+            // New variables for the updated template
+            'net_gcta_ymd' => $net_gcta_ymd,
+            'net_tastm_ymd' => $net_tastm_ymd,
+            'total_detention_gcta_ymd' => $total_detention_gcta_ymd,
+            'total_detention_gcta_tastm_ymd' => $total_detention_gcta_tastm_ymd
         ];
 
         $html = view('reports.gcta-tastm', $data)->render();
@@ -925,7 +925,6 @@ class ReportController extends Controller
 
         $year = $request->year;
 
-
         $monthlyData = [];
         $yearlyTotals = [
             'male_detainees' => 0,
@@ -960,102 +959,98 @@ class ReportController extends Controller
             'December'
         ];
 
+        // Pre-load all approved drug-related PDLs for the year to optimize queries
+        $allDrugPdls = Pdl::with(['cases' => function ($query) {
+            $query->where('drug_related', true);
+        }])
+            ->whereHas('verifications', function ($query) {
+                $query->where('status', 'approved');
+            })
+            ->whereHas('cases', function ($query) {
+                $query->where('drug_related', true);
+            })
+            ->whereYear('created_at', '<=', $year)
+            ->get();
+
         foreach ($monthNames as $index => $monthName) {
             $monthNumber = $index + 1;
             $startDate = Carbon::create($year, $monthNumber, 1)->startOfMonth();
             $endDate = Carbon::create($year, $monthNumber, 1)->endOfMonth();
 
-            // Get all PDLs with drug-related cases (not just those committed in this month)
-            $drugRelatedPdls = Pdl::with(['cases' => function ($query) {
-                $query->where('drug_related', true);
-            }])
-                ->whereHas('verifications', function ($query) {
-                    $query->where('status', 'approved');
-                })
-                ->where('archive_status', '=', null)
-                ->whereHas('cases', function ($query) {
-                    $query->where('drug_related', true);
-                })
-                ->where('created_at', '<=', $endDate) // PDLs created up to this month
-                ->get();
+            // Filter PDLs that were ACTIVE during this specific month
+            $activeDrugPdls = $allDrugPdls->filter(function ($pdl) use ($startDate, $endDate) {
+                // PDL must be created on or before the end of this month
+                if ($pdl->created_at > $endDate) {
+                    return false;
+                }
 
-            // Filter for active PDLs (not archived) as of this month
-            $activeDrugPdls = $drugRelatedPdls->filter(function ($pdl) use ($endDate) {
-                return $pdl->archive_status === null ||
-                    ($pdl->archived_at && $pdl->archived_at->gt($endDate));
+                // If PDL is not archived, they are active
+                if ($pdl->archive_status === null) {
+                    return true;
+                }
+
+                // If archived, check if they were archived AFTER this month ended
+                // If archived after month end, they were active during this month
+                if ($pdl->archived_at && $pdl->archived_at > $endDate) {
+                    return true;
+                }
+
+                return false;
             });
 
-            $maleDetainees = $activeDrugPdls->where('gender', 'Male')->count();
-            $femaleDetainees = $activeDrugPdls->where('gender', 'Female')->count();
-            $totalDetainees = $maleDetainees + $femaleDetainees;
-
-            // Get committed count (drug-related PDLs created in this month)
-            $committed = $drugRelatedPdls->filter(function ($pdl) use ($startDate, $endDate) {
+            // PDLs committed (created) in this month
+            $committedPdls = $allDrugPdls->filter(function ($pdl) use ($startDate, $endDate) {
                 return $pdl->created_at->between($startDate, $endDate);
-            })->count();
+            });
 
-            // Get discharged count (drug-related PDLs with discharge status in this month)
-            $discharged = $drugRelatedPdls->filter(function ($pdl) use ($startDate, $endDate) {
+            // PDLs discharged (archived) in this month
+            $dischargedPdls = $allDrugPdls->filter(function ($pdl) use ($startDate, $endDate) {
                 return $pdl->archive_status !== null &&
                     $pdl->archived_at &&
                     $pdl->archived_at->between($startDate, $endDate);
-            })->count();
+            });
 
-            // Get drug-related cases for the month (for discharge status breakdown)
-            $drugCases = CaseInformation::with(['pdl'])
-                ->where('drug_related', true)
-                ->whereHas('pdl', function ($query) use ($endDate) {
-                    $query->where('created_at', '<=', $endDate);
-                })
-                ->whereHas('pdl', function ($query) {
-                    $query->whereHas('verifications', function ($query) {
-                        $query->where('status', 'approved');
-                    })
-                        ->where('archive_status', '=', null);
-                })
-                ->get();
-
-            $bonded = $drugCases->filter(function ($case) {
-                return $case->pdl && $case->pdl->archive_status === 'BONDED';
-            })->count();
-
-            $servedSentence = $drugCases->filter(function ($case) {
-                return $case->pdl && $case->pdl->archive_status === 'SERVED_SENTENCE';
-            })->count();
-
-            $dismissed = $drugCases->filter(function ($case) {
-                return $case->pdl && in_array($case->pdl->archive_status, ['PROV_DISMISSED', 'DISMISSED']);
-            })->count();
-
-            $transferred = $drugCases->filter(function ($case) {
-                return $case->pdl && $case->pdl->archive_status === 'TRANSFER_TO_OTHER_FACILITY';
-            })->count();
-
-            $dapecol = $drugCases->filter(function ($case) {
-                return $case->pdl && $case->pdl->archive_status === 'DAPECOL';
-            })->count();
-
-            $probation = $drugCases->filter(function ($case) {
-                return $case->pdl && $case->pdl->archive_status === 'PROBATION';
-            })->count();
-
-            $deceased = $drugCases->filter(function ($case) {
-                return $case->pdl && $case->pdl->archive_status === 'DECEASED';
-            })->count();
-
-            $acquitted = $drugCases->filter(function ($case) {
-                return $case->pdl && $case->pdl->archive_status === 'ACQUITTED';
-            })->count();
-
-            $totalDischargedDrug = $bonded + $servedSentence + $dismissed + $transferred + $dapecol + $probation + $deceased + $acquitted;
-
-            // Calculate percentage of drug offenders from total population
-            $totalPopulation = Pdl::where('created_at', '<=', $endDate)
+            // Counts for active detainees
+            $maleDetainees = Pdl::where('gender', 'Male')->where('archive_status', null)
+                ->whereHas('verifications', function ($query) {
+                    $query->where('status', 'approved');
+                })->whereBetween('created_at', [$startDate, $endDate])
+                ->count();
+            $femaleDetainees = Pdl::where('gender', 'Female')->where('archive_status', null)
                 ->whereHas('verifications', function ($query) {
                     $query->where('status', 'approved');
                 })
-                ->where('archive_status', '=', null)
+                ->whereBetween('created_at', [$startDate, $endDate])
                 ->count();
+            $totalDetainees = $maleDetainees + $femaleDetainees;
+
+            // Committed and discharged counts
+            $committed = $committedPdls->count();
+            $discharged = $dischargedPdls->count();
+
+            // Breakdown of discharge reasons for this month
+            $bonded = $dischargedPdls->where('archive_status', 'BONDED')->count();
+            $servedSentence = $dischargedPdls->where('archive_status', 'SERVED_SENTENCE')->count();
+            $dismissed = $dischargedPdls->whereIn('archive_status', ['PROV_DISMISSED', 'DISMISSED'])->count();
+            $transferred = $dischargedPdls->where('archive_status', 'TRANSFER_TO_OTHER_FACILITY')->count();
+            $dapecol = $dischargedPdls->where('archive_status', 'DAPECOL')->count();
+            $probation = $dischargedPdls->where('archive_status', 'PROBATION')->count();
+            $deceased = $dischargedPdls->where('archive_status', 'DECEASED')->count();
+            $acquitted = $dischargedPdls->where('archive_status', 'ACQUITTED')->count();
+
+            $totalDischargedDrug = $bonded + $servedSentence + $dismissed + $transferred + $dapecol + $probation + $deceased + $acquitted;
+
+            // Calculate total population for percentage (all active PDLs, not just drug-related)
+            $totalPopulation = Pdl::whereHas('verifications', function ($query) {
+                $query->where('status', 'approved');
+            })
+                ->where('created_at', '<=', $endDate)
+                ->where(function ($query) use ($endDate) {
+                    $query->where('archive_status', null)
+                        ->orWhere('archived_at', '>', $endDate);
+                })
+                ->count();
+
             $drugOffendersPercentage = $totalPopulation > 0 ? round(($totalDetainees / $totalPopulation) * 100, 2) : 0;
 
             $monthlyData[] = [
@@ -1078,7 +1073,7 @@ class ReportController extends Controller
                 'total_drug_cases' => $totalDetainees
             ];
 
-            // Add to yearly totals
+            // Add to yearly totals (only add actual monthly values, not cumulative)
             $yearlyTotals['male_detainees'] += $maleDetainees;
             $yearlyTotals['female_detainees'] += $femaleDetainees;
             $yearlyTotals['total_detainees'] += $totalDetainees;
@@ -1093,8 +1088,41 @@ class ReportController extends Controller
             $yearlyTotals['deceased'] += $deceased;
             $yearlyTotals['acquitted'] += $acquitted;
             $yearlyTotals['total_discharged_drug'] += $totalDischargedDrug;
-            $yearlyTotals['total_drug_cases'] += $totalDetainees;
+            // Don't add total_drug_cases to yearly total - it's already represented by total_detainees
         }
+
+        // For yearly total drug cases, use the sum of monthly detainees (which should be correct)
+        $yearlyTotals['total_drug_cases'] = $yearlyTotals['total_detainees'];
+
+        // Calculate correct percentage for total row (year-end snapshot)
+        $yearEndDate = Carbon::create($year, 12, 31)->endOfDay();
+        $totalPopulationYearEnd = Pdl::whereHas('verifications', function ($query) {
+            $query->where('status', 'approved');
+        })
+            ->where('created_at', '<=', $yearEndDate)
+            ->where(function ($query) use ($yearEndDate) {
+                $query->where('archive_status', null)
+                    ->orWhere('archived_at', '>', $yearEndDate);
+            })
+            ->count();
+
+        // For total row, we want the percentage based on year-end active population
+        $yearEndActiveDrugPdls = $allDrugPdls->filter(function ($pdl) use ($yearEndDate) {
+            if ($pdl->created_at > $yearEndDate) {
+                return false;
+            }
+            if ($pdl->archive_status === null) {
+                return true;
+            }
+            if ($pdl->archived_at && $pdl->archived_at > $yearEndDate) {
+                return true;
+            }
+            return false;
+        });
+
+        $totalDrugCasesYearEnd = $yearEndActiveDrugPdls->count();
+        $totalPercentage = $totalPopulationYearEnd > 0 ?
+            round(($totalDrugCasesYearEnd / $totalPopulationYearEnd) * 100, 2) : 0;
 
         // Add total row
         $monthlyData[] = [
@@ -1113,8 +1141,8 @@ class ReportController extends Controller
             'deceased' => $yearlyTotals['deceased'],
             'acquitted' => $yearlyTotals['acquitted'],
             'total_discharged_drug' => $yearlyTotals['total_discharged_drug'],
-            'drug_offenders_percentage' => $yearlyTotals['total_detainees'] > 0 ? round(($yearlyTotals['total_drug_cases'] / $yearlyTotals['total_detainees']) * 100, 2) : 0,
-            'total_drug_cases' => $yearlyTotals['total_drug_cases']
+            'drug_offenders_percentage' => $totalPercentage,
+            'total_drug_cases' => $totalDrugCasesYearEnd
         ];
 
         $data = [
@@ -1129,7 +1157,6 @@ class ReportController extends Controller
                 'BSRC' => 'BALAY SILANGAN REFORMATORY CENTER'
             ]
         ];
-
 
         return Inertia::render('admin/report/drug-related-cases-monthly', [
             'reportData' => $data,
@@ -1148,7 +1175,6 @@ class ReportController extends Controller
 
         $year = $request->year;
 
-
         $monthlyData = [];
         $yearlyTotals = [
             'male_detainees' => 0,
@@ -1183,103 +1209,100 @@ class ReportController extends Controller
             'December'
         ];
 
+        // Pre-load all approved drug-related PDLs for the year to optimize queries
+        $allDrugPdls = Pdl::with(['cases' => function ($query) {
+            $query->where('drug_related', true);
+        }])
+            ->whereHas('verifications', function ($query) {
+                $query->where('status', 'approved');
+            })
+            ->whereHas('cases', function ($query) {
+                $query->where('drug_related', true);
+            })
+            ->whereYear('created_at', '<=', $year)
+            ->get();
+
         foreach ($monthNames as $index => $monthName) {
             $monthNumber = $index + 1;
             $startDate = Carbon::create($year, $monthNumber, 1)->startOfMonth();
             $endDate = Carbon::create($year, $monthNumber, 1)->endOfMonth();
 
-            // Get all PDLs with drug-related cases (not just those committed in this month)
-            $drugRelatedPdls = Pdl::with(['cases' => function ($query) {
-                $query->where('drug_related', true);
-            }])
-                ->whereHas('verifications', function ($query) {
-                    $query->where('status', 'approved');
-                })
-                ->where('archive_status', '=', null)
-                ->whereHas('cases', function ($query) {
-                    $query->where('drug_related', true);
-                })
-                ->where('created_at', '<=', $endDate) // PDLs created up to this month
-                ->get();
+            // Filter PDLs that were ACTIVE during this specific month
+            $activeDrugPdls = $allDrugPdls->filter(function ($pdl) use ($startDate, $endDate) {
+                // PDL must be created on or before the end of this month
+                if ($pdl->created_at > $endDate) {
+                    return false;
+                }
 
-            // Filter for active PDLs (not archived) as of this month
-            $activeDrugPdls = $drugRelatedPdls->filter(function ($pdl) use ($endDate) {
-                return $pdl->archive_status === null ||
-                    ($pdl->archived_at && $pdl->archived_at->gt($endDate));
+                // If PDL is not archived, they are active
+                if ($pdl->archive_status === null) {
+                    return true;
+                }
+
+                // If archived, check if they were archived AFTER this month ended
+                // If archived after month end, they were active during this month
+                if ($pdl->archived_at && $pdl->archived_at > $endDate) {
+                    return true;
+                }
+
+                return false;
             });
 
-            $maleDetainees = $activeDrugPdls->where('gender', 'Male')->count();
-            $femaleDetainees = $activeDrugPdls->where('gender', 'Female')->count();
-            $totalDetainees = $maleDetainees + $femaleDetainees;
-
-            // Get committed count (drug-related PDLs created in this month)
-            $committed = $drugRelatedPdls->filter(function ($pdl) use ($startDate, $endDate) {
+            // PDLs committed (created) in this month
+            $committedPdls = $allDrugPdls->filter(function ($pdl) use ($startDate, $endDate) {
                 return $pdl->created_at->between($startDate, $endDate);
-            })->count();
+            });
 
-            // Get discharged count (drug-related PDLs with discharge status in this month)
-            $discharged = $drugRelatedPdls->filter(function ($pdl) use ($startDate, $endDate) {
+            // PDLs discharged (archived) in this month
+            $dischargedPdls = $allDrugPdls->filter(function ($pdl) use ($startDate, $endDate) {
                 return $pdl->archive_status !== null &&
                     $pdl->archived_at &&
                     $pdl->archived_at->between($startDate, $endDate);
-            })->count();
+            });
 
-            // Get drug-related cases for the month (for discharge status breakdown)
-            $drugCases = CaseInformation::with(['pdl'])
-                ->where('drug_related', true)
-                ->whereHas('pdl', function ($query) use ($endDate) {
-                    $query->where('created_at', '<=', $endDate);
-                })
-                ->whereHas('pdl', function ($query) {
-                    $query->whereHas('verifications', function ($query) {
-                        $query->where('status', 'approved');
-                    })
-                        ->where('archive_status', '=', null);
-                })
-                ->get();
-
-            $bonded = $drugCases->filter(function ($case) {
-                return $case->pdl && $case->pdl->archive_status === 'BONDED';
-            })->count();
-
-            $servedSentence = $drugCases->filter(function ($case) {
-                return $case->pdl && $case->pdl->archive_status === 'SERVED_SENTENCE';
-            })->count();
-
-            $dismissed = $drugCases->filter(function ($case) {
-                return $case->pdl && in_array($case->pdl->archive_status, ['PROV_DISMISSED', 'DISMISSED']);
-            })->count();
-
-            $transferred = $drugCases->filter(function ($case) {
-                return $case->pdl && $case->pdl->archive_status === 'TRANSFER_TO_OTHER_FACILITY';
-            })->count();
-
-            $dapecol = $drugCases->filter(function ($case) {
-                return $case->pdl && $case->pdl->archive_status === 'DAPECOL';
-            })->count();
-
-            $probation = $drugCases->filter(function ($case) {
-                return $case->pdl && $case->pdl->archive_status === 'PROBATION';
-            })->count();
-
-            $deceased = $drugCases->filter(function ($case) {
-                return $case->pdl && $case->pdl->archive_status === 'DECEASED';
-            })->count();
-
-            $acquitted = $drugCases->filter(function ($case) {
-                return $case->pdl && $case->pdl->archive_status === 'ACQUITTED';
-            })->count();
-
-            $totalDischargedDrug = $bonded + $servedSentence + $dismissed + $transferred + $dapecol + $probation + $deceased + $acquitted;
-
-            // Calculate percentage of drug offenders from total population
-            $totalPopulation = Pdl::where('created_at', '<=', $endDate)
+            // Counts for active detainees
+            $maleDetainees = Pdl::where('gender', 'Male')->where('archive_status', null)
+                ->whereHas('verifications', function ($query) {
+                    $query->where('status', 'approved');
+                })->whereBetween('created_at', [$startDate, $endDate])
+                ->count();
+            $femaleDetainees = Pdl::where('gender', 'Female')->where('archive_status', null)
                 ->whereHas('verifications', function ($query) {
                     $query->where('status', 'approved');
                 })
-                ->where('archive_status', '=', null)
+                ->whereBetween('created_at', [$startDate, $endDate])
                 ->count();
+            $totalDetainees = $maleDetainees + $femaleDetainees;
+
+            // Committed and discharged counts
+            $committed = $committedPdls->count();
+            $discharged = $dischargedPdls->count();
+
+            // Breakdown of discharge reasons for this month
+            $bonded = $dischargedPdls->where('archive_status', 'BONDED')->count();
+            $servedSentence = $dischargedPdls->where('archive_status', 'SERVED_SENTENCE')->count();
+            $dismissed = $dischargedPdls->whereIn('archive_status', ['PROV_DISMISSED', 'DISMISSED'])->count();
+            $transferred = $dischargedPdls->where('archive_status', 'TRANSFER_TO_OTHER_FACILITY')->count();
+            $dapecol = $dischargedPdls->where('archive_status', 'DAPECOL')->count();
+            $probation = $dischargedPdls->where('archive_status', 'PROBATION')->count();
+            $deceased = $dischargedPdls->where('archive_status', 'DECEASED')->count();
+            $acquitted = $dischargedPdls->where('archive_status', 'ACQUITTED')->count();
+
+            $totalDischargedDrug = $bonded + $servedSentence + $dismissed + $transferred + $dapecol + $probation + $deceased + $acquitted;
+
+            // Calculate total population for percentage (all active PDLs, not just drug-related)
+            $totalPopulation = Pdl::whereHas('verifications', function ($query) {
+                $query->where('status', 'approved');
+            })
+                ->where('created_at', '<=', $endDate)
+                ->where(function ($query) use ($endDate) {
+                    $query->where('archive_status', null)
+                        ->orWhere('archived_at', '>', $endDate);
+                })
+                ->count();
+
             $drugOffendersPercentage = $totalPopulation > 0 ? round(($totalDetainees / $totalPopulation) * 100, 2) : 0;
+
             $monthlyData[] = [
                 'month' => $monthName,
                 'male_detainees' => $maleDetainees,
@@ -1300,7 +1323,7 @@ class ReportController extends Controller
                 'total_drug_cases' => $totalDetainees
             ];
 
-            // Add to yearly totals
+            // Add to yearly totals (only add actual monthly values, not cumulative)
             $yearlyTotals['male_detainees'] += $maleDetainees;
             $yearlyTotals['female_detainees'] += $femaleDetainees;
             $yearlyTotals['total_detainees'] += $totalDetainees;
@@ -1315,8 +1338,41 @@ class ReportController extends Controller
             $yearlyTotals['deceased'] += $deceased;
             $yearlyTotals['acquitted'] += $acquitted;
             $yearlyTotals['total_discharged_drug'] += $totalDischargedDrug;
-            $yearlyTotals['total_drug_cases'] += $totalDetainees;
+            // Don't add total_drug_cases to yearly total - it's already represented by total_detainees
         }
+
+        // For yearly total drug cases, use the sum of monthly detainees (which should be correct)
+        $yearlyTotals['total_drug_cases'] = $yearlyTotals['total_detainees'];
+
+        // Calculate correct percentage for total row (year-end snapshot)
+        $yearEndDate = Carbon::create($year, 12, 31)->endOfDay();
+        $totalPopulationYearEnd = Pdl::whereHas('verifications', function ($query) {
+            $query->where('status', 'approved');
+        })
+            ->where('created_at', '<=', $yearEndDate)
+            ->where(function ($query) use ($yearEndDate) {
+                $query->where('archive_status', null)
+                    ->orWhere('archived_at', '>', $yearEndDate);
+            })
+            ->count();
+
+        // For total row, we want the percentage based on year-end active population
+        $yearEndActiveDrugPdls = $allDrugPdls->filter(function ($pdl) use ($yearEndDate) {
+            if ($pdl->created_at > $yearEndDate) {
+                return false;
+            }
+            if ($pdl->archive_status === null) {
+                return true;
+            }
+            if ($pdl->archived_at && $pdl->archived_at > $yearEndDate) {
+                return true;
+            }
+            return false;
+        });
+
+        $totalDrugCasesYearEnd = $yearEndActiveDrugPdls->count();
+        $totalPercentage = $totalPopulationYearEnd > 0 ?
+            round(($totalDrugCasesYearEnd / $totalPopulationYearEnd) * 100, 2) : 0;
 
         // Add total row
         $monthlyData[] = [
@@ -1335,8 +1391,8 @@ class ReportController extends Controller
             'deceased' => $yearlyTotals['deceased'],
             'acquitted' => $yearlyTotals['acquitted'],
             'total_discharged_drug' => $yearlyTotals['total_discharged_drug'],
-            'drug_offenders_percentage' => $yearlyTotals['total_detainees'] > 0 ? round(($yearlyTotals['total_drug_cases'] / $yearlyTotals['total_detainees']) * 100, 2) : 0,
-            'total_drug_cases' => $yearlyTotals['total_drug_cases']
+            'drug_offenders_percentage' => $totalPercentage,
+            'total_drug_cases' => $totalDrugCasesYearEnd
         ];
 
         $data = [
@@ -1351,7 +1407,6 @@ class ReportController extends Controller
                 'BSRC' => 'BALAY SILANGAN REFORMATORY CENTER'
             ]
         ];
-
         $fileName = 'south_cotabato_drug_cases_monthly_' . $year . '.pdf';
 
         $html = view('reports.drug-cases-monthly', [
@@ -1377,6 +1432,8 @@ class ReportController extends Controller
 
     public function generateInmatesStatus(Request $request)
     {
+
+
         $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'required|date',
@@ -1406,32 +1463,32 @@ class ReportController extends Controller
             'courtOrders as male_count' => function ($query) use ($startDate, $endDate) {
                 $query->whereHas('pdl', function ($q) {
                     $q->where('gender', 'Male')
-                      ->whereHas('verifications', function ($query) {
-                          $query->where('status', 'approved');
-                      });
+                        ->whereHas('verifications', function ($query) {
+                            $query->where('status', 'approved');
+                        });
                 })
-                ->whereBetween('order_date', [$startDate, $endDate])
-                ->select(DB::raw('COUNT(DISTINCT pdl_id)')); // Count distinct PDls
+                    ->whereBetween('order_date', [$startDate, $endDate])
+                    ->select(DB::raw('COUNT(DISTINCT pdl_id)')); // Count distinct PDls
             },
             'courtOrders as female_count' => function ($query) use ($startDate, $endDate) {
                 $query->whereHas('pdl', function ($q) {
                     $q->where('gender', 'Female')
-                      ->whereHas('verifications', function ($query) {
-                          $query->where('status', 'approved');
-                      });
+                        ->whereHas('verifications', function ($query) {
+                            $query->where('status', 'approved');
+                        });
                 })
-                ->whereBetween('order_date', [$startDate, $endDate])
-                ->select(DB::raw('COUNT(DISTINCT pdl_id)')); // Count distinct PDls
+                    ->whereBetween('order_date', [$startDate, $endDate])
+                    ->select(DB::raw('COUNT(DISTINCT pdl_id)')); // Count distinct PDls
             },
             'courtOrders as cicl_count' => function ($query) use ($startDate, $endDate) {
                 $query->whereHas('pdl', function ($q) {
                     $q->where('age', '<', 18)
-                      ->whereHas('verifications', function ($query) {
-                          $query->where('status', 'approved');
-                      });
+                        ->whereHas('verifications', function ($query) {
+                            $query->where('status', 'approved');
+                        });
                 })
-                ->whereBetween('order_date', [$startDate, $endDate])
-                ->select(DB::raw('COUNT(DISTINCT pdl_id)')); // Count distinct PDls
+                    ->whereBetween('order_date', [$startDate, $endDate])
+                    ->select(DB::raw('COUNT(DISTINCT pdl_id)')); // Count distinct PDls
             }
         ])->get();
 
@@ -1550,26 +1607,26 @@ class ReportController extends Controller
             'courtOrders as male_count' => function ($query) use ($startDate, $endDate) {
                 $query->whereHas('pdl', function ($q) {
                     $q->where('gender', 'Male')
-                    ->whereHas('verifications', function ($query) {
-                        $query->where('status', 'approved');
-                    });
+                        ->whereHas('verifications', function ($query) {
+                            $query->where('status', 'approved');
+                        });
                 })
-                ->whereBetween('order_date', [$startDate, $endDate]);
+                    ->whereBetween('order_date', [$startDate, $endDate]);
             },
             'courtOrders as female_count' => function ($query) use ($startDate, $endDate) {
                 $query->whereHas('pdl', function ($q) {
                     $q->where('gender', 'Female')
-                    ->whereHas('verifications', function ($query) {
-                        $query->where('status', 'approved');
-                    });
+                        ->whereHas('verifications', function ($query) {
+                            $query->where('status', 'approved');
+                        });
                 })->whereBetween('order_date', [$startDate, $endDate]);
             },
             'courtOrders as cicl_count' => function ($query) use ($startDate, $endDate) {
                 $query->whereHas('pdl', function ($q) {
                     $q->where('age', '<', 18) // CICL - Children in Conflict with the Law
-                    ->whereHas('verifications', function ($query) {
-                        $query->where('status', 'approved');
-                    });
+                        ->whereHas('verifications', function ($query) {
+                            $query->where('status', 'approved');
+                        });
                 })->whereBetween('order_date', [$startDate, $endDate]);
             }
         ])->get();
@@ -2175,6 +2232,7 @@ class ReportController extends Controller
                 'fname' => $person['fname'],
                 'mname' => $person['mname'],
                 'lname' => $person['lname'],
+                'suffix' => $person['suffix'],
                 'full_name' => trim($name)
             ];
         });
@@ -2223,6 +2281,7 @@ class ReportController extends Controller
             'persons.*.fname' => 'required|string|max:255',
             'persons.*.mname' => 'nullable|string|max:255',
             'persons.*.lname' => 'required|string|max:255',
+            'persons.*.suffix' => 'nullable|string|max:255',
             'requested_by' => 'required|string|max:255',
             'requesting_agency' => 'required|string|max:255',
             'officer_name' => 'required|string|max:255',
@@ -2238,10 +2297,14 @@ class ReportController extends Controller
                 $name .= ' ' . trim($person['mname']);
             }
             $name .= ' ' . trim($person['lname']);
+            if (!empty($person['suffix'])) {
+                $name .= ' ' . trim($person['suffix']);
+            }
             return [
                 'fname' => $person['fname'],
                 'mname' => $person['mname'],
                 'lname' => $person['lname'],
+                'suffix' => $person['suffix'],
                 'full_name' => trim($name)
             ];
         });
@@ -2283,24 +2346,36 @@ class ReportController extends Controller
     }
     public function pdlInformationReport(Request $request)
     {
+
+
         $pdl = Pdl::with('cases')->find($request->pdl_id);
 
         if (!$pdl) {
+
             return redirect()->back()->with('error', 'PDL not found.');
         }
 
-        $fileName = 'pdl-information_' . $pdl->id . '_' . now()->format('Y-m-d') . '.pdf';
 
-        // Use Storage facade for better compatibility
+
+        $fileName = 'pdl-information_' . $pdl->id . '_' . now()->format('Y-m-d') . '.pdf';
         $imageBase64 = $this->getPdlMugshotBase64($pdl);
 
-        $html = view('reports.pdl-information', [
-            'pdl' => $pdl,
-            'image' => $imageBase64,
-            'hasImage' => !is_null($imageBase64)
-        ])->render();
 
-        return $this->generatePDF($html, $fileName);
+
+        try {
+            $html = view('reports.pdl-information', [
+                'pdl' => $pdl,
+                'image' => $imageBase64,
+                'hasImage' => !is_null($imageBase64)
+            ])->render();
+
+
+
+            return $this->generatePDF($html, $fileName);
+        } catch (\Exception $e) {
+
+            return redirect()->back()->with('error', 'Failed to generate report view.');
+        }
     }
 
     private function getPdlMugshotBase64(Pdl $pdl): ?string
@@ -2326,7 +2401,6 @@ class ReportController extends Controller
 
             Log::warning('Mugshot not found for PDL ' . $pdl->id . ' at path: ' . $pdl->mugshot_path);
             return $this->getDefaultAvatarBase64();
-
         } catch (\Exception $e) {
             Log::error('Error loading mugshot for PDL ' . $pdl->id . ': ' . $e->getMessage());
             return $this->getDefaultAvatarBase64();
@@ -2352,7 +2426,6 @@ class ReportController extends Controller
 
             // Create a simple placeholder image programmatically
             return $this->createSimplePlaceholder();
-
         } catch (\Exception $e) {
             Log::error('Failed to load placeholder image: ' . $e->getMessage());
             return null;
@@ -2376,7 +2449,7 @@ class ReportController extends Controller
             $options->set([
                 'isHtml5ParserEnabled' => true,
                 'isRemoteEnabled' => true,
-                'isPhpEnabled' => true,
+                'isPhpEnabled' => false,
                 'defaultFont' => 'DejaVu Sans', // Better font compatibility
                 'tempDir' => storage_path('temp'), // Ensure temp directory exists
                 'fontDir' => storage_path('fonts'),
@@ -2397,7 +2470,6 @@ class ReportController extends Controller
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
             ]);
-
         } catch (\Exception $e) {
             Log::error('PDF generation failed: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Failed to generate PDF report. Please try again.');

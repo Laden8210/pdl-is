@@ -31,6 +31,8 @@ use App\Http\Controllers\RequestLogController;
 Route::get('/', [AuthController::class, 'index'])->name('home');
 
 // Admin Routes - Protected by auth and admin middleware
+
+
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     Route::get('/request-logs', [RequestLogController::class, 'index'])->name('request-logs.index');
@@ -64,7 +66,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     Route::get('/report/inmate-population', [ReportController::class, 'populationReport'])->name('reports.population');
     Route::get('/report/inmate-population/generate', [ReportController::class, 'generatePopulationReport'])->name('reports.population.generate');
-    Route::post('/report/inmate-population/generate', [ReportController::class, 'generatePopulationReport'])->name('reports.population.generate');
+    Route::post('/report/inmate-population/generate', [ReportController::class, 'generatereport/no-records-certificatePopulationReport'])->name('reports.population.generate');
 
     Route::get('/report/gcta-and-tastm', [ReportController::class, 'gctaTastmReport'])->name('reports.gcta-tastm');
     Route::get('/report/gcta-and-tastm/generate', [ReportController::class, 'generateGCTATASTM'])->name('reports.gcta-tastm.export');
@@ -162,7 +164,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('/certificates/cleanup', [CertificateController::class, 'cleanup'])->name('certificates.cleanup');
 });
 
-// Record Officer Routes - Protected by auth and record.officer middleware
+
 Route::middleware(['auth', 'record.officer'])->prefix('record-officer')->group(function () {
 
     Route::get('/court-list', [CourtController::class, 'index'])->name('court-list.index');
@@ -208,7 +210,6 @@ Route::middleware(['auth', 'record.officer'])->prefix('record-officer')->group(f
     Route::delete('/pdl-management/physical-characteristics/{characteristic}', [PhysicalCharacteristicController::class, 'destroy'])->name('physical-characteristics.destroy');
 });
 
-// Law Enforcement Routes - Protected by auth and law.enforcement middleware
 Route::middleware(['auth', 'law.enforcement'])->prefix('law-enforcement')->group(function () {
     Route::get('/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management.index');
     Route::get('/dashboard', [DashboardController::class, 'lawEnforcementDashboard'])->name('dashboard.law-enforcement');
