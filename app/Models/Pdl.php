@@ -18,6 +18,7 @@ class Pdl extends Model
         'mname',
         'alias',
         'birthdate',
+        'suffix',
         'age',
         'gender',
         'ethnic_group',

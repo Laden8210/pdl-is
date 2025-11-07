@@ -323,9 +323,9 @@ export default function UpdatePDLInformation() {
                 crime_committed: '',
                 date_committed: '',
                 time_committed: '',
-                case_status: 'open',
+                case_status: '',
                 case_remarks: '',
-                security_classification: 'medium',
+                security_classification: '',
                 drug_related: false,
             },
         ]);
@@ -497,17 +497,27 @@ export default function UpdatePDLInformation() {
         province: pdl.province || '',
         court_orders:
             Array.isArray(pdl.court_orders) && pdl.court_orders.length > 0
-                ? pdl.court_orders.map((co: any) => ({
-                      court_order_id: co?.court_order_id || 0,
-                      order_type: co?.order_type || '',
-                      order_date: co?.order_date ? format(new Date(co.order_date), 'yyyy-MM-dd') : '',
-                      received_date: co?.received_date ? format(new Date(co.received_date), 'yyyy-MM-dd') : '',
-                      document_type: co?.document_type || '',
-                      document_path: co?.document_path || '',
-                      original_filename: co?.original_filename || '',
-                      court_id: co?.court_id || 0,
-                      cod_remarks: co?.remarks || '',
-                  }))
+                ? pdl.court_orders.map((co: any) => {
+                      // Ensure court_id is always a number
+                      let courtId = 0;
+                      if (co?.court_id) {
+                          courtId = parseInt(co.court_id) || 0;
+                      } else if (co?.court?.court_id) {
+                          courtId = parseInt(co.court.court_id) || 0;
+                      }
+
+                      return {
+                          court_order_id: co?.court_order_id || 0,
+                          order_type: co?.order_type || '',
+                          order_date: co?.order_date ? format(new Date(co.order_date), 'yyyy-MM-dd') : '',
+                          received_date: co?.received_date ? format(new Date(co.received_date), 'yyyy-MM-dd') : '',
+                          document_type: co?.document_type || '',
+                          document_path: co?.document_path || '',
+                          original_filename: co?.original_filename || '',
+                          court_id: courtId,
+                          cod_remarks: co?.remarks || '',
+                      };
+                  })
                 : [
                       {
                           court_order_id: 0,
@@ -517,7 +527,7 @@ export default function UpdatePDLInformation() {
                           document_type: '',
                           document_path: '',
                           original_filename: '',
-                          court_id: 0,
+                          court_id: 0, // Number, not string
                           cod_remarks: '',
                       },
                   ],
@@ -526,7 +536,7 @@ export default function UpdatePDLInformation() {
                 ? pdl.medical_records.map((mr: any) => ({
                       medical_record_id: mr?.medical_record_id || 0,
                       complaint: mr?.complaint || '',
-                      date: mr?.date || new Date().toISOString().split('T')[0],
+                      date: format(new Date(mr.date), 'yyyy-MM-dd') || '',
                       prognosis: mr?.prognosis || '',
                       prescription: mr?.prescription || '',
                       findings: mr?.findings || '',
@@ -920,6 +930,26 @@ export default function UpdatePDLInformation() {
             },
         });
     };
+
+    // Add this useEffect to preserve form data
+    useEffect(() => {
+        console.log('Step changed to:', currentStep);
+        console.log('Court orders before step change:', data.court_orders);
+
+        // Force the form data to persist by updating it with current values
+        const currentFormData = { ...data };
+
+        // Ensure court_orders preserve their values
+        if (currentFormData.court_orders && currentFormData.court_orders.length > 0) {
+            currentFormData.court_orders = currentFormData.court_orders.map((order) => ({
+                ...order,
+                court_id: order.court_id || 0, // Ensure court_id is preserved
+            }));
+        }
+
+        // Update the form data to trigger a re-render with preserved values
+        setData(currentFormData);
+    }, [currentStep]); // This runs every time currentStep changes
 
     const nextStep = () => {
         if (currentStep < steps.length) {
@@ -1346,7 +1376,7 @@ export default function UpdatePDLInformation() {
                                             <Input
                                                 id="order_type"
                                                 name="order_type"
-                                                value={data.court_orders[activeCourtOrderIndex].order_type}
+                                                value={data.court_orders[activeCourtOrderIndex]?.order_type}
                                                 onChange={(e) => handleCourtOrderChange(activeCourtOrderIndex, 'order_type', e.target.value)}
                                                 placeholder="Enter order type"
                                             />
@@ -1357,7 +1387,7 @@ export default function UpdatePDLInformation() {
                                             </Label>
                                             <Input
                                                 type="date"
-                                                value={data.court_orders[activeCourtOrderIndex].order_date}
+                                                value={data.court_orders[activeCourtOrderIndex]?.order_date}
                                                 onChange={(e) => handleCourtOrderChange(activeCourtOrderIndex, 'order_date', e.target.value)}
                                             />
                                         </div>
@@ -1367,7 +1397,7 @@ export default function UpdatePDLInformation() {
                                             </Label>
                                             <Input
                                                 type="date"
-                                                value={data.court_orders[activeCourtOrderIndex].received_date}
+                                                value={data.court_orders[activeCourtOrderIndex]?.received_date}
                                                 onChange={(e) => handleCourtOrderChange(activeCourtOrderIndex, 'received_date', e.target.value)}
                                             />
                                         </div>
@@ -1386,13 +1416,13 @@ export default function UpdatePDLInformation() {
                                             <div className="text-xs text-muted-foreground">
                                                 Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
                                             </div>
-                                            {data.court_orders[activeCourtOrderIndex].original_filename && (
+                                            {data.court_orders[activeCourtOrderIndex]?.original_filename && (
                                                 <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                                                     <div className="flex items-center space-x-3">
                                                         <FileText className="h-4 w-4 text-gray-400" />
                                                         <div>
                                                             <p className="text-sm font-medium text-gray-900">
-                                                                {data.court_orders[activeCourtOrderIndex].original_filename}
+                                                                {data.court_orders[activeCourtOrderIndex]?.original_filename}
                                                             </p>
                                                             <p className="text-xs text-gray-500">Current file</p>
                                                         </div>
@@ -1404,8 +1434,8 @@ export default function UpdatePDLInformation() {
                                                             size="sm"
                                                             onClick={() =>
                                                                 handleOldDocumentPreview(
-                                                                    data.court_orders[activeCourtOrderIndex].document_path || '',
-                                                                    data.court_orders[activeCourtOrderIndex].original_filename || '',
+                                                                    data.court_orders[activeCourtOrderIndex]?.document_path || '',
+                                                                    data.court_orders[activeCourtOrderIndex]?.original_filename || '',
                                                                 )
                                                             }
                                                             className="text-blue-500 hover:text-blue-700"
@@ -1536,13 +1566,17 @@ export default function UpdatePDLInformation() {
                                                 Court Branch <span className="text-red-500">*</span>
                                             </Label>
                                             <Select
-                                                value={data.court_orders[activeCourtOrderIndex].court_id.toString()}
-                                                onValueChange={(value) => handleCourtOrderChange(activeCourtOrderIndex, 'court_id', parseInt(value))}
+                                                value={data.court_orders[activeCourtOrderIndex]?.court_id?.toString() || '0'}
+                                                onValueChange={(value) => {
+                                                    const courtId = parseInt(value) || 0;
+                                                    handleCourtOrderChange(activeCourtOrderIndex, 'court_id', courtId);
+                                                }}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select court branch" />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                    <SelectItem value="0">Select court branch</SelectItem>
                                                     {(courts as any[]).map((court: any) => (
                                                         <SelectItem key={court.court_id} value={court.court_id.toString()}>
                                                             {court.branch_code}
@@ -1551,13 +1585,14 @@ export default function UpdatePDLInformation() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
+                                     
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="cod_remarks">Remarks</Label>
                                         <Textarea
                                             id="cod_remarks"
                                             name="cod_remarks"
-                                            value={data.court_orders[activeCourtOrderIndex].cod_remarks}
+                                            value={data.court_orders[activeCourtOrderIndex]?.cod_remarks}
                                             onChange={(e) => handleCourtOrderChange(activeCourtOrderIndex, 'cod_remarks', e.target.value)}
                                             rows={3}
                                             placeholder="Enter any additional remarks..."

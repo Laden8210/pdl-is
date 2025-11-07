@@ -954,11 +954,10 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
                                                                         <SelectValue placeholder="Select case status" />
                                                                     </SelectTrigger>
                                                                     <SelectContent>
-                                                                        <SelectItem value="open">Open</SelectItem>
-                                                                        <SelectItem value="pending">Pending</SelectItem>
+
                                                                         <SelectItem value="on_trial">On Trial</SelectItem>
                                                                         <SelectItem value="convicted">Convicted</SelectItem>
-                                                                        <SelectItem value="dismissed">Dismissed</SelectItem>
+
                                                                     </SelectContent>
                                                                 </Select>
                                                             </div>

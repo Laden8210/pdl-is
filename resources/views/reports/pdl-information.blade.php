@@ -325,13 +325,15 @@
                                 <td style="border: 1px solid #000; padding: 8px;">{{ $case->case_status ?? 'N/A' }}
                                 </td>
                                 <td style="border: 1px solid #000; padding: 8px;">
-                                    {{ $case->court_branch ? 'RTC ' . $case->court_branch : 'N/A' }}</td>
+                                    {{
+                                        $courtOrder->court->branch_code
+                                    }}
+                                </td>
                                 <td style="border: 1px solid #000; padding: 8px;">
-                                    @if ($case->date_filed)
-                                        {{ $case->date_filed->format('M d, Y') }}
-                                    @else
-                                        N/A
-                                    @endif
+                                    {{
+                                          $courtOrder->order_date->format('F d, Y')
+                                    }}
+
                                 </td>
                             </tr>
                         @endforeach

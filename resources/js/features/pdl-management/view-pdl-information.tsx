@@ -77,7 +77,7 @@ export function ViewPdlInformation({ pdl }: { pdl: Pdl }) {
 
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                                <span className="text-muted-foreground">Full Name:</span> {`${pdl.fname} ${pdl.lname}`}
+                                <span className="text-muted-foreground">Full Name:</span> {`${pdl.fname} ${pdl.lname}`} {pdl?.suffix ? ' ' + pdl.suffix : ''}
                             </div>
                             <div>
                                 <span className="text-muted-foreground">Alias:</span> {pdl.alias || '-'}

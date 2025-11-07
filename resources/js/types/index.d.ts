@@ -83,6 +83,7 @@ export interface Pdl {
     name: string;
     fname: string;
     lname: string;
+    suffix:string| null;
     alias?: string | null;
     status?: string | null;
     birthdate: string;
@@ -133,6 +134,7 @@ export type CourtOrder = {
     document_path: string;
     court_branch: string;
     pdl_id: number;
+    admission_date: string;
     pdl?: Pdl;
 };
 

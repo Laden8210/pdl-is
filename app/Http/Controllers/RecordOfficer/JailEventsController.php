@@ -67,8 +67,7 @@ class JailEventsController extends Controller
 
         if (!empty($conflictingEvents)) {
             return redirect()->back()->withErrors([
-                'error' => 'There are conflicting events for the selected PDL(s).',
-                'details' => $conflictingEvents
+                'error' => 'There are conflicting events for the selected PDL(s).'
             ])->withInput();
         }
 

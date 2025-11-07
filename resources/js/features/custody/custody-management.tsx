@@ -25,8 +25,10 @@ export function CustodyManagement({ pdl }: CustodyManagementProps) {
     const { props } = usePage<any>();
     const successMessage = props.success;
 
+    console.log('PDL Data in CustodyManagement:', pdl.court_orders[0].admission_date);
+
     const { data, setData, post, processing, errors, reset } = useForm({
-        admission_date: pdl?.admission_date ? format(new Date(pdl.admission_date), 'yyyy-MM-dd') : '',
+        admission_date: pdl?.court_orders[0]?.admission_date ? format(new Date(pdl.court_orders[0].admission_date), 'yyyy-MM-dd') : '',
         release_date: pdl?.release_date ? format(new Date(pdl.release_date), 'yyyy-MM-dd') : '',
     });
 

@@ -272,6 +272,8 @@ export default function PersonalInformation() {
                                                 .filter(Boolean)
                                                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                                                 .join(' ')}
+
+
                                         </TableCell>
                                         <TableCell>{pdl.alias ?? '-'}</TableCell>
                                         <TableCell>{pdl.gender ?? '-'}</TableCell>
