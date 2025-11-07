@@ -125,15 +125,15 @@
             margin-bottom: 5px;
             font-family: monospace;
             text-align: right;
-            width: 100%;
-
+            width: 50%;
+            margin: auto;
             padding: 2px 0;
         }
 
-  
+
 
         .computation-label {
-            text-align: right;
+            text-align: left;
         }
 
         .computation-value {
@@ -259,7 +259,7 @@
             }
         }
 
-          .signature-section {
+        .signature-section {
             margin-top: 40px;
             text-align: right;
         }
@@ -335,7 +335,7 @@
     <div class="computation-section">
         <div class="computation-title">Computation of Preventive Imprisonment:</div>
 
-        <div style="width: 100%;">
+        <div style="width: 50%; margin: auto;">
             <div class="computation-line">
                 <div class="computation-label">Present Date:</div>
                 <div class="computation-date">
@@ -343,7 +343,6 @@
                     <span>{{ $currentDate->format('n') }}</span>
                     <span>{{ $currentDate->format('j') }}</span>
                 </div>
-                <span class="computation-date-separator">-------------------</span>
             </div>
 
             <div class="computation-line">
@@ -361,27 +360,28 @@
 
             <div class="computation-line">
                 <div class="computation-label">Total Detention</div>
-                <div class="computation-value">{{ $time_served['years'] }} Y {{ $time_served['months'] }} M
-                    {{ $time_served['days'] }} D</div>
-                      <span class="computation-date-separator">-------------------</span>
+                <div class="computation-value">{{ $time_served['years'] }}  {{ $time_served['months'] }} 
+                    {{ $time_served['days'] }} </div>
+
             </div>
 
             <div class="computation-line">
                 <div class="computation-label">Add GCTA</div>
-                <div class="computation-value">({{ $net_gcta_ymd }})</div>
+                <div class="computation-value">{{ $net_gcta_ymd }}</div>
+                <span class="computation-date-separator">-------------------</span>
             </div>
 
             <div class="separator-line" style="margin-left: 0;"></div>
 
             <div class="computation-line">
                 <div class="computation-label">Total Detention w/ GCTA</div>
-                <div class="computation-value">({{ $total_detention_gcta_ymd }})</div>
-                <span class="computation-date-separator">-------------------</span>
+                <div class="computation-value">{{ $total_detention_gcta_ymd }}</div>
+
             </div>
 
             <div class="computation-line">
                 <div class="computation-label">Add TASTM</div>
-                <div class="computation-value">({{ $net_tastm_ymd }})</div>
+                <div class="computation-value">{{ $net_tastm_ymd }}</div>
                 <span class="computation-date-separator">-------------------</span>
             </div>
 
@@ -389,7 +389,7 @@
 
             <div class="computation-line">
                 <div class="computation-label">Total Detention w/ GCTA & TASTM</div>
-                <div class="computation-value">({{ $total_detention_gcta_tastm_ymd }})</div>
+                <div class="computation-value">{{ $total_detention_gcta_tastm_ymd }}</div>
                 <span class="computation-date-separator">-------------------</span>
             </div>
         </div>
@@ -438,11 +438,11 @@
         Issued this {{ now()->format('jS') }} day of {{ now()->format('F Y') }}. Koronadal City, South Cotabato.
     </div>
 
-    
+
     <div class="signature-section">
 
-        <div class="signature-name">{{$full_name ?? 'Provincial Warden'}}</div>
-        <div class="signature-title">{{$position ?? 'Provincial Warden'}}</div>
+        <div class="signature-name">{{ $full_name ?? 'Provincial Warden' }}</div>
+        <div class="signature-title">{{ $position ?? 'Provincial Warden' }}</div>
     </div>
 </body>
 

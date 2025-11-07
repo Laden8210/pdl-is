@@ -48,6 +48,7 @@ class PDLManagementController extends Controller
                     'fname' => $pdl->fname,
                     'lname' => $pdl->lname,
                     'mname' => $pdl->mname,
+                    'suffix' => $pdl->suffix,
                     'alias' => $pdl->alias,
                     'birthdate' => $pdl->birthdate,
                     'mugshot_path' => $pdl->mugshot_path,
@@ -126,6 +127,7 @@ class PDLManagementController extends Controller
                         'fname' => $pdl->fname,
                         'lname' => $pdl->lname,
                         'mname' => $pdl->mname,
+                        'suffix' => $pdl->suffix,
                         'alias' => $pdl->alias,
                         'birthdate' => $pdl->birthdate,
                         'mugshot_path' => $pdl->mugshot_path,
@@ -148,6 +150,7 @@ class PDLManagementController extends Controller
                                 'court_branch' => $order->court_branch->branch_code,
                                 'document_path' => $order->document_path,
                                 'court_id' => $order->court_id,
+                                'admission_date' => $order->admission_date,
                             ];
                         }),
                         'medical_records' => $pdl->medicalRecords,
@@ -415,6 +418,7 @@ class PDLManagementController extends Controller
                 'lname' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
                 'mname' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
                 'alias' => 'required|string|max:255|regex:/^[A-Za-z\s\-]+$/',
+                'suffix' => 'nullable|string|max:255|regex:/^[A-Za-z\s\-]+$/',
                 'birthdate' => 'required|date',
                 'age' => 'required|integer|min:18',
                 'gender' => 'required|string|in:Male,Female',
@@ -446,9 +450,6 @@ class PDLManagementController extends Controller
 
             // Handle Court Orders Array
             if ($request->has('court_orders') && is_array($request->court_orders)) {
-                // Delete existing court orders
-                $pdl->courtOrders()->delete();
-
                 foreach ($request->court_orders as $courtOrderData) {
                     $documentPath = null;
                     $documentFilename = null;
@@ -463,29 +464,41 @@ class PDLManagementController extends Controller
                         $documentFilename = $filename;
                     }
 
-                    $courtOrderCreateData = [
-                        'order_type' => $courtOrderData['order_type'],
-                        'order_date' => $courtOrderData['order_date'],
-                        'received_date' => $courtOrderData['received_date'],
-                        'remarks' => $courtOrderData['cod_remarks'],
-                        'court_id' => $courtOrderData['court_id'],
+                    $courtOrderUpdateData = [
+                        'order_type' => $courtOrderData['order_type'] ?? null,
+                        'order_date' => $courtOrderData['order_date'] ?? null,
+                        'received_date' => $courtOrderData['received_date'] ?? null,
+                        'remarks' => $courtOrderData['cod_remarks'] ?? null,
+                        'court_id' => $courtOrderData['court_id'] ?? null,
                     ];
 
                     // Add file fields if file was uploaded
                     if ($documentPath) {
-                        $courtOrderCreateData['document_type'] = pathinfo($originalName, PATHINFO_FILENAME);
-                        $courtOrderCreateData['document_path'] = $documentPath;
-                        $courtOrderCreateData['original_filename'] = $originalName;
+                        $courtOrderUpdateData['document_type'] = pathinfo($originalName, PATHINFO_FILENAME);
+                        $courtOrderUpdateData['document_path'] = $documentPath;
+                        $courtOrderUpdateData['original_filename'] = $originalName;
                     }
 
-                    $pdl->courtOrders()->create($courtOrderCreateData);
+                    // Check if this is an existing court order (has court_order_id) or new one
+                    if (!empty($courtOrderData['court_order_id']) && $courtOrderData['court_order_id'] != 0) {
+                        // Update existing court order
+                        $courtOrder = CourtOrder::where('court_order_id', $courtOrderData['court_order_id'])
+                            ->where('pdl_id', $pdl->id)
+                            ->first();
+
+                        if ($courtOrder) {
+                            $courtOrder->update($courtOrderUpdateData);
+                        }
+                    } else {
+                        // Create new court order
+                        $pdl->courtOrders()->create($courtOrderUpdateData);
+                    }
                 }
             }
 
             // Handle Medical Records Array
             if ($request->has('medical_records') && is_array($request->medical_records)) {
-                // Delete existing medical records
-                $pdl->medicalRecords()->delete();
+    
 
                 foreach ($request->medical_records as $medicalRecordData) {
                     $medicalRecordCreateData = [
@@ -506,10 +519,18 @@ class PDLManagementController extends Controller
 
                         $medicalRecordCreateData['stored_filename'] = $originalName;
                         $medicalRecordCreateData['file_path'] = $medicalPath;
-
                     }
 
-                    $pdl->medicalRecords()->create($medicalRecordCreateData);
+                    if(!empty($medicalRecordData['medical_record_id']) && $medicalRecordData['medical_record_id'] != 0) {
+                        // Update existing medical record
+                        $medicalRecord = $pdl->medicalRecords()->where('medical_record_id', $medicalRecordData['medical_record_id'])->first();
+                        if ($medicalRecord) {
+                            $medicalRecord->update($medicalRecordCreateData);
+                        }
+                    } else {
+                        // Create new medical record
+                        $pdl->medicalRecords()->create($medicalRecordCreateData);
+                    }
                 }
             }
 

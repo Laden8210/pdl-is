@@ -10,9 +10,6 @@ import { toast } from 'sonner';
 export default function AppSidebarLayout({ children, breadcrumbs = [] }: PropsWithChildren<{ breadcrumbs?: BreadcrumbItem[] }>) {
     const { props, setProps } = usePage<PageProps>();
     const { auth, notifications } = props;
-    
-    console.log('Auth:', auth);
-    console.log('Notifications:', notifications);
 
     useEffect(() => {
         const successMessage = (props as any).success;

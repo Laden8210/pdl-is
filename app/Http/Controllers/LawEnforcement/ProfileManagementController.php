@@ -4,6 +4,8 @@ namespace App\Http\Controllers\LawEnforcement;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+
 
 class ProfileManagementController extends Controller
 {
@@ -12,5 +14,5 @@ class ProfileManagementController extends Controller
         return Inertia::render('admin/profile-management/profie');
     }
 
-    
+
 }

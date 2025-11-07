@@ -1491,7 +1491,7 @@ export default function CreatePDLInformation() {
                                                 <SelectContent>
                                                     {(courts as any[]).map((court: any) => (
                                                         <SelectItem key={court.court_id} value={court.court_id.toString()}>
-                                                            {court.branch_code} - {court.branch_name || court.branch_code}
+                                                            {court.branch_code} - {court.court_type}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -1677,9 +1677,6 @@ export default function CreatePDLInformation() {
                                                     <SelectValue placeholder="Select status" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-
-
-
                                                     <SelectItem value="on_trial">On Trial</SelectItem>
                                                     <SelectItem value="convicted">Convicted</SelectItem>
                                                     <SelectItem value="deceased">Deceased</SelectItem>
@@ -2012,11 +2009,6 @@ export default function CreatePDLInformation() {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 Physical Characteristics
-                                {data.height && data.weight && (
-                                    <Badge variant="secondary">
-                                        {data.height}cm / {data.weight}kg
-                                    </Badge>
-                                )}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-6">

@@ -13,8 +13,8 @@ import { getAge } from '@/lib/dateUtils';
 import { PageProps, type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Archive, Edit, ChevronUp, ChevronDown, Search } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { Archive, ChevronDown, ChevronUp, Edit, Search } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -92,11 +92,11 @@ export default function PersonalInformation() {
     // Filter and sort verifications
     const filteredAndSortedVerifications = useMemo(() => {
         // First, filter out verifications without PDL data
-        let filtered = verifications.filter(verification => verification.pdl);
+        let filtered = verifications.filter((verification) => verification.pdl);
 
         // Apply search filter
         if (searchTerm) {
-            filtered = filtered.filter(verification => {
+            filtered = filtered.filter((verification) => {
                 const pdl = verification.pdl;
                 const fullName = `${pdl?.fname || ''} ${pdl?.mname || ''} ${pdl?.lname || ''}`.toLowerCase();
                 const searchLower = searchTerm.toLowerCase();
@@ -177,7 +177,7 @@ export default function PersonalInformation() {
     // Sort indicator component
     const SortIndicator = ({ field }: { field: string }) => {
         if (sortField !== field) return null;
-        return sortDirection === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
+        return sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />;
     };
 
     const handleCustodyDates = (pdl: any) => {
@@ -293,9 +293,9 @@ export default function PersonalInformation() {
                 <h1 className="text-2xl font-bold">Personal Information</h1>
 
                 {/* Search and Controls */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+                <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                     <div className="relative w-full sm:w-64">
-                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Search className="absolute top-2.5 left-2 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder="Search PDLs..."
                             value={searchTerm}
@@ -307,7 +307,7 @@ export default function PersonalInformation() {
                         />
                     </div>
 
-                    <div className="flex gap-4 items-center">
+                    <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
                             <span className="text-sm text-muted-foreground">Show:</span>
                             <Select
@@ -344,7 +344,7 @@ export default function PersonalInformation() {
                     <CardHeader>
                         <CardTitle>
                             Personal Information List
-                            <span className="text-sm font-normal text-muted-foreground ml-2">
+                            <span className="ml-2 text-sm font-normal text-muted-foreground">
                                 ({filteredAndSortedVerifications.length} PDL{filteredAndSortedVerifications.length !== 1 ? 's' : ''})
                             </span>
                         </CardTitle>
@@ -353,57 +353,39 @@ export default function PersonalInformation() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead
-                                        className="cursor-pointer hover:bg-muted/50"
-                                        onClick={() => handleSort('id')}
-                                    >
+                                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('id')}>
                                         <div className="flex items-center gap-1">
                                             ID
                                             <SortIndicator field="id" />
                                         </div>
                                     </TableHead>
-                                    <TableHead
-                                        className="cursor-pointer hover:bg-muted/50"
-                                        onClick={() => handleSort('name')}
-                                    >
+                                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('name')}>
                                         <div className="flex items-center gap-1">
                                             Full Name
                                             <SortIndicator field="name" />
                                         </div>
                                     </TableHead>
                                     <TableHead>Alias</TableHead>
-                                    <TableHead
-                                        className="cursor-pointer hover:bg-muted/50"
-                                        onClick={() => handleSort('gender')}
-                                    >
+                                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('gender')}>
                                         <div className="flex items-center gap-1">
                                             Gender
                                             <SortIndicator field="gender" />
                                         </div>
                                     </TableHead>
-                                    <TableHead
-                                        className="cursor-pointer hover:bg-muted/50"
-                                        onClick={() => handleSort('ethnic_group')}
-                                    >
+                                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('ethnic_group')}>
                                         <div className="flex items-center gap-1">
                                             Ethnic Group
                                             <SortIndicator field="ethnic_group" />
                                         </div>
                                     </TableHead>
-                                    <TableHead
-                                        className="cursor-pointer hover:bg-muted/50"
-                                        onClick={() => handleSort('civil_status')}
-                                    >
+                                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('civil_status')}>
                                         <div className="flex items-center gap-1">
                                             Civil Status
                                             <SortIndicator field="civil_status" />
                                         </div>
                                     </TableHead>
                                     <TableHead>Date of Birth</TableHead>
-                                    <TableHead
-                                        className="cursor-pointer hover:bg-muted/50"
-                                        onClick={() => handleSort('age')}
-                                    >
+                                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('age')}>
                                         <div className="flex items-center gap-1">
                                             Age
                                             <SortIndicator field="age" />
@@ -426,6 +408,8 @@ export default function PersonalInformation() {
                                                 .filter(Boolean)
                                                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                                                 .join(' ')}
+
+                                            {verification.pdl?.suffix ? ' ' + verification.pdl.suffix : ''}
                                         </TableCell>
                                         <TableCell>{verification.pdl.alias ?? '-'}</TableCell>
                                         <TableCell>{verification.pdl.gender ?? '-'}</TableCell>
@@ -439,7 +423,7 @@ export default function PersonalInformation() {
                                                 ? `${verification.pdl.personnel.fname} ${verification.pdl.personnel.lname}`
                                                 : '—'}
                                         </TableCell>
-                                            <TableCell>{verification.pdl.personnel ? `${verification.pdl.personnel.agency}` : '—'}</TableCell>
+                                        <TableCell>{verification.pdl.personnel ? `${verification.pdl.personnel.agency}` : '—'}</TableCell>
                                         <TableCell className="space-x-1">
                                             <ViewPdlInformation pdl={verification.pdl} />
                                             {!isAdmin && (
@@ -460,8 +444,6 @@ export default function PersonalInformation() {
                                                     Edit
                                                 </Button>
                                             )}
-
-
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -470,15 +452,16 @@ export default function PersonalInformation() {
 
                         {/* Pagination Controls */}
                         {totalPages > 1 && (
-                            <div className="flex items-center justify-between mt-4">
+                            <div className="mt-4 flex items-center justify-between">
                                 <div className="text-sm text-muted-foreground">
-                                    Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredAndSortedVerifications.length)} of {filteredAndSortedVerifications.length} entries
+                                    Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredAndSortedVerifications.length)} of{' '}
+                                    {filteredAndSortedVerifications.length} entries
                                 </div>
                                 <div className="flex gap-2">
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                                         disabled={currentPage === 1}
                                     >
                                         Previous
@@ -499,7 +482,7 @@ export default function PersonalInformation() {
                                             return (
                                                 <Button
                                                     key={pageNum}
-                                                    variant={currentPage === pageNum ? "default" : "outline"}
+                                                    variant={currentPage === pageNum ? 'default' : 'outline'}
                                                     size="sm"
                                                     onClick={() => setCurrentPage(pageNum)}
                                                 >
@@ -511,7 +494,7 @@ export default function PersonalInformation() {
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                                         disabled={currentPage === totalPages}
                                     >
                                         Next

@@ -14,6 +14,7 @@ use App\Models\Court;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Models\CourtOrder;
 
 class ReportController extends Controller
 {
@@ -727,16 +728,16 @@ class ReportController extends Controller
         $totalDetentionDays = $commitmentDate->diffInDays($currentDate);
 
         // Calculate the new required variables
-        $net_gcta_ymd = $this->convertDaysToYMD($totalGCTA);
-        $net_tastm_ymd = $this->convertDaysToYMD($totalTASTM);
+        $net_gcta_ymd = $this->convertDaysToYMDWithoutExtension($totalGCTA);
+        $net_tastm_ymd = $this->convertDaysToYMDWithoutExtension($totalTASTM);
 
         // Calculate total detention with GCTA
         $total_detention_gcta_days = $totalDetentionDays + $totalGCTA;
-        $total_detention_gcta_ymd = $this->convertDaysToYMD($total_detention_gcta_days);
+        $total_detention_gcta_ymd = $this->convertDaysToYMDWithoutExtension($total_detention_gcta_days);
 
         // Calculate total detention with GCTA and TASTM
         $total_detention_gcta_tastm_days = $totalDetentionDays + $totalGCTA + $totalTASTM;
-        $total_detention_gcta_tastm_ymd = $this->convertDaysToYMD($total_detention_gcta_tastm_days);
+        $total_detention_gcta_tastm_ymd = $this->convertDaysToYMDWithoutExtension($total_detention_gcta_tastm_days);
 
         $data = [
             'verification' => $verification,
@@ -854,6 +855,30 @@ class ReportController extends Controller
         }
 
         return $data;
+    }
+
+    
+    public function convertDaysToYMDWithoutExtension($days)
+    {
+        $years = floor($days / 365);
+        $remainingDays = $days % 365;
+        $months = floor($remainingDays / 30);
+        $days = $remainingDays % 30;
+
+        $result = '';
+        if ($years > 0) {
+            $result .= $years . '' . ($years > 1 ? '' : '');
+        }
+        if ($months > 0) {
+            if ($result) $result .= ' ';
+            $result .= $months . '' . ($months > 1 ? '' : '');
+        }
+        if ($days > 0) {
+            if ($result) $result .= '  ';
+            $result .= $days . '' . ($days > 1 ? '' : '');
+        }
+
+        return $result ?: '0';
     }
 
     public function convertDaysToYMD($days)
@@ -2347,8 +2372,8 @@ class ReportController extends Controller
     public function pdlInformationReport(Request $request)
     {
 
-
         $pdl = Pdl::with('cases')->find($request->pdl_id);
+        $courtOrder = CourtOrder::with('court')->where('pdl_id', $request->pdl_id)->latest()->first();
 
         if (!$pdl) {
 
@@ -2360,11 +2385,10 @@ class ReportController extends Controller
         $fileName = 'pdl-information_' . $pdl->id . '_' . now()->format('Y-m-d') . '.pdf';
         $imageBase64 = $this->getPdlMugshotBase64($pdl);
 
-
-
         try {
             $html = view('reports.pdl-information', [
                 'pdl' => $pdl,
+                'courtOrder' => $courtOrder,
                 'image' => $imageBase64,
                 'hasImage' => !is_null($imageBase64)
             ])->render();
