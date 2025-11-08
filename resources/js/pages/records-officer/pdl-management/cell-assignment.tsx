@@ -26,6 +26,8 @@ interface PageProps {
             id: number;
             fname: string;
             lname: string;
+            mname: string | null;
+            suffix: string | null;
             gender: 'Male' | 'Female';
         };
         created_at: string;
@@ -50,7 +52,7 @@ export default function CellAssignment() {
         cell_id: assignment.cell.cell_id,
         cell_gender: assignment.cell.gender,
         pdl_id: assignment.pdl.id,
-        pdl_name: `${assignment.pdl.fname} ${assignment.pdl.lname}`,
+        pdl_name: `${assignment.pdl.fname} ${assignment.pdl.mname || ''} ${assignment.pdl.lname} ${assignment.pdl.suffix || ''}`,
         pdl_gender: assignment.pdl.gender,
         assigned_date: assignment.created_at,
     }));

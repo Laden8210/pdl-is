@@ -319,7 +319,7 @@
 
     <div class="certification-text">
         THIS IS TO CERTIFY that convicted prisoner
-        <strong>{{ strtoupper($pdl->fname . ' ' . $pdl->lname) }}</strong>, was detained in this facility since
+        <strong>{{ strtoupper($pdl->fname . ' '. $pdl->mname . ' ' . $pdl->lname . ' ' . $pdl->suffix) }}</strong>, was detained in this facility since
         <strong>{{ $commitment_date }}</strong> to date. {{ $pdl->gender == 'Male' ? 'He' : 'She' }} is generally of
         good behaviour. {{ $pdl->gender == 'Male' ? 'He' : 'She' }} is granted of Good Conduct Time Allowance (GCTA)
         less <strong>0 year/s to deduct</strong> for {{ $pdl->gender == 'Male' ? 'his' : 'her' }} violation of
@@ -360,7 +360,7 @@
 
             <div class="computation-line">
                 <div class="computation-label">Total Detention</div>
-                <div class="computation-value">{{ $time_served['years'] }}  {{ $time_served['months'] }} 
+                <div class="computation-value">{{ $time_served['years'] }}  {{ $time_served['months'] }}
                     {{ $time_served['days'] }} </div>
 
             </div>
@@ -408,7 +408,7 @@
             @foreach ($computation_data as $row)
                 <tr>
                     <td colspan="3">{{ explode(' ', $row['first_column_date'])[0] }}</td>
-                    <td colspan="3">{{ explode(' ', $row['second_column_date'])[0] }}</td>
+                    <td colspan="3">{{ explode(' ', $row['first_column_date'])[0] + 1 }}</td>
                     <td class="col-earned-gcta">{{ $row['gcta_calculation'] }} {{ $row['gcta_total'] }}</td>
                     <td class="col-earned-tastm">{{ $row['tastm_calculation'] }} {{ $row['tastm_total'] }}</td>
                 </tr>

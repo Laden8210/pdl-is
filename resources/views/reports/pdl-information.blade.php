@@ -226,7 +226,7 @@
                     <img src="data:image/jpeg;base64,{{ $image }}" alt="PDL Image"
                         style="width: 150px; height: 150px; object-fit: cover;">
                 </div>
-                <div class="inmate-id">{{ $pdl->fname }}, {{ $pdl->mname }}.<br>ID No: {{ $pdl->id }}</div>
+                <div class="inmate-id">{{ $pdl->lname }}, {{ $pdl->mname }}.<br>ID No: {{ $pdl->id }}</div>
             </div>
 
             <div class="details-section">
@@ -241,7 +241,7 @@
                     <div class="detail-label">First Name:</div>
                     <div class="detail-value">{{ $pdl->fname }}</div>
                     <div class="detail-label-right">Gender:</div>
-                    <div class="detail-value-right">FEMALE</div>
+                    <div class="detail-value-right">{{ $pdl->gender }}</div>
                 </div>
 
                 <div class="details-row">
@@ -252,21 +252,22 @@
                 </div>
 
                 <div class="details-row">
-                    <div class="detail-label">Alias:</div>
-                    <div class="detail-value">{{ $pdl->alias }}</div>
-                    <div class="detail-label-right">Date Committed:</div>
-                    <div class="detail-value-right">
+                    <div class="detail-label">Suffix:</div>
+                    <div class="detail-value">{{ $pdl->suffix }}</div>
+                    <div class="detail-label-right">Alias:</div>
+                    <div class="detail-value-right">{{ $pdl->alias }}</div>
+                </div>
+
+                <div class="details-row">
+
+                    <div class="detail-label">Date Committed:</div>
+                    <div class="detail-value">
                         @if ($pdl->cases->isNotEmpty() && $pdl->cases->first()->date_committed)
                             {{ $pdl->cases->first()->date_committed->format('F d, Y') }}
                         @else
                             N/A
                         @endif
                     </div>
-                </div>
-
-                <div class="details-row">
-                    <div class="detail-label">Barangay:</div>
-                    <div class="detail-value">{{ $pdl->brgy }}</div>
                     <div class="detail-label-right">Time Committed:</div>
                     <div class="detail-value-right">
                         @if ($pdl->cases->isNotEmpty() && $pdl->cases->first()->time_committed)
@@ -278,17 +279,26 @@
                 </div>
 
                 <div class="details-row">
-                    <div class="detail-label">Municipality:</div>
-                    <div class="detail-value">{{ $pdl->city }}</div>
-                    <div class="detail-label-right">Tribe:</div>
-                    <div class="detail-value-right">{{ $pdl->ethnic_group }}</div>
+                    <div class="detail-label">Barangay:</div>
+                    <div class="detail-value">{{ $pdl->brgy }}</div>
+                    <div class="detail-label-right">Municipality:</div>
+                    <div class="detail-value-right">{{ $pdl->city }}</div>
+
                 </div>
 
                 <div class="details-row">
                     <div class="detail-label">Province:</div>
                     <div class="detail-value">{{ $pdl->province }}</div>
-                    <div class="detail-label-right">Status:</div>
-                    <div class="detail-value-right">{{ $pdl->civil_status }}</div>
+                    <div class="detail-label-right">Tribe:</div>
+                    <div class="detail-value-right">{{ $pdl->ethnic_group }}</div>
+                </div>
+
+                <div class="details-row">
+
+                    <div class="detail-label">Status:</div>
+                    <div class="detail-value">{{ $pdl->civil_status }}</div>
+                    <div class="detail-label-right"> </div>
+
                 </div>
             </div>
         </div>
@@ -325,14 +335,10 @@
                                 <td style="border: 1px solid #000; padding: 8px;">{{ $case->case_status ?? 'N/A' }}
                                 </td>
                                 <td style="border: 1px solid #000; padding: 8px;">
-                                    {{
-                                        $courtOrder->court->branch_code
-                                    }}
+                                    {{ $courtOrder->court->branch_code }}
                                 </td>
                                 <td style="border: 1px solid #000; padding: 8px;">
-                                    {{
-                                          $courtOrder->order_date->format('F d, Y')
-                                    }}
+                                    {{ $courtOrder->order_date->format('F d, Y') }}
 
                                 </td>
                             </tr>

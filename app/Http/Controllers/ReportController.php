@@ -189,13 +189,22 @@ class ReportController extends Controller
             ->orderBy('lname')
             ->get()
             ->map(function ($pdl) {
-                $mainCase = $pdl->cases->first();
+                // Get all cases sorted by date committed
+                $cases = $pdl->cases->sortBy('date_committed');
+                $earliestCase = $cases->first();
+
                 return [
                     'id' => $pdl->id,
                     'name' => $pdl->fname . ' ' . $pdl->lname,
-                    'case_number' => $mainCase->case_number ?? 'N/A',
-                    'crime_committed' => $mainCase->crime_committed ?? 'N/A',
-                    'date_committed' => $mainCase->date_committed ?? null,
+                    'date_committed' => $earliestCase->date_committed ?? null,
+                    'cases' => $cases->map(function ($case) {
+                        return [
+                            'case_number' => $case->case_number,
+                            'crime_committed' => $case->crime_committed,
+                            'date_committed' => $case->date_committed,
+                            'case_status' => $case->case_status,
+                        ];
+                    })->values()->toArray(),
                 ];
             });
 
@@ -220,15 +229,19 @@ class ReportController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        $pdl = Pdl::with(['cases', 'personnel'])->findOrFail($request->pdl_id);
-        $mainCase = $pdl->cases->first();
+        $pdl = Pdl::with(['cases', 'personnel', 'courtOrders'])->findOrFail($request->pdl_id);
 
-        if (!$mainCase) {
+        // Check if PDL has any cases
+        if ($pdl->cases->isEmpty()) {
             return back()->withErrors(['error' => 'No case information found for this PDL.']);
         }
 
-        // Calculate detention period
-        $dateCommitted = Carbon::parse($mainCase->date_committed);
+        // Get all cases and calculate detention period based on earliest case
+        $allCases = $pdl->cases->sortBy('date_committed');
+        $earliestCase = $allCases->first();
+
+        // Calculate detention period based on earliest case date
+        $dateCommitted = Carbon::parse($earliestCase->date_committed);
         $issueDate = Carbon::parse($request->issue_date);
         $detentionPeriod = $dateCommitted->diff($issueDate);
 
@@ -250,12 +263,30 @@ class ReportController extends Controller
             $detentionText .= $days . ' (' . $this->numberToWords($days) . ') day' . ($days > 1 ? 's' : '');
         }
 
+        // Format cases text for paragraph
+        $casesText = '';
+        if ($allCases->count() === 1) {
+            $case = $allCases->first();
+            $casesText = strtoupper($case->crime_committed) . ' docketed as ' . $case->case_number;
+        } else {
+            $casesArray = $allCases->map(function ($case, $index) use ($allCases) {
+                if ($index === $allCases->count() - 1) {
+                    return 'and for ' . strtoupper($case->crime_committed) . ' docketed as ' . $case->case_number;
+                } else {
+                    return 'for ' . strtoupper($case->crime_committed) . ' docketed as ' . $case->case_number;
+                }
+            })->toArray();
+
+            $casesText = implode(', ', $casesArray);
+        }
+
+        $court_branch = $pdl->courtOrders->first()?->court->branch_code ?? 'Regional Court Branch 26, Surallah, South Cotabato';
         $data = [
             'pdl_name' => strtoupper($pdl->fname . ' ' . $pdl->lname),
             'date_committed' => $dateCommitted->format('F j, Y'),
-            'court_branch' => 'Regional Court Branch 26, Surallah, South Cotabato',
-            'crime_committed' => strtoupper($mainCase->crime_committed),
-            'case_number' => $mainCase->case_number,
+            'court_branch' => $court_branch,
+            'cases_text' => $casesText,
+            'cases_count' => $allCases->count(),
             'detention_period' => $detentionText,
             'issue_date' => $issueDate->format('jS \d\a\y \o\f F Y'),
             'issue_city' => 'City of Koronadal',
@@ -265,8 +296,6 @@ class ReportController extends Controller
 
         $pdf = Pdf::loadView('reports.certificate-of-detention', $data);
         $pdf->setPaper('A4', 'portrait');
-
-
 
         return response($pdf->output(), 200, [
             'Content-Type' => 'application/pdf',
@@ -448,7 +477,7 @@ class ReportController extends Controller
     private function generateCaseStatusReport($reportDate)
     {
         $cases = CaseInformation::with('pdl')
-            ->where('date_committed', '<=', $reportDate)
+            ->where('created_at', '<=', $reportDate)
             ->whereHas('pdl', function ($query) {
                 $query->whereHas('verifications', function ($query) {
                     $query->where('status', 'approved');
@@ -458,20 +487,20 @@ class ReportController extends Controller
             ->get();
 
         $statusGroups = [
-            'SERVED SENTENCE',
-            'ARRAIGNMENT',
-            'PRE-TRIAL',
-            'ON TRIAL',
-            'BONDED',
-            'ARCHIVED',
-            'DISMISSED',
-            'PROBATION',
-            'TRANSFERRED',
-            'DECEASED',
-            'CONVICTED',
-            'HOUSE ARREST',
-            'ACQUITTED',
-            'ESCAPE'
+            'served_sentence',
+            'arraignment',
+            'pre_trial',
+            'on_trial',
+            'bonded',
+            'archived',
+            'dismissed',
+            'probation',
+            'transferred',
+            'deceased',
+            'convicted',
+            'house_arrest',
+            'acquitted',
+            'escape'
         ];
 
         $reportData = [];
@@ -494,6 +523,9 @@ class ReportController extends Controller
             $total = $maleCount + $femaleCount;
             $totalMale += $maleCount;
             $totalFemale += $femaleCount;
+
+            // upper case and remove the underscores
+            $status = strtoupper(str_replace('_', ' ', $status));
 
             $reportData[] = [
                 'status' => $status,
@@ -666,6 +698,8 @@ class ReportController extends Controller
                         'id' => $pdl->id,
                         'fname' => $pdl->fname,
                         'lname' => $pdl->lname,
+                        'mname' => $pdl->mname,
+                        'suffix' => $pdl->suffix,
                         'alias' => $pdl->alias,
                         'birthdate' => $pdl->birthdate,
                         'age' => $pdl->age,
@@ -702,7 +736,9 @@ class ReportController extends Controller
                     'medicalRecords',
                     'cases',
                     'personnel:id,fname,lname',
-                    'timeAllowances'
+                    'timeAllowances' => function ($query) {
+                        $query->orderBy('awarded_at', 'asc');
+                    }
                 ]);
             },
             'reviewer:id,fname,lname'
@@ -711,15 +747,28 @@ class ReportController extends Controller
         $pdl = $verification->pdl;
 
         // Get commitment date from the first case
-        $commitmentDate = $pdl->cases->first()?->date_committed ?? $pdl->created_at;
+        $commitmentDate = $pdl->courtOrders->first()?->admission_date ?? $pdl->created_at;
+        if (is_string($commitmentDate)) {
+            $commitmentDate = Carbon::parse($commitmentDate);
+        }
         $currentDate = now();
 
-        // Generate year-by-year computation
-        $computationData = $this->generateGCTATASTMComputation($commitmentDate, $currentDate);
+        // Calculate total GCTA and TASTM from actual database records
+        $totalGCTA = 0;
+        $totalTASTM = 0;
 
-        // Calculate total GCTA and TASTM
-        $totalGCTA = array_sum(array_column($computationData, 'gcta_total'));
-        $totalTASTM = array_sum(array_column($computationData, 'tastm_total'));
+        if ($pdl && $pdl->timeAllowances) {
+            foreach ($pdl->timeAllowances as $allowance) {
+                if ($allowance->type === 'gcta') {
+                    $totalGCTA += $allowance->days;
+                } elseif ($allowance->type === 'tastm') {
+                    $totalTASTM += $allowance->days;
+                }
+            }
+        }
+
+        // Generate year-by-year computation from actual database records
+        $computationData = $this->generateGCTATASTMComputation($commitmentDate, $currentDate, $pdl->timeAllowances ?? collect());
 
         // Calculate time served
         $timeServed = $commitmentDate->diff($currentDate);
@@ -776,88 +825,138 @@ class ReportController extends Controller
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'inline; filename="gcta-tastm-report-' . $pdl->id . '.pdf"');
     }
-
-    private function generateGCTATASTMComputation($commitmentDate, $currentDate)
+    private function generateGCTATASTMComputation($commitmentDate, $currentDate, $timeAllowances)
     {
         $data = [];
         $commitmentYear = $commitmentDate->year;
         $commitmentMonth = $commitmentDate->month;
         $commitmentDay = $commitmentDate->day;
 
-        $currentYear = $currentDate->year;
-        $currentMonth = $currentDate->month;
-        $currentDay = $currentDate->day;
+        // Group allowances by service year based on commitment anniversary
+        $allowancesByServiceYear = [];
 
-        // Calculate total years from commitment to current date
-        $totalYears = $currentYear - $commitmentYear;
+        foreach ($timeAllowances as $allowance) {
+            $awardedAt = Carbon::parse($allowance->awarded_at);
 
-        // If we haven't reached the anniversary date this year, subtract 1
-        if ($currentMonth < $commitmentMonth || ($currentMonth == $commitmentMonth && $currentDay < $commitmentDay)) {
-            $totalYears = $totalYears - 1;
-        }
+            // Calculate which service year this allowance belongs to
+            $yearsFromCommitment = $awardedAt->year - $commitmentYear;
+            $anniversaryDate = Carbon::create($commitmentYear + $yearsFromCommitment, $commitmentMonth, $commitmentDay);
 
-        // Generate rows for each year from commitment to current
-        for ($yearOffset = 0; $yearOffset <= $totalYears; $yearOffset++) {
-            $currentYearDate = $commitmentYear + $yearOffset;
-
-            // First column: commitment date for this year
-            $firstColumnDate = Carbon::create($currentYearDate, $commitmentMonth, $commitmentDay);
-
-            // Second column: one year after commitment date for this year
-            $secondColumnDate = Carbon::create($currentYearDate + 1, $commitmentMonth, $commitmentDay);
-
-            // For the last year, use current date if we've reached it
-            if ($yearOffset == $totalYears) {
-                $secondColumnDate = $currentDate;
+            // If awarded date is before the anniversary in the same year, it belongs to previous service year
+            if ($awardedAt->lt($anniversaryDate)) {
+                $serviceYear = $yearsFromCommitment; // Previous year
+                $periodStart = Carbon::create($commitmentYear + $serviceYear, $commitmentMonth, $commitmentDay);
+            } else {
+                $serviceYear = $yearsFromCommitment + 1; // Current year
+                $periodStart = $anniversaryDate;
             }
 
-            // Calculate years served to determine GCTA rate
-            $yearsServed = $yearOffset + 1;
+            // Ensure period start is not before commitment date
+            if ($periodStart->lt($commitmentDate)) {
+                $periodStart = $commitmentDate->copy();
+                $serviceYear = 1; // First service year
+            }
 
-            // Determine GCTA rate based on years served
-            $gctaRate = 20; // Default for 1-2 years
-            if ($yearsServed >= 3 && $yearsServed <= 5) {
+            $periodEnd = $periodStart->copy()->addYear();
+
+            // Use service year as key
+            $yearKey = $serviceYear;
+
+            if (!isset($allowancesByServiceYear[$yearKey])) {
+                $allowancesByServiceYear[$yearKey] = [
+                    'service_year' => $serviceYear,
+                    'period_start' => $periodStart,
+                    'period_end' => $periodEnd,
+                    'gcta' => 0,
+                    'tastm' => 0,
+                    'gcta_records' => [],
+                    'tastm_records' => [],
+                    'months' => [], // Track unique months
+                ];
+            }
+
+            // Track unique months using year-month format
+            $monthKey = $awardedAt->format('Y-m');
+            if (!in_array($monthKey, $allowancesByServiceYear[$yearKey]['months'])) {
+                $allowancesByServiceYear[$yearKey]['months'][] = $monthKey;
+            }
+
+            if ($allowance->type === 'gcta') {
+                $allowancesByServiceYear[$yearKey]['gcta'] += $allowance->days;
+                $allowancesByServiceYear[$yearKey]['gcta_records'][] = $allowance;
+            } elseif ($allowance->type === 'tastm') {
+                $allowancesByServiceYear[$yearKey]['tastm'] += $allowance->days;
+                $allowancesByServiceYear[$yearKey]['tastm_records'][] = $allowance;
+            }
+        }
+
+        // Sort by service year
+        ksort($allowancesByServiceYear);
+
+        // Generate rows for each service year
+        foreach ($allowancesByServiceYear as $yearKey => $yearData) {
+            $periodStart = $yearData['period_start'];
+            $periodEnd = $yearData['period_end'];
+
+            // Adjust period end if it exceeds current date
+            if ($periodEnd->gt($currentDate)) {
+                $periodEnd = $currentDate->copy();
+            }
+
+            // Get the number of months from awarded_at dates
+            $monthsCount = count($yearData['months']);
+
+            // Determine GCTA rate based on service year
+            $serviceYear = $yearData['service_year'];
+            $gctaRate = 20; // default
+
+            if ($serviceYear >= 3 && $serviceYear <= 5) {
                 $gctaRate = 23;
-            } elseif ($yearsServed >= 6 && $yearsServed <= 10) {
+            } elseif ($serviceYear >= 6 && $serviceYear <= 10) {
                 $gctaRate = 25;
-            } elseif ($yearsServed >= 11) {
+            } elseif ($serviceYear >= 11) {
                 $gctaRate = 30;
             }
 
-            // Calculate months for the year
-            $months = 12;
-            if ($yearOffset == $totalYears) {
-                // Calculate partial year for the current year
-                $startOfYear = Carbon::create($currentYearDate, $commitmentMonth, $commitmentDay);
-                $months = $startOfYear->diffInMonths($currentDate);
-
-                // Add partial month calculation
-                $lastMonthStart = $startOfYear->copy()->addMonths($months);
-                $daysInLastMonth = $currentDate->diffInDays($lastMonthStart);
-                $partialMonth = $daysInLastMonth / 30;
-                $months += $partialMonth;
+            // Override with rate from records if available
+            if (isset($yearData['gcta_records']) && count($yearData['gcta_records']) > 0) {
+                $rates = [];
+                foreach ($yearData['gcta_records'] as $record) {
+                    $rates[] = $record->days;
+                }
+                $rateCounts = array_count_values($rates);
+                arsort($rateCounts);
+                $gctaRate = (int)key($rateCounts);
             }
 
-            $gctaTotal = $gctaRate * $months;
-            $tastmTotal = 15 * 12; // TASTM is always 15 days per month
+            // TASTM rate is always 15 days per month
+            $tastmRate = 15;
+
+            // Calculate totals based on actual months count
+            $gctaTotal = $gctaRate * $monthsCount;
+            $tastmTotal = $tastmRate * $monthsCount;
+
+            // Build calculation strings
+            $gctaCalculation = $gctaRate . 'X' . $monthsCount;
+            $tastmCalculation = $tastmRate . 'X' . $monthsCount;
 
             $data[] = [
-                'year' => $currentYearDate,
-                'first_column_date' => $firstColumnDate->format('Y n j'),
-                'second_column_date' => $secondColumnDate->format('Y n j'),
-                'gcta_rate' => $gctaRate,
-                'months' => $months,
-                'gcta_calculation' => $gctaRate . 'X' . number_format($months, 1),
-                'gcta_total' => round($gctaTotal),
-                'tastm_calculation' => '15X12',
-                'tastm_total' => $tastmTotal
+                'service_year' => $serviceYear,
+                'first_column_date' => $periodStart->format('Y'),
+                'second_column_date' => $periodEnd->format('Y'),
+                'gcta_calculation' => $gctaCalculation,
+                'gcta_total' => $gctaTotal,
+                'tastm_calculation' => $tastmCalculation,
+                'tastm_total' => $tastmTotal,
+                'months_count' => $monthsCount,
+                'unique_months' => $yearData['months']
             ];
         }
 
         return $data;
     }
 
-    
+
     public function convertDaysToYMDWithoutExtension($days)
     {
         $years = floor($days / 365);
@@ -1532,34 +1631,26 @@ class ReportController extends Controller
 
                 $total = $maleCount + $femaleCount + $ciclCount;
 
-                $courtData[$courtType]['stations'][] = [
-                    'station' => $court->station,
-                    'branch' => $court->branch,
-                    'branch_code' => $court->branch_code,
-                    'location' => $court->location,
-                    'male' => $maleCount,
-                    'female' => $femaleCount,
-                    'cicl' => $ciclCount,
-                    'total' => $total
-                ];
+                if ($total != 0) {
 
-                $totalMale += $maleCount;
-                $totalFemale += $femaleCount;
-                $totalCICL += $ciclCount;
+                    $courtData[$courtType]['stations'][] = [
+                        'station' => $court->station,
+                        'branch' => $court->branch,
+                        'branch_code' => $court->branch_code,
+                        'location' => $court->location,
+                        'male' => $maleCount,
+                        'female' => $femaleCount,
+                        'cicl' => $ciclCount,
+                        'total' => $total
+                    ];
+
+                    $totalMale += $maleCount;
+                    $totalFemale += $femaleCount;
+                    $totalCICL += $ciclCount;
+                }
             }
         }
 
-        // Alternative approach: Count PDLs by their court assignments
-        // This ensures we count each PDL only once (based on their most recent court order)
-        $uniquePdlsByCourt = Pdl::whereBetween('created_at', [$startDate, $endDate])
-            ->whereNull('deleted_at')
-            ->with(['courtOrders' => function ($query) {
-                $query->latest('order_date')->first();
-            }, 'courtOrders.court'])
-            ->get()
-            ->groupBy(function ($pdl) {
-                return $pdl->courtOrders->first()->court->court_type ?? 'Unassigned';
-            });
 
 
 
