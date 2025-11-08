@@ -13,7 +13,7 @@ class SMSController extends Controller
             ->where('is_used', false)
             ->orderBy('created_at', 'asc')
             ->limit(10)
-            ->get(['id', 'recipient_number', 'message']); 
+            ->get(['id', 'recipient_number', 'message']);
 
         return response()->json([
             'success' => true,
@@ -25,7 +25,7 @@ class SMSController extends Controller
     public function markAsUsed($id)
     {
         $sms = Sms::findOrFail($id);
-        $sms->is_used = true;
+        $sms->is_sent = true;
         $sms->save();
 
         return response()->json(['message' => 'SMS marked as used.']);
