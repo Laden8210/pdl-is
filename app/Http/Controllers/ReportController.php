@@ -151,7 +151,7 @@ class ReportController extends Controller
         return [
             'id' => $pdl->id . '-' . ($case ? $case->id : 'no-case'),
             'pdl_id' => $pdl->id,
-            'name' => $pdl->fname . ' ' . $pdl->lname,
+            'name' => $pdl->fname . ' ' . $pdl->mname . ' ' . $pdl->lname . ' ' . $pdl->suffix,
             'case_no' => $case->case_number ?? 'N/A',
             'crime_committed' => $case->crime_committed ?? 'N/A',
             'date_of_birth' => $pdl->birthdate?->format('Y-m-d'),
@@ -1762,20 +1762,24 @@ class ReportController extends Controller
 
                 $total = $maleCount + $femaleCount + $ciclCount;
 
-                $courtData[$courtType]['stations'][] = [
-                    'station' => $court->station,
-                    'branch' => $court->branch,
-                    'branch_code' => $court->branch_code,
-                    'location' => $court->location,
-                    'male' => $maleCount,
-                    'female' => $femaleCount,
-                    'cicl' => $ciclCount,
-                    'total' => $total
-                ];
+                if ($total != 0) {
 
-                $totalMale += $maleCount;
-                $totalFemale += $femaleCount;
-                $totalCICL += $ciclCount;
+                    $courtData[$courtType]['stations'][] = [
+                        'station' => $court->station,
+                        'branch' => $court->branch,
+                        'branch_code' => $court->branch_code,
+                        'location' => $court->location,
+                        'male' => $maleCount,
+                        'female' => $femaleCount,
+                        'cicl' => $ciclCount,
+                        'total' => $total
+                    ];
+
+
+                    $totalMale += $maleCount;
+                    $totalFemale += $femaleCount;
+                    $totalCICL += $ciclCount;
+                }
             }
         }
 
