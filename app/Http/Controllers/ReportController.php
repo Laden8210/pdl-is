@@ -195,7 +195,7 @@ class ReportController extends Controller
 
                 return [
                     'id' => $pdl->id,
-                    'name' => $pdl->fname . ' ' . $pdl->lname,
+                    'name' => $pdl->fname . ' ' . $pdl->mname . ' ' . $pdl->lname . ' ' . $pdl->suffix,
                     'date_committed' => $earliestCase->date_committed ?? null,
                     'cases' => $cases->map(function ($case) {
                         return [
