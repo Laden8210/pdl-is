@@ -149,7 +149,7 @@ export default function GCTATASTMReport() {
                                             verification.pdl && (
                                                 <TableRow key={verification.pdl.id}>
                                                     <TableCell>{verification.pdl.id}</TableCell>
-                                                    <TableCell>{`${verification.pdl.fname} ${verification.pdl.lname}`}</TableCell>
+                                                    <TableCell>{`${verification.pdl.fname} ${verification.pdl.mname || ''} ${verification.pdl.lname} ${verification.pdl.suffix ?? ''}`}</TableCell>
                                                     <TableCell>{verification.pdl.alias ?? '-'}</TableCell>
                                                     <TableCell>{verification.pdl.gender ?? '-'}</TableCell>
                                                     <TableCell className="font-medium">{verification.gcta_days}</TableCell>

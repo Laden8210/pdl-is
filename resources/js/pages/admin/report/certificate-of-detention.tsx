@@ -20,11 +20,17 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+interface Case {
+    case_number: string;
+    crime_committed: string;
+    date_committed: string | null;
+    case_status: string;
+}
+
 interface Pdl {
     id: number;
     name: string;
-    case_number: string;
-    crime_committed: string;
+    cases: Case[];
     date_committed: string | null;
 }
 
@@ -96,6 +102,45 @@ export default function CertificateOfDetention({ pdls }: PageProps) {
         return result || 'Less than 1 day';
     };
 
+    const formatCasesText = () => {
+        if (!selectedPdl?.cases?.length) return '';
+
+        const cases = selectedPdl.cases;
+
+        if (cases.length === 1) {
+            const caseItem = cases[0];
+            return `for ${caseItem.crime_committed.toUpperCase()} docketed as ${caseItem.case_number}`;
+        } else {
+            return cases.map((caseItem, index) => {
+                if (index === cases.length - 1) {
+                    return `and for ${caseItem.crime_committed.toUpperCase()} docketed as ${caseItem.case_number}`;
+                } else {
+                    return `for ${caseItem.crime_committed.toUpperCase()} docketed as ${caseItem.case_number}`;
+                }
+            }).join(', ');
+        }
+    };
+
+    const formatDate = (dateString: string | null) => {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
+
+    const formatIssueDate = () => {
+        if (!issueDate) return '';
+        const date = new Date(issueDate);
+        const day = date.getDate();
+        const suffix = day === 1 ? 'st' : day === 2 ? 'nd' : day === 3 ? 'rd' : 'th';
+        const month = date.toLocaleDateString('en-US', { month: 'long' });
+        const year = date.getFullYear();
+
+        return `${day}${suffix} day of ${month} ${year}`;
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Certificate of Detention" />
@@ -159,7 +204,8 @@ export default function CertificateOfDetention({ pdls }: PageProps) {
                                                     <div className="flex flex-col">
                                                         <span className="font-medium">{pdl.name}</span>
                                                         <span className="text-xs text-gray-500">
-                                                            {pdl.case_number} - {pdl.crime_committed}
+                                                            {pdl.cases.length} case{pdl.cases.length !== 1 ? 's' : ''} •
+                                                            Earliest: {formatDate(pdl.date_committed)}
                                                         </span>
                                                     </div>
                                                 </SelectItem>
@@ -202,23 +248,31 @@ export default function CertificateOfDetention({ pdls }: PageProps) {
                                             <span className="font-medium">Name:</span> {selectedPdl.name}
                                         </div>
                                         <div>
-                                            <span className="font-medium">Case Number:</span> {selectedPdl.case_number}
+                                            <span className="font-medium">Total Cases:</span> {selectedPdl.cases.length}
                                         </div>
                                         <div>
-                                            <span className="font-medium">Crime Committed:</span> {selectedPdl.crime_committed}
-                                        </div>
-                                        <div>
-                                            <span className="font-medium">Date Committed:</span> {
-                                                selectedPdl.date_committed
-                                                    ? new Date(selectedPdl.date_committed).toLocaleDateString()
-                                                    : 'N/A'
-                                            }
+                                            <span className="font-medium">Earliest Date Committed:</span> {formatDate(selectedPdl.date_committed)}
                                         </div>
                                         {issueDate && (
-                                            <div className="md:col-span-2">
+                                            <div>
                                                 <span className="font-medium">Detention Period:</span> {calculateDetentionPeriod()}
                                             </div>
                                         )}
+                                    </div>
+
+                                    {/* Cases List */}
+                                    <div className="mt-3">
+                                        <span className="font-medium text-blue-900">Cases:</span>
+                                        <div className="mt-2 space-y-2">
+                                            {selectedPdl.cases.map((caseItem, index) => (
+                                                <div key={caseItem.case_number} className="text-sm bg-white p-2 rounded border">
+                                                    <div className="font-medium">Case {index + 1}: {caseItem.case_number}</div>
+                                                    <div>Crime: {caseItem.crime_committed}</div>
+                                                    <div>Date Committed: {formatDate(caseItem.date_committed)}</div>
+                                                    <div>Status: {caseItem.case_status}</div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -233,7 +287,7 @@ export default function CertificateOfDetention({ pdls }: PageProps) {
                             {/* Submit Button */}
                             <div className="flex justify-end">
                                 <Button
-                                    onClick={() => handleExport()}
+                                    onClick={handleExport}
                                     disabled={processing || !selectedPdl || !issueDate}
                                     variant="outline"
                                     size="sm"
@@ -255,45 +309,60 @@ export default function CertificateOfDetention({ pdls }: PageProps) {
                         </CardHeader>
                         <CardContent>
                             <div className="bg-white border-2 border-gray-200 p-8 rounded-lg">
-                                <div className="text-center mb-6">
-                                    <div className="text-sm font-bold mb-1">Republic of the Philippines</div>
-                                    <div className="text-sm font-bold mb-1">Province of South Cotabato</div>
-                                    <div className="text-base font-bold mb-1">OFFICE OF THE PROVINCIAL GOVERNOR</div>
-                                    <div className="text-sm font-bold mb-1">Provincial Jail Management Unit</div>
-                                    <div className="text-sm mb-2">Koronadal City</div>
-                                    <div className="border-t border-gray-400 mb-2"></div>
-                                    <div className="text-xs">Tel #: (083) 228-2445; Email Address: socot.scrdcjail@gmail.com</div>
-                                </div>
+                                {/* Header Section */}
+                                <div className="header mb-6">
+                                    <div className="logo-section flex items-center justify-between">
+                                        {/* Left Logo */}
 
-                                <div className="text-center mb-6">
-                                    <div className="text-lg font-bold uppercase">Certificate of Detention</div>
-                                </div>
 
-                                <div className="mb-4">
-                                    <div className="font-bold underline uppercase mb-4">To Whom It May Concern:</div>
+                                        {/* Header Text */}
+                                        <div className="header-text text-center flex-1 mx-4">
+                                            <div className="republic text-sm font-bold mb-1">Republic of the Philippines</div>
+                                            <div className="province text-sm font-bold mb-1">Province of South Cotabato</div>
+                                            <div className="office text-base font-bold mb-1">OFFICE OF THE PROVINCIAL GOVERNOR</div>
+                                            <div className="unit text-sm font-bold mb-1">Provincial Jail Management Unit</div>
+                                            <div className="location text-sm mb-2">Koronadal City</div>
+                                            <div className="separator border-t border-gray-400 mb-2"></div>
+                                            <div className="contact text-xs">
+                                                Tel #: (083) 228-2445; Email Address: socot.scrdcjail@gmail.com
+                                            </div>
+                                        </div>
 
-                                    <div className="space-y-3 text-sm leading-relaxed">
-                                        <p className="text-justify">
-                                            THIS IS TO CERTIFY that <strong className="uppercase">{selectedPdl.name}</strong>, was committed in this institution on <strong>{selectedPdl.date_committed ? new Date(selectedPdl.date_committed).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</strong>, per Commitment Order issued by the Regional Court Branch 26, Surallah, South Cotabato for the charge of <strong className="uppercase">{selectedPdl.crime_committed}</strong> docketed as <strong>{selectedPdl.case_number}</strong>.
-                                        </p>
 
-                                        <p className="text-justify">
-                                            It is further certified that said accused was detained for <strong>{calculateDetentionPeriod()}</strong> as to date.
-                                                                                </p>
-
-                                        <p className="text-justify">
-                                            This certification is issued upon the request of the above-named person for whatever legal purpose it may serve him best.
-                                                                                </p>
-
-                                        <p className="text-justify">
-                                            Issued this <strong>{new Date(issueDate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>,                                         City of Koronadal.
-                                        </p>
                                     </div>
                                 </div>
 
-                                <div className="text-right mt-8">
-                                    <div className="font-bold uppercase">{data.officer_name ?? 'JUAN R. LANZADERAS, JR., MPA'}</div>
-                                    <div className="text-sm">{data.officer_position ?? 'Provincial Warden'}</div>
+                                {/* Title */}
+                                <div className="title text-center mb-6">
+                                    <div className="text-lg font-bold uppercase">Certificate of Detention</div>
+                                </div>
+
+                                {/* Salutation */}
+                                <div className="salutation font-bold underline uppercase mb-4">To Whom It May Concern:</div>
+
+                                {/* Content */}
+                                <div className="content space-y-3 text-sm leading-relaxed">
+                                    <p className="text-justify">
+                                        THIS IS TO CERTIFY that <span className="highlight uppercase font-bold">{selectedPdl.name}</span>, was committed in this institution on <span className="highlight font-bold">{formatDate(selectedPdl.date_committed)}</span>, per Commitment Order issued by the <span className="highlight font-bold">Regional Court Branch 26, Surallah, South Cotabato</span> {formatCasesText()}.
+                                    </p>
+
+                                    <p className="text-justify">
+                                        It is further certified that said accused was detained for <span className="highlight font-bold">{calculateDetentionPeriod()}</span> as to date.
+                                    </p>
+
+                                    <p className="text-justify">
+                                        This certification is issued upon the request of the above-named person for whatever legal purpose it may serve him best.
+                                    </p>
+
+                                    <p className="text-justify">
+                                        Issued this <span className="highlight font-bold">{formatIssueDate()}</span>, <span className="highlight font-bold">City of Koronadal</span>.
+                                    </p>
+                                </div>
+
+                                {/* Signature Section */}
+                                <div className="signature-section text-right mt-8">
+                                    <div className="signature-name font-bold uppercase">{data.officer_name || 'JUAN R. LANZADERAS, JR., MPA'}</div>
+                                    <div className="signature-title text-sm">{data.officer_position || 'Provincial Warden'}</div>
                                 </div>
                             </div>
                         </CardContent>
