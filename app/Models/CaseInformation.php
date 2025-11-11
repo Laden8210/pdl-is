@@ -27,6 +27,7 @@ class CaseInformation extends Model
         'date_committed' => 'date',
         'drug_related' => 'boolean',
     ];
+    
 
     public function pdl()
     {

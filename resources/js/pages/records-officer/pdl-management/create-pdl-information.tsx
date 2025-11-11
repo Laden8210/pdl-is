@@ -21,7 +21,7 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { usePSGCLocation } from '@/hooks/usePSGCLocation';
 import { Check, ChevronsUpDown, Eye, FileText, Image, Loader2, Upload, X } from 'lucide-react';
-
+import { cn } from '@/lib/utils';
 // Order type suggestions
 const orderTypeSuggestions = [
     'Commitment Order',
@@ -355,6 +355,10 @@ const steps = [
     { id: 5, title: 'Physical Characteristics', description: 'Physical description and identification marks' },
     { id: 6, title: 'Review & Submit', description: 'Review all information before submission' },
 ];
+const bodyBuildOptions = ["Slim", "Medium", "Heavy", "Athletic", "Stocky", "Muscular"];
+const complexionOptions = ["Fair", "Light", "Medium", "Olive", "Tan", "Dark", "Very Dark"];
+const hairColorOptions = ["Black", "Brown", "Blonde", "Red", "Auburn", "Gray", "White", "Bald"];
+const eyeColorOptions = ["Brown", "Black", "Blue", "Green", "Hazel", "Gray", "Amber"];
 
 export default function CreatePDLInformation() {
     const [currentStep, setCurrentStep] = useState(1);
@@ -369,7 +373,10 @@ export default function CreatePDLInformation() {
     const [mugshotPreview, setMugshotPreview] = useState<string | null>(null);
     const [isCustomOrderType, setIsCustomOrderType] = useState<boolean>(false);
     const [orderTypeOpen, setOrderTypeOpen] = useState(false);
-
+    const [bodyBuildOpen, setBodyBuildOpen] = useState(false);
+    const [complexionOpen, setComplexionOpen] = useState(false);
+    const [hairColorOpen, setHairColorOpen] = useState(false);
+    const [eyeColorOpen, setEyeColorOpen] = useState(false);
     // PSGC Location hook
     const {
         provinces,
@@ -845,6 +852,13 @@ export default function CreatePDLInformation() {
         setData(name, value as any);
     };
 
+    const handleSelectChange = (field: string, value: string) => {
+        setData((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -955,11 +969,14 @@ export default function CreatePDLInformation() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="suffix">
-                                        Suffix
-
-                                    </Label>
-                                    <Input id="suffix" name="suffix" value={data.suffix} onChange={handleChange} placeholder="Enter suffix (if any)" />
+                                    <Label htmlFor="suffix">Suffix</Label>
+                                    <Input
+                                        id="suffix"
+                                        name="suffix"
+                                        value={data.suffix}
+                                        onChange={handleChange}
+                                        placeholder="Enter suffix (if any)"
+                                    />
                                 </div>
 
                                 <div className="space-y-2">
@@ -2007,9 +2024,7 @@ export default function CreatePDLInformation() {
                 return (
                     <Card>
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                Physical Characteristics
-                            </CardTitle>
+                            <CardTitle className="flex items-center gap-2">Physical Characteristics</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -2045,51 +2060,202 @@ export default function CreatePDLInformation() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="build">
-                                        Build <span className="text-red-500">*</span>
+                                        Body Build <span className="text-red-500">*</span>
                                     </Label>
-                                    <Input
-                                        id="build"
-                                        name="build"
-                                        value={data.build}
-                                        onChange={handleChange}
-                                        placeholder="e.g., Slim, Medium, Heavy"
-                                    />
+                                    <Popover open={bodyBuildOpen} onOpenChange={setBodyBuildOpen}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                role="combobox"
+                                                aria-expanded={bodyBuildOpen}
+                                                className="w-full justify-between"
+                                            >
+                                                {data.build || 'Select body build...'}
+                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-full p-0" align="start">
+                                            <Command>
+                                                <CommandInput
+                                                    placeholder="Search body builds..."
+                                                    value={data.build || ''}
+                                                    onValueChange={(value) => handleSelectChange('build', value)}
+                                                />
+                                                <CommandList>
+                                                    <CommandEmpty>No body build found.</CommandEmpty>
+                                                    <CommandGroup>
+                                                        {bodyBuildOptions.map((build) => (
+                                                            <CommandItem
+                                                                key={build}
+                                                                value={build}
+                                                                onSelect={(currentValue) => {
+                                                                    handleSelectChange('build', currentValue);
+                                                                    setBodyBuildOpen(false);
+                                                                }}
+                                                            >
+                                                                <Check
+                                                                    className={cn('mr-2 h-4 w-4', data.build === build ? 'opacity-100' : 'opacity-0')}
+                                                                />
+                                                                {build}
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <div className="text-xs text-muted-foreground">Select the PDL's body build type</div>
                                 </div>
+
                                 <div className="space-y-2">
                                     <Label htmlFor="complexion">
                                         Complexion <span className="text-red-500">*</span>
                                     </Label>
-                                    <Input
-                                        id="complexion"
-                                        name="complexion"
-                                        value={data.complexion}
-                                        onChange={handleChange}
-                                        placeholder="e.g., Fair, Dark, Medium"
-                                    />
+                                    <Popover open={complexionOpen} onOpenChange={setComplexionOpen}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                role="combobox"
+                                                aria-expanded={complexionOpen}
+                                                className="w-full justify-between"
+                                            >
+                                                {data.complexion || 'Select complexion...'}
+                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-full p-0" align="start">
+                                            <Command>
+                                                <CommandInput
+                                                    placeholder="Search complexions..."
+                                                    value={data.complexion || ''}
+                                                    onValueChange={(value) => handleSelectChange('complexion', value)}
+                                                />
+                                                <CommandList>
+                                                    <CommandEmpty>No complexion found.</CommandEmpty>
+                                                    <CommandGroup>
+                                                        {complexionOptions.map((complexion) => (
+                                                            <CommandItem
+                                                                key={complexion}
+                                                                value={complexion}
+                                                                onSelect={(currentValue) => {
+                                                                    handleSelectChange('complexion', currentValue);
+                                                                    setComplexionOpen(false);
+                                                                }}
+                                                            >
+                                                                <Check
+                                                                    className={cn(
+                                                                        'mr-2 h-4 w-4',
+                                                                        data.complexion === complexion ? 'opacity-100' : 'opacity-0',
+                                                                    )}
+                                                                />
+                                                                {complexion}
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <div className="text-xs text-muted-foreground">Select the PDL's skin complexion</div>
                                 </div>
+
                                 <div className="space-y-2">
                                     <Label htmlFor="hair_color">
                                         Hair Color <span className="text-red-500">*</span>
                                     </Label>
-                                    <Input
-                                        id="hair_color"
-                                        name="hair_color"
-                                        value={data.hair_color}
-                                        onChange={handleChange}
-                                        placeholder="e.g., Black, Brown, Gray"
-                                    />
+                                    <Popover open={hairColorOpen} onOpenChange={setHairColorOpen}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                role="combobox"
+                                                aria-expanded={hairColorOpen}
+                                                className="w-full justify-between"
+                                            >
+                                                {data.hair_color || 'Select hair color...'}
+                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-full p-0" align="start">
+                                            <Command>
+                                                <CommandInput
+                                                    placeholder="Search hair colors..."
+                                                    value={data.hair_color || ''}
+                                                    onValueChange={(value) => handleSelectChange('hair_color', value)}
+                                                />
+                                                <CommandList>
+                                                    <CommandEmpty>No hair color found.</CommandEmpty>
+                                                    <CommandGroup>
+                                                        {hairColorOptions.map((color) => (
+                                                            <CommandItem
+                                                                key={color}
+                                                                value={color}
+                                                                onSelect={(currentValue) => {
+                                                                    handleSelectChange('hair_color', currentValue);
+                                                                    setHairColorOpen(false);
+                                                                }}
+                                                            >
+                                                                <Check
+                                                                    className={cn(
+                                                                        'mr-2 h-4 w-4',
+                                                                        data.hair_color === color ? 'opacity-100' : 'opacity-0',
+                                                                    )}
+                                                                />
+                                                                {color}
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <div className="text-xs text-muted-foreground">Select the PDL's hair color</div>
                                 </div>
+
                                 <div className="space-y-2">
                                     <Label htmlFor="eye_color">
                                         Eye Color <span className="text-red-500">*</span>
                                     </Label>
-                                    <Input
-                                        id="eye_color"
-                                        name="eye_color"
-                                        value={data.eye_color}
-                                        onChange={handleChange}
-                                        placeholder="e.g., Brown, Black, Blue"
-                                    />
+                                    <Popover open={eyeColorOpen} onOpenChange={setEyeColorOpen}>
+                                        <PopoverTrigger asChild>
+                                            <Button variant="outline" role="combobox" aria-expanded={eyeColorOpen} className="w-full justify-between">
+                                                {data.eye_color || 'Select eye color...'}
+                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-full p-0" align="start">
+                                            <Command>
+                                                <CommandInput
+                                                    placeholder="Search eye colors..."
+                                                    value={data.eye_color || ''}
+                                                    onValueChange={(value) => handleSelectChange('eye_color', value)}
+                                                />
+                                                <CommandList>
+                                                    <CommandEmpty>No eye color found.</CommandEmpty>
+                                                    <CommandGroup>
+                                                        {eyeColorOptions.map((color) => (
+                                                            <CommandItem
+                                                                key={color}
+                                                                value={color}
+                                                                onSelect={(currentValue) => {
+                                                                    handleSelectChange('eye_color', currentValue);
+                                                                    setEyeColorOpen(false);
+                                                                }}
+                                                            >
+                                                                <Check
+                                                                    className={cn(
+                                                                        'mr-2 h-4 w-4',
+                                                                        data.eye_color === color ? 'opacity-100' : 'opacity-0',
+                                                                    )}
+                                                                />
+                                                                {color}
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <div className="text-xs text-muted-foreground">Select the PDL's eye color</div>
                                 </div>
                             </div>
 

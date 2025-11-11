@@ -1,4 +1,5 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -13,13 +14,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler, useState } from 'react';
-import { Edit, Trash2, Eye, Calendar, User, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
+import { AlertTriangle, Calendar, Edit, Eye, Trash2, User } from 'lucide-react';
+import { FormEventHandler, useState } from 'react';
 
 interface TimeAllowanceRecord {
     id: number;
@@ -28,6 +28,7 @@ interface TimeAllowanceRecord {
     reason: string;
     awarded_by: number;
     awarded_at: string;
+    supporting_document?: string;
     awardedBy?: {
         id: number;
         fname: string;
@@ -48,7 +49,15 @@ export function TimeAllowanceRecords({ pdl, records }: TimeAllowanceRecordsProps
     const [recordToDelete, setRecordToDelete] = useState<TimeAllowanceRecord | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-    const { data, setData, put, delete: destroy, processing, errors, reset } = useForm({
+    const {
+        data,
+        setData,
+        put,
+        delete: destroy,
+        processing,
+        errors,
+        reset,
+    } = useForm({
         type: 'gcta',
         days: 0,
         reason: '',
@@ -95,6 +104,7 @@ export function TimeAllowanceRecords({ pdl, records }: TimeAllowanceRecordsProps
         });
     };
 
+
     const getTypeBadge = (type: string) => {
         if (type === 'gcta') {
             return <Badge className="bg-blue-100 text-blue-800">GCTA</Badge>;
@@ -116,15 +126,13 @@ export function TimeAllowanceRecords({ pdl, records }: TimeAllowanceRecordsProps
                         View Records
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
+                <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-[800px]">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Calendar className="h-5 w-5" />
                             Time Allowance Records for {pdl.fname} {pdl.lname}
                         </DialogTitle>
-                        <DialogDescription>
-                            View and manage all time allowance records for this PDL.
-                        </DialogDescription>
+                        <DialogDescription>View and manage all time allowance records for this PDL.</DialogDescription>
                     </DialogHeader>
 
                     {successMessage && (
@@ -150,15 +158,9 @@ export function TimeAllowanceRecords({ pdl, records }: TimeAllowanceRecordsProps
                                 <TableBody>
                                     {records.map((record) => (
                                         <TableRow key={record.id}>
-                                            <TableCell>
-                                                {getTypeBadge(record.type)}
-                                            </TableCell>
-                                            <TableCell className="font-medium">
-                                                {record.days} days
-                                            </TableCell>
-                                            <TableCell className="max-w-xs truncate">
-                                                {record.reason}
-                                            </TableCell>
+                                            <TableCell>{getTypeBadge(record.type)}</TableCell>
+                                            <TableCell className="font-medium">{record.days} days</TableCell>
+                                            <TableCell className="max-w-xs truncate">{record.reason}</TableCell>
                                             <TableCell>
                                                 {record.awardedBy ? (
                                                     <div className="flex items-center gap-2">
@@ -171,24 +173,19 @@ export function TimeAllowanceRecords({ pdl, records }: TimeAllowanceRecordsProps
                                                     <span className="text-sm text-gray-500">Unknown</span>
                                                 )}
                                             </TableCell>
-                                            <TableCell>
-                                                {format(new Date(record.awarded_at), 'MMM dd, yyyy')}
-                                            </TableCell>
+                                            <TableCell>{format(new Date(record.awarded_at), 'MMM dd, yyyy')}</TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => handleEdit(record)}
-                                                        className="h-8 w-8 p-0"
-                                                    >
+
+                    
+                                                    <Button variant="outline" size="sm" onClick={() => handleEdit(record)} className="h-8 w-8 p-0">
                                                         <Edit className="h-4 w-4" />
                                                     </Button>
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
                                                         onClick={() => handleRevoke(record)}
-                                                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                        className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
@@ -200,8 +197,8 @@ export function TimeAllowanceRecords({ pdl, records }: TimeAllowanceRecordsProps
                             </Table>
                         </div>
                     ) : (
-                        <div className="text-center py-8 text-gray-500">
-                            <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                        <div className="py-8 text-center text-gray-500">
+                            <Calendar className="mx-auto mb-4 h-12 w-12 text-gray-300" />
                             <p>No time allowance records found for this PDL.</p>
                         </div>
                     )}
@@ -220,13 +217,11 @@ export function TimeAllowanceRecords({ pdl, records }: TimeAllowanceRecordsProps
                     <form id="edit-time-allowance-form" onSubmit={handleUpdate}>
                         <DialogHeader>
                             <DialogTitle>Edit Time Allowance Record</DialogTitle>
-                            <DialogDescription>
-                                Update the details for this time allowance record.
-                            </DialogDescription>
+                            <DialogDescription>Update the details for this time allowance record.</DialogDescription>
                         </DialogHeader>
 
                         {Object.keys(errors).length > 0 && (
-                            <Alert variant="destructive" className="mb-4 mt-4">
+                            <Alert variant="destructive" className="mt-4 mb-4">
                                 <AlertTitle>Unable to process request</AlertTitle>
                                 <AlertDescription>
                                     {Object.values(errors).map((error, index) => (
@@ -241,11 +236,7 @@ export function TimeAllowanceRecords({ pdl, records }: TimeAllowanceRecordsProps
                         <div className="grid gap-4 py-2">
                             <div className="grid gap-2">
                                 <Label htmlFor="edit-type">Allowance Type</Label>
-                                <Select
-                                    value={data.type}
-                                    onValueChange={(value: 'gcta' | 'tastm') => setData('type', value)}
-                                    required
-                                >
+                                <Select value={data.type} onValueChange={(value: 'gcta' | 'tastm') => setData('type', value)} required>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select allowance type" />
                                     </SelectTrigger>
@@ -294,12 +285,7 @@ export function TimeAllowanceRecords({ pdl, records }: TimeAllowanceRecordsProps
                             >
                                 Cancel
                             </Button>
-                            <Button
-                                type="submit"
-                                form="edit-time-allowance-form"
-                                className="bg-blue-500 hover:bg-blue-600"
-                                disabled={processing}
-                            >
+                            <Button type="submit" form="edit-time-allowance-form" className="bg-blue-500 hover:bg-blue-600" disabled={processing}>
                                 {processing ? 'Updating...' : 'Update Record'}
                             </Button>
                         </DialogFooter>
@@ -321,12 +307,12 @@ export function TimeAllowanceRecords({ pdl, records }: TimeAllowanceRecordsProps
                     </DialogHeader>
 
                     {recordToDelete && (
-                        <div className="bg-gray-50 p-4 rounded-md border">
-                            <div className="flex items-center gap-2 mb-2">
+                        <div className="rounded-md border bg-gray-50 p-4">
+                            <div className="mb-2 flex items-center gap-2">
                                 {getTypeBadge(recordToDelete.type)}
                                 <span className="font-medium">{recordToDelete.days} days</span>
                             </div>
-                            <p className="text-sm text-gray-600 mb-1">
+                            <p className="mb-1 text-sm text-gray-600">
                                 <strong>Reason:</strong> {recordToDelete.reason}
                             </p>
                             <p className="text-sm text-gray-600">
@@ -345,11 +331,7 @@ export function TimeAllowanceRecords({ pdl, records }: TimeAllowanceRecordsProps
                         >
                             Cancel
                         </Button>
-                        <Button
-                            variant="destructive"
-                            onClick={confirmRevoke}
-                            disabled={processing}
-                        >
+                        <Button variant="destructive" onClick={confirmRevoke} disabled={processing}>
                             {processing ? 'Revoking...' : 'Revoke Record'}
                         </Button>
                     </DialogFooter>

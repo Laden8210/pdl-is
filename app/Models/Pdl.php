@@ -202,4 +202,25 @@ class Pdl extends Model
     {
         return $this->cases()->whereIn('case_status', ['open', 'pending', 'on_trial', 'convicted'])->get();
     }
+
+    protected $appends = ['highest_classification'];
+
+    public function getHighestClassificationAttribute()
+    {
+        $classifications = $this->cases()
+            ->whereNotNull('security_classification')
+            ->pluck('security_classification')
+            ->unique()
+            ->toArray();
+
+        if (in_array('high', $classifications)) {
+            return 'high';
+        } elseif (in_array('medium', $classifications)) {
+            return 'medium';
+        } elseif (in_array('low', $classifications)) {
+            return 'low';
+        } else {
+            return null;
+        }
+    }
 }

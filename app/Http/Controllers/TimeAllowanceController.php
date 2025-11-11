@@ -114,14 +114,22 @@ class TimeAllowanceController extends Controller
         $request->validate([
             'type' => 'required|in:gcta,tastm',
             'days' => 'required|integer|min:0',
-            'reason' => 'required|string'
+            'reason' => 'required|string',
+            'supporting_document' => 'nullable|file|mimes:jpg,jpeg,png|max:2048'
         ]);
+
+        // check if supporting document is provided
+        if ($request->hasFile('supporting_document')) {
+            $file = $request->file('supporting_document');
+            $filePath = $file->store('time_allowance_documents', 'public');
+        }
 
         TimeAllowance::create([
             'pdl_id' => $pdlId,
             'type' => $request->type,
             'days' => $request->days,
             'reason' => $request->reason,
+            'supporting_document' => $filePath ?? null,
             'awarded_by' => auth()->id(),
             'awarded_at' => now()
         ]);

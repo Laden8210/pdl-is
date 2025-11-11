@@ -18,6 +18,7 @@ interface CellAssignment {
   pdl_name: string;
   pdl_gender: string;
   assigned_date: string;
+
 }
 
 interface TransferCellProps {
@@ -129,7 +130,7 @@ export function TransferCell({ assignment, cells = [] }: TransferCellProps) {
               <SelectContent>
                 {availableCells.map((cell) => (
                   <SelectItem key={cell.cell_id} value={cell.cell_id.toString()}>
-                    {cell.cell_name} ({cell.gender}) - Capacity: {cell.capacity}
+                    {cell.cell_name} ({cell.gender}) - Capacity: {cell.capacity} - Classification : {cell.classification}
                   </SelectItem>
                 ))}
               </SelectContent>
