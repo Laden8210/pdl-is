@@ -21,6 +21,7 @@ class EditCellRequest extends FormRequest
             'description' => 'nullable|string',
             'cell_type' => 'required|in:isolation,female,male,trustee,kitchen boys',
             'status' => 'required|in:active,inactive',
+            'classification' => 'required|in:maximum,high,medium,low',
         ];
     }
 
@@ -35,6 +36,8 @@ class EditCellRequest extends FormRequest
             'status.in' => 'Status must be either active or inactive.',
             'cell_type.required' => 'Cell type is required.',
             'cell_type.in' => 'Cell type must be either isolation, female, male, trustee, or kitchen boys.',
+            'classification.required' => 'Classification is required.',
+            'classification.in' => 'Classification must be either maximum, high, medium, or low.',
         ];
     }
 }

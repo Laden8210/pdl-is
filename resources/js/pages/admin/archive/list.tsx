@@ -14,12 +14,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+
 import { PageProps, type BreadcrumbItem } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { ArchiveRestore, Check, ChevronsUpDown, Eye, FileText, Plus, Search, X } from 'lucide-react';
+import { set } from 'lodash';
+import { ArchiveRestore, Check, ChevronsUpDown, Eye, FileText, Plus, PlusIcon, Search, X } from 'lucide-react';
 import { useState } from 'react';
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
@@ -223,6 +224,11 @@ const criminalCaseTypes = [
     },
 ];
 
+const bodyBuildOptions = ['Slim', 'Medium', 'Heavy', 'Athletic', 'Stocky', 'Muscular'];
+const complexionOptions = ['Fair', 'Light', 'Medium', 'Olive', 'Tan', 'Dark', 'Very Dark'];
+const hairColorOptions = ['Black', 'Brown', 'Blonde', 'Red', 'Auburn', 'Gray', 'White', 'Bald'];
+const eyeColorOptions = ['Brown', 'Black', 'Blue', 'Green', 'Hazel', 'Gray', 'Amber'];
+
 interface ArchiveIndexProps extends PageProps {
     archivedUsers: {
         personnel: any[];
@@ -247,6 +253,12 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
     const [unarchiveReason, setUnarchiveReason] = useState('');
     const [unarchiveRemarks, setUnarchiveRemarks] = useState('');
     const [crimeCommittedOpen, setCrimeCommittedOpen] = useState(false);
+    const [newAppearance, setNewAppearance] = useState<any[]>([]);
+
+    const [buildOpen, setBuildOpen] = useState(false);
+    const [complexionOpen, setComplexionOpen] = useState(false);
+    const [hairColorOpen, setHairColorOpen] = useState(false);
+    const [eyeColorOpen, setEyeColorOpen] = useState(false);
 
     const { post: postRestorePersonnel, processing: restorePersonnelProcessing } = useForm();
 
@@ -266,6 +278,18 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
                 case_remarks: '',
                 security_classification: 'medium',
                 drug_related: false,
+            },
+        ] as any[],
+        physical_appearances: [
+            {
+                height: '',
+                weight: '',
+                hair_color: '',
+                eye_color: '',
+                distinguishing_marks: '',
+                mark_location: '',
+                remark: '',
+                pc_remark: '',
             },
         ] as any[],
         unarchive_reason: '',
@@ -317,9 +341,33 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
         ];
         setNewCases(updatedCases);
         // Also update form data
-        setUnarchiveData(prev => ({ ...prev, cases: updatedCases }));
+        setUnarchiveData((prev) => ({ ...prev, cases: updatedCases }));
     };
 
+    const addPhysicalAppearance = () => {
+        const updatedAppearances = [
+            ...newAppearance,
+            {
+                height: '',
+                weight: '',
+                hair_color: '',
+                eye_color: '',
+                distinguishing_marks: '',
+                mark_location: '',
+                remark: '',
+                pc_remark: '',
+            },
+        ];
+        setNewAppearance(updatedAppearances);
+        // Also update form data
+        setUnarchiveData((prev) => ({ ...prev, physical_appearances: updatedAppearances }));
+    };
+
+    const removePhysicalAppearance = (index: number) => {
+        if (newAppearance.length > 1) {
+            setNewAppearance(newAppearance.filter((_, i) => i !== index));
+        }
+    };
 
     const removeCase = (index: number) => {
         if (newCases.length > 1) {
@@ -332,12 +380,19 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
         updatedCases[index] = { ...updatedCases[index], [field]: value };
         setNewCases(updatedCases);
         // Also update form data
-        setUnarchiveData(prev => ({ ...prev, cases: updatedCases }));
+        setUnarchiveData((prev) => ({ ...prev, cases: updatedCases }));
     };
+
+    const updatePhysicalAppearance = (index: number, field: string, value: any) => {
+        const updatedAppearances = [...newAppearance];
+        updatedAppearances[index] = { ...updatedAppearances[index], [field]: value };
+        setNewAppearance(updatedAppearances);
+        // Also update form data
+        setUnarchiveData((prev) => ({ ...prev, physical_appearances: updatedAppearances }));
+    }
 
     const confirmUnarchive = () => {
         if (pdlToUnarchive) {
-
             postUnarchive(route('user-pdl-archive.unarchive', pdlToUnarchive.id), {
                 onSuccess: () => {
                     setUnarchiveDialogOpen(false);
@@ -814,7 +869,7 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
                                 {/* Cases Information */}
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
-                                        <h3 className="text-lg font-semibold">New Case Information</h3>
+                                        <h3 className="font-semibold">New Case Information</h3>
                                         <Button type="button" variant="outline" size="sm" onClick={addNewCase} className="flex items-center gap-2">
                                             <Plus className="h-4 w-4" />
                                             Add Case
@@ -954,10 +1009,8 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
                                                                         <SelectValue placeholder="Select case status" />
                                                                     </SelectTrigger>
                                                                     <SelectContent>
-
                                                                         <SelectItem value="on_trial">On Trial</SelectItem>
                                                                         <SelectItem value="convicted">Convicted</SelectItem>
-
                                                                     </SelectContent>
                                                                 </Select>
                                                             </div>
@@ -1005,6 +1058,304 @@ export default function ArchiveIndex({ archivedUsers, userRole }: ArchiveIndexPr
                                                                 onChange={(e) => updateCase(index, 'case_remarks', e.target.value)}
                                                                 placeholder="Enter case-related remarks..."
                                                                 rows={3}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                        ))}
+                                    </Accordion>
+                                </div>
+
+                                {/* Physical Appearance */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="font-semibold">Updated Physical Appearance</h3>
+
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={addPhysicalAppearance}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <PlusIcon className="h-4 w-4" />
+                                            Add Physical Appearance
+                                        </Button>
+                                    </div>
+                                    <Accordion type="single" collapsible className="w-full">
+
+                                        {newAppearance.map((appearance, index) => (
+                                            <AccordionItem key={index} value={`appearance-${index}`}>
+                                                <AccordionTrigger className="hover:no-underline">
+                                                    <div className="flex w-full items-center justify-between pr-4">
+                                                        <span>Appearance {index + 1}</span>
+                                                        {newAppearance.length > 1 && (
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    removePhysicalAppearance(index);
+                                                                }}
+                                                                className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </AccordionTrigger>
+                                                <AccordionContent>
+                                                    <div className="space-y-4 pt-4">
+                                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                            <div>
+                                                                <Label htmlFor={`height_${index}`}>Height (cm)</Label>
+                                                                <Input
+                                                                    id={`height_${index}`}
+                                                                    type="number"
+                                                                    value={appearance.height}
+                                                                    onChange={(e) => updatePhysicalAppearance(index, 'height', e.target.value)}
+                                                                    placeholder="Enter height in cm"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <Label htmlFor={`weight_${index}`}>Weight (kg)</Label>
+                                                                <Input
+                                                                    id={`weight_${index}`}
+                                                                    type="number"
+                                                                    value={appearance.weight}
+                                                                    onChange={(e) => updatePhysicalAppearance(index, 'weight', e.target.value)}
+                                                                    placeholder="Enter weight in kg"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <Label htmlFor={`build_${index}`}>Build</Label>
+                                                            <Popover open={buildOpen} onOpenChange={setBuildOpen}>
+                                                                <PopoverTrigger asChild>
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        role="combobox"
+                                                                        aria-expanded={buildOpen}
+                                                                        className="w-full justify-between"
+                                                                    >
+                                                                        {appearance.build || 'Select or type build...'}
+                                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                                    </Button>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent className="w-full p-0" align="start">
+                                                                    <Command>
+                                                                        <CommandInput
+                                                                            placeholder="Search builds or type custom..."
+                                                                            value={appearance.build}
+                                                                            onValueChange={(value) => updatePhysicalAppearance(index, 'build', value)}
+                                                                        />
+                                                                        <CommandList>
+                                                                            <CommandEmpty>
+                                                                                <div className="p-2 text-sm text-muted-foreground">
+                                                                                    No build found. Press Enter to add "{appearance.build || ''}" as custom
+                                                                                    build.
+                                                                                </div>
+                                                                            </CommandEmpty>
+                                                                            {bodyBuildOptions.map((buildType) => (
+                                                                                <CommandItem
+                                                                                    key={buildType}
+                                                                                    value={buildType}
+                                                                                    onSelect={(currentValue) => {
+                                                                                        updatePhysicalAppearance(index, 'build', currentValue);
+                                                                                        setBuildOpen(false);
+                                                                                    }}
+                                                                                >
+                                                                                    <Check
+                                                                                        className={`mr-2 h-4 w-4 ${
+                                                                                            appearance.build === buildType ? 'opacity-100' : 'opacity-0'
+                                                                                        }`}
+                                                                                    />
+                                                                                    {buildType}
+                                                                                </CommandItem>
+                                                                            ))}
+                                                                        </CommandList>
+                                                                    </Command>
+                                                                </PopoverContent>
+                                                            </Popover>
+                                                        </div>
+                                                        <div>
+                                                            <Label htmlFor={`complexion_${index}`}>Complexion</Label>
+                                                            <Popover open={complexionOpen} onOpenChange={setComplexionOpen}>
+                                                                <PopoverTrigger asChild>
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        role="combobox"
+                                                                        aria-expanded={complexionOpen}
+                                                                        className="w-full justify-between"
+                                                                    >
+                                                                        {appearance.complexion || 'Select or type complexion...'}
+                                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                                    </Button>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent className="w-full p-0" align="start">
+                                                                    <Command>
+                                                                        <CommandInput
+                                                                            placeholder="Search complexions or type custom..."
+                                                                            value={appearance.complexion}
+                                                                            onValueChange={(value) => updatePhysicalAppearance(index, 'complexion', value)}
+                                                                        />
+                                                                        <CommandList>
+                                                                            <CommandEmpty>
+                                                                                <div className="p-2 text-sm text-muted-foreground">
+                                                                                    No complexion found. Press Enter to add "{appearance.complexion || ''}" as custom
+                                                                                    complexion.
+                                                                                </div>
+                                                                            </CommandEmpty>
+                                                                            {complexionOptions.map((complexionType) => (
+                                                                                <CommandItem key={complexionType} onSelect={() => updatePhysicalAppearance(index, 'complexion', complexionType)}>
+                                                                                    {complexionType}
+                                                                                </CommandItem>
+                                                                            ))}
+                                                                        </CommandList>
+                                                                    </Command>
+                                                                </PopoverContent>
+                                                            </Popover>
+
+                                                        </div>
+                                                        <div>
+                                                            <Label htmlFor={`hair_color_${index}`}>Hair Color</Label>
+                                                            <Popover open={hairColorOpen} onOpenChange={setHairColorOpen}>
+                                                                <PopoverTrigger asChild>
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        role="combobox"
+                                                                        aria-expanded={hairColorOpen}
+                                                                        className="w-full justify-between"
+                                                                    >
+                                                                        {appearance.hair_color || 'Select or type hair color...'}
+                                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                                    </Button>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent className="w-full p-0" align="start">
+                                                                    <Command>
+                                                                        <CommandInput
+                                                                            placeholder="Search hair colors or type custom..."
+                                                                            value={appearance.hair_color}
+                                                                            onValueChange={(value) => updatePhysicalAppearance(index, 'hair_color', value)}
+                                                                        />
+                                                                        <CommandList>
+                                                                            <CommandEmpty>
+                                                                                <div className="p-2 text-sm text-muted-foreground">
+                                                                                    No hair color found. Press Enter to add "{appearance.hair_color || ''}" as custom
+                                                                                    hair color.
+                                                                                </ div>
+                                                                            </CommandEmpty>
+                                                                            {hairColorOptions.map((hairColor) => (
+                                                                                <CommandItem
+                                                                                    key={hairColor}
+                                                                                    value={hairColor}
+                                                                                    onSelect={(currentValue) => {
+                                                                                        updatePhysicalAppearance(index, 'hair_color', currentValue);
+                                                                                        setHairColorOpen(false);
+                                                                                    }}
+                                                                                >
+                                                                                    <Check
+                                                                                        className={`mr-2 h-4 w-4 ${
+                                                                                            appearance.hair_color === hairColor ? 'opacity-100' : 'opacity-0'
+                                                                                        }`}
+                                                                                    />
+                                                                                    {hairColor}
+                                                                                </CommandItem>
+                                                                            ))}
+                                                                        </CommandList>
+                                                                    </Command>
+                                                                </PopoverContent>
+                                                            </Popover>
+                                                        </div>
+                                                        <div>
+                                                            <Label htmlFor={`eye_color_${index}`}>Eye Color</Label>
+                                                            <Popover open={eyeColorOpen} onOpenChange={setEyeColorOpen}>
+                                                                <PopoverTrigger asChild>
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        role="combobox"
+                                                                        aria-expanded={eyeColorOpen}
+                                                                        className="w-full justify-between"
+                                                                    >
+                                                                        {appearance.eye_color || 'Select or type eye color...'}
+                                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                                    </Button>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent className="w-full p-0" align="start">
+                                                                    <Command>
+                                                                        <CommandInput
+                                                                            placeholder="Search eye colors or type custom..."
+                                                                            value={appearance.eye_color}
+                                                                            onValueChange={(value) => updatePhysicalAppearance(index, 'eye_color', value)}
+                                                                        />
+                                                                        <CommandList>
+                                                                            <CommandEmpty>
+                                                                                <div className="p-2 text-sm text-muted-foreground">
+                                                                                    No eye color found. Press Enter to add "{appearance.eye_color || ''}" as custom eye color.
+                                                                                </div>
+                                                                            </CommandEmpty>
+                                                                            {eyeColorOptions.map((eyeColor) => (
+                                                                                <CommandItem
+                                                                                    key={eyeColor}
+                                                                                    value={eyeColor}
+                                                                                    onSelect={(currentValue) => {
+                                                                                        updatePhysicalAppearance(index, 'eye_color', currentValue);
+                                                                                        setEyeColorOpen(false);
+                                                                                    }}
+                                                                                >
+                                                                                    <Check
+                                                                                        className={`mr-2 h-4 w-4 ${
+                                                                                            appearance.eye_color === eyeColor ? 'opacity-100' : 'opacity-0'
+                                                                                        }`}
+                                                                                    />
+                                                                                    {eyeColor}
+                                                                                </CommandItem>
+                                                                            ))}
+                                                                        </CommandList>
+                                                                    </Command>
+                                                                </PopoverContent>
+                                                            </Popover>
+                                                        </div>
+                                                        <div>
+                                                            <Label htmlFor={`identification_marks_${index}`}>Identification Marks</Label>
+                                                            <Input
+                                                                id={`identification_marks_${index}`}
+                                                                value={appearance.identification_marks}
+                                                                onChange={(e) =>
+                                                                    updatePhysicalAppearance(index, 'identification_marks', e.target.value)
+                                                                }
+                                                                placeholder="Enter identification marks"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <Label htmlFor={`mark_location_${index}`}>Mark Location</Label>
+                                                            <Input
+                                                                id={`mark_location_${index}`}
+                                                                value={appearance.mark_location}
+                                                                onChange={(e) => updatePhysicalAppearance(index, 'mark_location', e.target.value)}
+                                                                placeholder="Enter mark location"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <Label htmlFor={`remark_${index}`}>Remark</Label>
+                                                            <Textarea
+                                                                id={`remark_${index}`}
+                                                                value={appearance.remark}
+                                                                onChange={(e) => updatePhysicalAppearance(index, 'remark', e.target.value)}
+                                                                placeholder="Enter remark"
+                                                                rows={2}
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <Label htmlFor={`pc_remark_${index}`}>PC Remark</Label>
+                                                            <Textarea
+                                                                id={`pc_remark_${index}`}
+                                                                value={appearance.pc_remark}
+                                                                onChange={(e) => updatePhysicalAppearance(index, 'pc_remark', e.target.value)}
+                                                                placeholder="Enter PC remark"
+                                                                rows={2}
                                                             />
                                                         </div>
                                                     </div>

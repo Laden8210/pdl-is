@@ -788,6 +788,23 @@ class ReportController extends Controller
         $total_detention_gcta_tastm_days = $totalDetentionDays + $totalGCTA + $totalTASTM;
         $total_detention_gcta_tastm_ymd = $this->convertDaysToYMDWithoutExtension($total_detention_gcta_tastm_days);
 
+        // get all time record and ascend by awarded_at
+        $timeRecords = $pdl->timeAllowances->sortBy('awarded_at');
+
+
+        $timeRecords = $timeRecords->map(function ($record) {
+            $documentPath = storage_path('app/public/' . $record->supporting_document);
+            if (file_exists($documentPath)) {
+                $base64Document = base64_encode(file_get_contents($documentPath));
+                $record->base64_document = $base64Document;
+            } else {
+                $record->base64_document = null;
+            }
+            return $record;
+        });
+
+
+
         $data = [
             'verification' => $verification,
             'pdl' => $pdl,
@@ -807,7 +824,7 @@ class ReportController extends Controller
             'convertDaysToYMD' => [$this, 'convertDaysToYMD'],
             'full_name' => $full_name,
             'position' => $position,
-            // New variables for the updated template
+            'time_records' => $timeRecords,
             'net_gcta_ymd' => $net_gcta_ymd,
             'net_tastm_ymd' => $net_tastm_ymd,
             'total_detention_gcta_ymd' => $total_detention_gcta_ymd,

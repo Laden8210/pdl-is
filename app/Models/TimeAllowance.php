@@ -14,6 +14,7 @@ class TimeAllowance extends Model
         'type',
         'days',
         'reason',
+        'supporting_document',
         'awarded_by',
         'awarded_at'
     ];

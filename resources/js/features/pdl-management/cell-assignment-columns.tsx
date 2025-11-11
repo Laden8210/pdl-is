@@ -1,14 +1,5 @@
 // Updated columns definition for cell assignments
 import type { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, ArrowRightLeft } from "lucide-react";
 import type { CellAssignment } from "@/types";
 import { TransferCell } from "./transfer-cell";
 
@@ -32,6 +23,11 @@ export const cell_assignment_columns: ColumnDef<CellAssignment>[] = [
   {
     accessorKey: "pdl_name",
     header: "PDL Name",
+  },
+  {
+    accessorKey: "pdl_classification",
+    header: "PDL Classification",
+    cell: ({ row }) => row.original.pdl_classification.replace(/\b\w/g, c => c.toUpperCase()),
   },
   {
     accessorKey: "assigned_date",

@@ -36,23 +36,27 @@ class CellAssignmentController extends Controller
             ->paginate($perPage);
 
         $cells = Cells::all();
+
+        // Update this query to include classification
         $pdls = Pdl::whereDoesntHave('assignments')
             ->whereHas('verifications', function ($query) {
                 $query->where('status', 'approved');
             })
-            ->get();
-
+            ->with(['cases'])
+            ->get()
+            ->map(function ($pdl) {
+                $pdl->classification = $pdl->highest_classification;
+                return $pdl;
+            });
 
 
         return Inertia::render('records-officer/pdl-management/cell-assignment', [
             'assignments' => $assignments->items(),
             'cells' => $cells,
             'pdls' => $pdls,
-
             'filters' => [
                 'search' => $search,
             ],
-
             'pagination' => [
                 'current_page' => $assignments->currentPage(),
                 'last_page' => $assignments->lastPage(),
@@ -70,16 +74,9 @@ class CellAssignmentController extends Controller
         ]);
 
         $cell = Cells::find($validated['cell_id']);
-        $currentOccupancy = CellAssignment::where('cell_id', $validated['cell_id'])->count();
-        $selectedPdlsCount = count($validated['pdl_ids']);
 
-        // Check capacity
-        if ($currentOccupancy + $selectedPdlsCount > $cell->capacity) {
-            $availableSpots = $cell->capacity - $currentOccupancy;
-            return back()->withErrors([
-                'cell_id' => "This cell only has {$availableSpots} available spot(s). You selected {$selectedPdlsCount} PDL(s)."
-            ]);
-        }
+
+
 
         $errors = [];
         $successfulAssignments = 0;
@@ -87,10 +84,18 @@ class CellAssignmentController extends Controller
         foreach ($validated['pdl_ids'] as $pdlId) {
             $pdl = Pdl::find($pdlId);
 
+
+
             // Check if PDL is already assigned
             $existingAssignment = CellAssignment::where('pdl_id', $pdlId)->first();
             if ($existingAssignment) {
                 $errors[] = "PDL {$pdl->fname} {$pdl->lname} is already assigned to a cell";
+                continue;
+            }
+
+            // Check classification compatibility
+            if (strtolower($cell->classification) !== strtolower($pdl->highest_classification)) {
+                $errors[] = "PDL {$pdl->fname} {$pdl->lname} (Classification: {$pdl->highest_classification}) cannot be assigned to {$cell->cell_name} (Classification: {$cell->classification})";
                 continue;
             }
 
@@ -108,14 +113,13 @@ class CellAssignmentController extends Controller
         }
 
         if ($successfulAssignments > 0) {
+
             $message = "Successfully assigned {$successfulAssignments} PDL(s) to the cell.";
             if (!empty($errors)) {
                 $message .= " Some assignments failed.";
             }
 
-            return redirect()->route('cell-assignments.index')
-                ->with('success', $message)
-                ->withErrors($errors);
+            return redirect()->back()->with('success', $message);
         }
 
         return back()->withErrors($errors);
@@ -178,15 +182,16 @@ class CellAssignmentController extends Controller
             return back()->withErrors(['to_cell_id' => 'Cannot transfer PDL to the same cell.']);
         }
 
-        // Check capacity of destination cell
-        $currentOccupancy = CellAssignment::where('cell_id', $validated['to_cell_id'])->count();
-        if ($currentOccupancy >= $toCell->capacity) {
-            return back()->withErrors(['to_cell_id' => 'Destination cell is at full capacity.']);
-        }
+
 
         // Check gender compatibility
         if (strtolower($assignment->pdl->gender) !== strtolower($toCell->gender)) {
             return back()->withErrors(['to_cell_id' => "PDL gender ({$assignment->pdl->gender}) does not match destination cell gender ({$toCell->gender})."]);
+        }
+
+        // Check classification compatibility
+        if (strtolower($assignment->pdl->highest_classification) !== strtolower($toCell->classification)) {
+            return back()->withErrors(['to_cell_id' => "PDL classification ({$assignment->pdl->highest_classification}) does not match destination cell classification ({$toCell->classification})."]);
         }
 
         // Start database transaction
@@ -233,7 +238,7 @@ class CellAssignmentController extends Controller
         if ($cellId) {
             $query->where(function ($q) use ($cellId) {
                 $q->where('from_cell_id', $cellId)
-                  ->orWhere('to_cell_id', $cellId);
+                    ->orWhere('to_cell_id', $cellId);
             });
         }
 
@@ -241,18 +246,18 @@ class CellAssignmentController extends Controller
         $query->when($search, function ($query, $search) {
             $query->whereHas('pdl', function ($q) use ($search) {
                 $q->where('fname', 'like', "%{$search}%")
-                  ->orWhere('lname', 'like', "%{$search}%");
+                    ->orWhere('lname', 'like', "%{$search}%");
             })
-            ->orWhereHas('fromCell', function ($q) use ($search) {
-                $q->where('cell_name', 'like', "%{$search}%");
-            })
-            ->orWhereHas('toCell', function ($q) use ($search) {
-                $q->where('cell_name', 'like', "%{$search}%");
-            })
-            ->orWhereHas('transferredBy', function ($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%");
-            });
+                ->orWhereHas('fromCell', function ($q) use ($search) {
+                    $q->where('cell_name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('toCell', function ($q) use ($search) {
+                    $q->where('cell_name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('transferredBy', function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%");
+                });
         });
 
         $transferLogs = $query->latest('transferred_at')->paginate($perPage);

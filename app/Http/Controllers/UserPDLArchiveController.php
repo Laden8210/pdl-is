@@ -67,6 +67,7 @@ class UserPDLArchiveController extends Controller
 
     public function unarchivePdl(Request $request, Pdl $pdl)
     {
+
         try {
             Log::info('Unarchive request for PDL ID: ' . $pdl->id);
             Log::info('PDL before unarchive:', $pdl->toArray());
@@ -84,6 +85,17 @@ class UserPDLArchiveController extends Controller
                 'cases.*.case_remarks' => 'nullable|string',
                 'cases.*.security_classification' => 'required|string|in:low,medium,high,maximum',
                 'cases.*.drug_related' => 'required|boolean',
+                'physical_appearances' => 'required|array|min:1',
+                'physical_appearances.*.height' => 'nullable|string|max:50',
+                'physical_appearances.*.weight' => 'nullable|string|max:50',
+                'physical_appearances.*.build' => 'nullable|string|max:100',
+                'physical_appearances.*.complexion' => 'nullable|string|max:100',
+                'physical_appearances.*.hair_color' => 'nullable|string|max:100',
+                'physical_appearances.*.eye_color' => 'nullable|string|max:100',
+                'physical_appearances.*.identification_marks' => 'nullable|string|max:1000',
+                'physical_appearances.*.mark_location' => 'nullable|string|max:255',
+                'physical_appearances.*.remark' => 'nullable|string|max:1000',
+                'physical_appearances.*.pc_remark' => 'nullable|string|max:1000',
             ]);
 
             // Start database transaction
@@ -111,6 +123,22 @@ class UserPDLArchiveController extends Controller
                     'case_remarks' => $caseData['case_remarks'] ?? '',
                     'security_classification' => $caseData['security_classification'],
                     'drug_related' => $caseData['drug_related'],
+                ]);
+            }
+
+            // Create new physical characteristic records
+            foreach ($validated['physical_appearances'] as $appearanceData) {
+                $pdl->physicalCharacteristics()->create([
+                    'height' => $appearanceData['height'] ?? null,
+                    'weight' => $appearanceData['weight'] ?? null,
+                    'build' => $appearanceData['build'] ?? null,
+                    'complexion' => $appearanceData['complexion'] ?? null,
+                    'hair_color' => $appearanceData['hair_color'] ?? null,
+                    'eye_color' => $appearanceData['eye_color'] ?? null,
+                    'identification_marks' => $appearanceData['identification_marks'] ?? null,
+                    'mark_location' => $appearanceData['mark_location'] ?? null,
+                    'remark' => $appearanceData['remark'] ?? null,
+                    'pc_remark' => $appearanceData['pc_remark'] ?? null,
                 ]);
             }
 

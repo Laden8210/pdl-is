@@ -21,6 +21,7 @@ interface PageProps {
             cell_id: number;
             cell_name: string;
             gender: 'male' | 'female';
+            classification: string;
         };
         pdl: {
             id: number;
@@ -43,6 +44,7 @@ export default function CellAssignment() {
     const { props } = usePage<PageProps>();
     const { auth } = props;
     const { assignments, cells, pdls, filters } = props;
+
     const [searchInput, setSearchInput] = useState(filters.search || '');
     const [genderFilter, setGenderFilter] = useState<string>('all');
 
@@ -55,6 +57,7 @@ export default function CellAssignment() {
         pdl_name: `${assignment.pdl.fname} ${assignment.pdl.mname || ''} ${assignment.pdl.lname} ${assignment.pdl.suffix || ''}`,
         pdl_gender: assignment.pdl.gender,
         assigned_date: assignment.created_at,
+        pdl_classification: assignment.cell.classification,
     }));
 
     // Filter assignments based on search and gender
@@ -94,6 +97,8 @@ export default function CellAssignment() {
             href: '/record-officer/pdl-management/cell-assignment',
         },
     ];
+
+    console.log('Filtered Assignments:', filteredAssignmentData); // Debug log to check filtered assignments
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

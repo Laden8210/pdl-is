@@ -35,6 +35,7 @@ export function CreateCellInformation() {
         cell_type: string;
         description: string;
         status: string;
+        classification: string;
     }>({
         cell_name: '',
         capacity: '',
@@ -42,6 +43,7 @@ export function CreateCellInformation() {
         cell_type: 'isolation',
         description: '',
         status: 'active',
+        classification: 'medium',
     });
 
     const { props } = usePage();
@@ -138,7 +140,7 @@ export function CreateCellInformation() {
                             </Select>
                         </div>
 
-                        <div className="md:col-span-2">
+                        <div className="md:col-span-1">
                             <Label htmlFor="cell_type">Cell Type</Label>
                             {/* isolation, female, male, trustee, kitchen boys */}
                             <Select value={data.cell_type} onValueChange={(value) => setData('cell_type', value)}>
@@ -151,6 +153,23 @@ export function CreateCellInformation() {
                                     <SelectItem value="male">Male</SelectItem>
                                     <SelectItem value="trustee">Trustee</SelectItem>
                                     <SelectItem value="kitchen boys">Kitchen Boys</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="md:col-span-1">
+                            <Label htmlFor="classification">Classification</Label>
+                            {/* maximum, high, medium, low */}
+                            <Select value={data.classification} onValueChange={(value) => setData('classification', value)}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select classification" />
+                                </SelectTrigger>
+                                <SelectContent>
+
+                                    <SelectItem value="maximum">Maximum</SelectItem>
+                                    <SelectItem value="high">High</SelectItem>
+                                    <SelectItem value="medium">Medium</SelectItem>
+                                    <SelectItem value="low">Low</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

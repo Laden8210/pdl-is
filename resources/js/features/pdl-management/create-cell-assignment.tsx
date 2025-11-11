@@ -17,6 +17,7 @@ interface CreateCellAssignmentProps {
 }
 
 export function CreateCellAssignment({ cells, pdls }: CreateCellAssignmentProps) {
+    console.log('PDLs received:', pdls); // Debug log to check PDLs data
     const [open, setOpen] = useState(false);
     const [selectedCell, setSelectedCell] = useState<string>('');
     const [selectedPdls, setSelectedPdls] = useState<number[]>([]);
@@ -42,7 +43,9 @@ export function CreateCellAssignment({ cells, pdls }: CreateCellAssignmentProps)
                 filtered = filtered.filter(pdl => {
                     // Convert PDL gender to lowercase to match cell gender format
                     const pdlGender = pdl.gender?.toLowerCase();
-                    return pdlGender === selectedCellData.gender;
+                    const pdlClassification = pdl.classification?.toLowerCase();
+
+                    return pdlGender === selectedCellData.gender ;
                 });
             }
         }
@@ -205,7 +208,7 @@ export function CreateCellAssignment({ cells, pdls }: CreateCellAssignmentProps)
                             <SelectContent>
                                 {compatibleCells.map((cell) => (
                                     <SelectItem key={cell.cell_id} value={cell.cell_id.toString()}>
-                                        {cell.cell_name} (Capacity: {cell.capacity}, Gender: {cell.gender})
+                                        {cell.cell_name} (Capacity: {cell.capacity}, Gender: {cell.gender}, Classification: {cell.classification})
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -252,7 +255,8 @@ export function CreateCellAssignment({ cells, pdls }: CreateCellAssignmentProps)
                                                 htmlFor={`pdl-${pdl.id}`}
                                                 className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                             >
-                                                {pdl.fname} {pdl.lname} (ID: {pdl.id}) {pdl.gender}
+                                                {pdl.fname} {pdl.lname} (ID: {pdl.id}) {pdl.gender} <br />
+                                                <span className="text-xs text-muted-foreground">Classification: {pdl.classification}</span>
                                             </label>
                                         </div>
                                     ))

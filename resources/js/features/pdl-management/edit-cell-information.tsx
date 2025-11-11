@@ -31,6 +31,7 @@ type Props = {
         description: string;
         status: string;
         cell_type?: string;
+        classification?: string;
     };
 };
 
@@ -43,6 +44,7 @@ export function UpdateCellInformation({ cell }: Props) {
         description: cell.description ?? '',
         status: cell.status,
         cell_type: cell.cell_type ?? 'isolation',
+        classification: cell.classification ?? 'medium',
     });
 
     const { props } = usePage<PageProps>();
@@ -144,7 +146,7 @@ export function UpdateCellInformation({ cell }: Props) {
                             </Select>
                         </div>
 
-                        <div className="md:col-span-2">
+                        <div className="md:col-span-1">
                             <Label htmlFor="description">Description</Label>
 
                             {/* isolation, female, male, trustee, kitchen boys */}
@@ -161,6 +163,24 @@ export function UpdateCellInformation({ cell }: Props) {
                                 </SelectContent>
                             </Select>
                         </div>
+
+                        <div className="md:col-span-1">
+                            <Label htmlFor="classification">Classification</Label>
+
+                            {/* maximum, high, medium, low */}
+                            <Select value={data.classification} onValueChange={(value) => setData('classification', value)}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select classification" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="maximum">Maximum</SelectItem>
+                                    <SelectItem value="high">High</SelectItem>
+                                    <SelectItem value="medium">Medium</SelectItem>
+                                    <SelectItem value="low">Low</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
                         <div className="md:col-span-2">
                             <Label htmlFor="description">Description</Label>
                             <Textarea id="description" name="description" value={data.description} onChange={(e) => setData('description', e.target.value)} rows={3}

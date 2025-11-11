@@ -60,6 +60,7 @@ export type CellAssignment = {
     cell_id: number;
     pdl_id: number;
     pdl_name: string;
+    pdl_classification?: string;
     assigned_date: string;
 };
 
@@ -76,6 +77,7 @@ export interface Cells {
     updated_at?: string;
     assignments?: CellAssignment[];
     assignments_count?: number;
+    classification?: 'high' | 'medium' | 'low' | null;
 }
 
 export interface Pdl {

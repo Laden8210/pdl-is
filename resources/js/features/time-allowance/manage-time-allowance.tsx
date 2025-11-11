@@ -31,9 +31,7 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
 
     // Get GCTA days based on years served
     const getGctaDays = () => {
-        const yearsServed = typeof pdl?.years_served === 'object'
-            ? pdl.years_served.years
-            : pdl?.years_served || 0;
+        const yearsServed = typeof pdl?.years_served === 'object' ? pdl.years_served.years : pdl?.years_served || 0;
 
         if (yearsServed >= 0 && yearsServed <= 2) return 20;
         if (yearsServed >= 3 && yearsServed <= 5) return 23;
@@ -46,6 +44,7 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
         type: 'gcta',
         days: getGctaDays(),
         reason: '',
+        supporting_document: null,
     });
 
     const submit: FormEventHandler = (e) => {
@@ -77,14 +76,17 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
             <DialogContent className="sm:max-w-[500px]">
                 <form id="time-allowance-form" onSubmit={submit}>
                     <DialogHeader>
-                        <DialogTitle>Manage Time Allowance for {pdl.fname} {pdl.lname}</DialogTitle>
+                        <DialogTitle>
+                            Manage Time Allowance for {pdl.fname} {pdl.lname}
+                        </DialogTitle>
                         <DialogDescription>
-                            Add time allowance days for Good Conduct Time Allowance (GCTA) or Time Allowance for Study, Teaching and Mentoring (TASTM).
+                            Add time allowance days for Good Conduct Time Allowance (GCTA) or Time Allowance for Study, Teaching and Mentoring
+                            (TASTM).
                         </DialogDescription>
                     </DialogHeader>
 
                     {Object.keys(errors).length > 0 && (
-                        <Alert variant="destructive" className="mb-4 mt-4">
+                        <Alert variant="destructive" className="mt-4 mb-4">
                             <AlertTitle>Unable to process request</AlertTitle>
                             <AlertDescription>
                                 {Object.values(errors).map((error, index) => (
@@ -103,39 +105,38 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
                         </Alert>
                     )}
 
-                    <div className="grid grid-cols-2 gap-4 mb-4 py-2">
-                        <div className="bg-blue-50 p-3 rounded-md border border-blue-200">
+                    <div className="mb-4 grid grid-cols-2 gap-4 py-2">
+                        <div className="rounded-md border border-blue-200 bg-blue-50 p-3">
                             <h3 className="text-sm font-medium text-blue-800">Current GCTA Days</h3>
                             <p className="text-2xl font-bold text-blue-900">{gctaDays}</p>
                         </div>
-                        <div className="bg-green-50 p-3 rounded-md border border-green-200">
+                        <div className="rounded-md border border-green-200 bg-green-50 p-3">
                             <h3 className="text-sm font-medium text-green-800">Current TASTM Days</h3>
                             <p className="text-2xl font-bold text-green-900">{tastmDays}</p>
                         </div>
                     </div>
 
                     {/* Years Served Information */}
-                    <div className="bg-gray-50 p-3 rounded-md border border-gray-200 mb-4">
+                    <div className="mb-4 rounded-md border border-gray-200 bg-gray-50 p-3">
                         <h3 className="text-sm font-medium text-gray-800">Years Served</h3>
                         <p className="text-lg font-semibold text-gray-900">
-                            {typeof pdl?.years_served === 'object'
-                                ? pdl.years_served.formatted
-                                : `${pdl?.years_served || 0} years`}
+                            {typeof pdl?.years_served === 'object' ? pdl.years_served.formatted : `${pdl?.years_served || 0} years`}
                         </p>
                         <div className="mt-2 text-xs text-gray-600">
-                            <p><strong>GCTA Default:</strong> {getGctaDays()} days per month (based on {typeof pdl?.years_served === 'object' ? pdl.years_served.years : pdl?.years_served || 0} years served)</p>
-                            <p><strong>TASTM Default:</strong> 15 days per month (fixed)</p>
+                            <p>
+                                <strong>GCTA Default:</strong> {getGctaDays()} days per month (based on{' '}
+                                {typeof pdl?.years_served === 'object' ? pdl.years_served.years : pdl?.years_served || 0} years served)
+                            </p>
+                            <p>
+                                <strong>TASTM Default:</strong> 15 days per month (fixed)
+                            </p>
                         </div>
                     </div>
 
                     <div className="grid gap-4 py-2">
                         <div className="grid gap-2">
                             <Label htmlFor="type">Allowance Type</Label>
-                            <Select
-                                value={data.type}
-                                onValueChange={handleTypeChange}
-                                required
-                            >
+                            <Select value={data.type} onValueChange={handleTypeChange} required>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select allowance type" />
                                 </SelectTrigger>
@@ -148,11 +149,7 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
 
                         <div className="grid gap-2">
                             <Label htmlFor="days">Days to Add</Label>
-                            <Select
-                                value={data.days.toString()}
-                                onValueChange={(value) => setData('days', parseInt(value))}
-                                required
-                            >
+                            <Select value={data.days.toString()} onValueChange={(value) => setData('days', parseInt(value))} required>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select days to add" />
                                 </SelectTrigger>
@@ -182,22 +179,46 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
                                 required
                             />
                         </div>
+
+                        <div className="grid gap-2 mb-2">
+                            <Label htmlFor="supporting_document">Supporting Document (optional)</Label>
+                            <div>
+                                <div className="mb-1 text-xs text-gray-600">
+                                    Upload a supporting document (e.g., approval letter, memorandum) if applicable.
+                                </div>
+                            </div>
+                            <div>
+
+                                <Input
+                                    type="file"
+                                    id="supporting_document"
+                                    name="supporting_document"
+                                    accept=".jpg,.jpeg,.png"
+                                    onChange={(e) => setData('supporting_document', e.target.files?.[0] || null)}
+                                />
+
+                                {data.supporting_document && (
+                                    <a
+                                        href={URL.createObjectURL(data.supporting_document)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="mt-2 inline-block text-sm text-blue-600 hover:underline"
+                                    >
+                                        Review Uploaded Document
+                                    </a>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     <DialogFooter>
-                        <div className="flex items-center justify-between w-full">
-
+                        <div className="flex w-full items-center justify-between">
                             <div className="flex gap-2">
                                 <DialogClose asChild>
                                     <Button variant="secondary">Cancel</Button>
                                 </DialogClose>
                                 <TimeAllowanceRecords pdl={pdl} records={records} />
-                                 <Button
-                                    type="submit"
-                                    form="time-allowance-form"
-                                    className="bg-blue-500 hover:bg-blue-600"
-                                    disabled={processing}
-                                >
+                                <Button type="submit" form="time-allowance-form" className="bg-blue-500 hover:bg-blue-600" disabled={processing}>
                                     {processing ? 'Adding...' : 'Add Allowance'}
                                 </Button>
                             </div>

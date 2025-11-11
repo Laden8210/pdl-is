@@ -18,7 +18,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     href: '/dashboard',
   },
   {
-    title: 'Document Verification',
+    title: 'PDL Transfer Requests',
     href: '/admin/verification',
   },
 ];
@@ -46,12 +46,12 @@ export default function VerificationList() {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Document Verification" />
+      <Head title="PDL Transfer Requests" />
 
       <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <h2 className="text-xl font-semibold">Document Verification Requests</h2>
+          <h2 className="text-xl font-semibold">PDL Transfer Requests</h2>
 
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex items-center gap-2">
