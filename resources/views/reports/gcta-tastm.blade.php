@@ -434,6 +434,39 @@
         {{ $pdl->gender == 'Male' ? 'him' : 'her' }} best.
     </div>
 
+    @if($time_records && $time_records->where('documents', '!=', null)->where('documents', '!=', [])->count() > 0)
+        <div style="margin: 30px 0; page-break-inside: avoid;">
+            <div style="font-weight: bold; margin-bottom: 15px; font-size: 12px;">Supporting Documents:</div>
+            @foreach($time_records as $record)
+                @if($record->documents && count($record->documents) > 0)
+                    <div style="margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; page-break-inside: avoid;">
+                        <div style="font-weight: bold; margin-bottom: 8px; font-size: 11px;">
+                            {{ strtoupper($record->type) }} - {{ $record->days }} days (Awarded: {{ \Carbon\Carbon::parse($record->awarded_at)->format('F j, Y') }})
+                        </div>
+                        <div style="font-size: 10px; margin-bottom: 5px; color: #666;">Reason: {{ $record->reason }}</div>
+                        <div style="margin-top: 10px;">
+                            @foreach($record->documents as $index => $doc)
+                                <div style="margin-bottom: 10px; page-break-inside: avoid;">
+                                    <div style="font-size: 10px; font-weight: bold; margin-bottom: 5px;">Document {{ $index + 1 }}: {{ $doc['filename'] }}</div>
+                                    @if(strpos($doc['mime_type'], 'image/') === 0)
+                                        <img src="data:{{ $doc['mime_type'] }};base64,{{ $doc['base64'] }}" 
+                                             alt="{{ $doc['filename'] }}" 
+                                             style="max-width: 100%; height: auto; border: 1px solid #ccc; margin-top: 5px;" />
+                                    @elseif($doc['mime_type'] === 'application/pdf')
+                                        <div style="padding: 10px; background-color: #f5f5f5; border: 1px solid #ccc; margin-top: 5px;">
+                                            <div style="font-size: 10px; color: #666;">PDF Document: {{ $doc['filename'] }}</div>
+                                            <div style="font-size: 9px; color: #999; margin-top: 3px;">(PDF files are embedded in the system)</div>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            @endforeach
+        </div>
+    @endif
+
     <div class="issued-text">
         Issued this {{ now()->format('jS') }} day of {{ now()->format('F Y') }}. Koronadal City, South Cotabato.
     </div>

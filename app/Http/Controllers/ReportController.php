@@ -22,14 +22,40 @@ class ReportController extends Controller
     {
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
+        $crimeCommitted = $request->input('crime_committed');
+        $age = $request->input('age');
+        $address = $request->input('address');
+        $rtc = $request->input('rtc');
 
-        $pdls = Pdl::with(['cases', 'personnel', 'courtOrders'])
+        $pdls = Pdl::with(['cases', 'personnel', 'courtOrders.court'])
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
                 return $query->whereHas('cases', function ($q) use ($startDate, $endDate) {
                     $q->whereBetween('date_committed', [
                         Carbon::parse($startDate)->startOfDay(),
                         Carbon::parse($endDate)->endOfDay()
                     ]);
+                });
+            })
+            ->when($crimeCommitted && $crimeCommitted !== 'all', function ($query) use ($crimeCommitted) {
+                return $query->whereHas('cases', function ($q) use ($crimeCommitted) {
+                    $q->where('crime_committed', $crimeCommitted);
+                });
+            })
+            ->when($age !== null && $age !== '' && $age !== 'all', function ($query) use ($age) {
+                return $query->where(function ($q) use ($age) {
+                    $q->whereRaw('TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) = ?', [$age]);
+                });
+            })
+            ->when($address && $address !== 'all', function ($query) use ($address) {
+                return $query->where(function ($q) use ($address) {
+                    $q->where('brgy', 'like', '%' . $address . '%')
+                      ->orWhere('city', 'like', '%' . $address . '%')
+                      ->orWhere('province', 'like', '%' . $address . '%');
+                });
+            })
+            ->when($rtc && $rtc !== 'all', function ($query) use ($rtc) {
+                return $query->whereHas('courtOrders.court', function ($q) use ($rtc) {
+                    $q->where('branch_code', $rtc);
                 });
             })
             ->whereHas('verifications', function ($query) {
@@ -52,11 +78,52 @@ class ReportController extends Controller
                 });
             });
 
+        // Get unique crime committed values
+        $crimes = CaseInformation::whereHas('pdl', function ($query) {
+            $query->whereHas('verifications', function ($q) {
+                $q->where('status', 'approved');
+            })->where('archive_status', '=', null);
+        })
+        ->distinct()
+        ->orderBy('crime_committed')
+        ->pluck('crime_committed')
+        ->filter()
+        ->values();
+
+        // Get unique addresses (cities and provinces)
+        $addresses = Pdl::whereHas('verifications', function ($query) {
+            $query->where('status', 'approved');
+        })
+        ->where('archive_status', '=', null)
+        ->where(function ($q) {
+            $q->whereNotNull('city')
+              ->orWhereNotNull('province')
+              ->orWhereNotNull('brgy');
+        })
+        ->get()
+        ->map(function ($pdl) {
+            $address = trim(($pdl->brgy ?? '') . ', ' . ($pdl->city ?? '') . ', ' . ($pdl->province ?? ''));
+            return $address === ', , ' ? null : $address;
+        })
+        ->filter()
+        ->unique()
+        ->sort()
+        ->values();
+
+        $courts = Court::orderBy('branch_code')->get();
+
         return Inertia::render('admin/report/list-of-pdl-reports', [
             'pdls' => $pdls,
+            'courts' => $courts,
+            'crimes' => $crimes,
+            'addresses' => $addresses,
             'filters' => [
                 'start_date' => $startDate,
-                'end_date' => $endDate
+                'end_date' => $endDate,
+                'crime_committed' => $crimeCommitted,
+                'age' => $age,
+                'address' => $address,
+                'rtc' => $rtc
             ]
         ]);
     }
@@ -66,19 +133,49 @@ class ReportController extends Controller
     {
         $request->validate([
             'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date'
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'crime_committed' => 'nullable|string',
+            'age' => 'nullable|integer',
+            'address' => 'nullable|string',
+            'rtc' => 'nullable|string'
         ]);
 
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
+        $crimeCommitted = $request->input('crime_committed');
+        $age = $request->input('age');
+        $address = $request->input('address');
+        $rtc = $request->input('rtc');
 
-        $pdls = Pdl::with(['cases', 'personnel', 'courtOrders'])
+        $pdls = Pdl::with(['cases', 'personnel', 'courtOrders.court'])
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
                 return $query->whereHas('cases', function ($q) use ($startDate, $endDate) {
                     $q->whereBetween('date_committed', [
                         Carbon::parse($startDate)->startOfDay(),
                         Carbon::parse($endDate)->endOfDay()
                     ]);
+                });
+            })
+            ->when($crimeCommitted && $crimeCommitted !== 'all', function ($query) use ($crimeCommitted) {
+                return $query->whereHas('cases', function ($q) use ($crimeCommitted) {
+                    $q->where('crime_committed', $crimeCommitted);
+                });
+            })
+            ->when($age !== null && $age !== '' && $age !== 'all', function ($query) use ($age) {
+                return $query->where(function ($q) use ($age) {
+                    $q->whereRaw('TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) = ?', [$age]);
+                });
+            })
+            ->when($address && $address !== 'all', function ($query) use ($address) {
+                return $query->where(function ($q) use ($address) {
+                    $q->where('brgy', 'like', '%' . $address . '%')
+                      ->orWhere('city', 'like', '%' . $address . '%')
+                      ->orWhere('province', 'like', '%' . $address . '%');
+                });
+            })
+            ->when($rtc && $rtc !== 'all', function ($query) use ($rtc) {
+                return $query->whereHas('courtOrders.court', function ($q) use ($rtc) {
+                    $q->where('branch_code', $rtc);
                 });
             })
             ->whereHas('verifications', function ($query) {
@@ -102,7 +199,7 @@ class ReportController extends Controller
             });
 
         if ($pdls->isEmpty()) {
-            return redirect()->back()->with('error', 'No records found for the selected date range.');
+            return redirect()->back()->with('error', 'No records found for the selected filters.');
         }
 
         // Generate PDF instead of CSV
@@ -112,6 +209,10 @@ class ReportController extends Controller
             'pdls' => $pdls,
             'startDate' => $startDate,
             'endDate' => $endDate,
+            'crimeCommitted' => $crimeCommitted,
+            'age' => $age,
+            'address' => $address,
+            'rtc' => $rtc,
             'generatedAt' => now()->format('Y-m-d H:i:s')
         ])->setPaper('a4', 'landscape');
 
@@ -793,13 +894,40 @@ class ReportController extends Controller
 
 
         $timeRecords = $timeRecords->map(function ($record) {
-            $documentPath = storage_path('app/public/' . $record->supporting_document);
-            if (file_exists($documentPath)) {
-                $base64Document = base64_encode(file_get_contents($documentPath));
-                $record->base64_document = $base64Document;
-            } else {
-                $record->base64_document = null;
+            $documents = [];
+            
+            // Handle both old format (string) and new format (array)
+            $supportingDocs = $record->supporting_document;
+            if (is_string($supportingDocs) && !empty($supportingDocs)) {
+                // Old format: single file path
+                $supportingDocs = [$supportingDocs];
+            } elseif (!is_array($supportingDocs)) {
+                $supportingDocs = [];
             }
+
+            // Process each document
+            foreach ($supportingDocs as $docPath) {
+                $documentPath = storage_path('app/public/' . $docPath);
+                if (file_exists($documentPath)) {
+                    $base64Document = base64_encode(file_get_contents($documentPath));
+                    $fileExtension = strtolower(pathinfo($docPath, PATHINFO_EXTENSION));
+                    $mimeType = 'image/jpeg'; // default
+                    if ($fileExtension === 'png') {
+                        $mimeType = 'image/png';
+                    } elseif ($fileExtension === 'pdf') {
+                        $mimeType = 'application/pdf';
+                    }
+                    
+                    $documents[] = [
+                        'base64' => $base64Document,
+                        'mime_type' => $mimeType,
+                        'filename' => basename($docPath),
+                        'path' => $docPath
+                    ];
+                }
+            }
+            
+            $record->documents = $documents;
             return $record;
         });
 

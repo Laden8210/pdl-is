@@ -21,6 +21,10 @@ class TimeAllowance extends Model
 
     protected $dates = ['awarded_at'];
 
+    protected $casts = [
+        'supporting_document' => 'array',
+    ];
+
     public function pdl()
     {
         return $this->belongsTo(Pdl::class);
