@@ -94,6 +94,7 @@ class TimeAllowanceController extends Controller
                                 'type' => $allowance->type,
                                 'days' => $allowance->days,
                                 'reason' => $allowance->reason,
+                                'supporting_document' => $allowance->supporting_document,
                                 'awarded_by' => $allowance->awarded_by,
                                 'awarded_at' => $allowance->awarded_at,
                                 'awardedBy' => $allowance->awardedBy ? [
@@ -115,13 +116,17 @@ class TimeAllowanceController extends Controller
             'type' => 'required|in:gcta,tastm',
             'days' => 'required|integer|min:0',
             'reason' => 'required|string',
-            'supporting_document' => 'nullable|file|mimes:jpg,jpeg,png|max:2048'
+            'supporting_documents' => 'nullable|array',
+            'supporting_documents.*' => 'file|mimes:jpg,jpeg,png'
         ]);
 
-        // check if supporting document is provided
-        if ($request->hasFile('supporting_document')) {
-            $file = $request->file('supporting_document');
-            $filePath = $file->store('time_allowance_documents', 'public');
+        $filePaths = [];
+
+        // Handle multiple supporting documents
+        if ($request->hasFile('supporting_documents')) {
+            foreach ($request->file('supporting_documents') as $file) {
+                $filePaths[] = $file->store('time_allowance_documents', 'public');
+            }
         }
 
         TimeAllowance::create([
@@ -129,7 +134,7 @@ class TimeAllowanceController extends Controller
             'type' => $request->type,
             'days' => $request->days,
             'reason' => $request->reason,
-            'supporting_document' => $filePath ?? null,
+            'supporting_document' => !empty($filePaths) ? $filePaths : null,
             'awarded_by' => auth()->id(),
             'awarded_at' => now()
         ]);

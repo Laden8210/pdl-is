@@ -169,6 +169,18 @@
             to
             {{ $endDate ? \Carbon\Carbon::parse($endDate)->format('F d, Y') : 'All Dates' }}
         </p>
+        @if(isset($crimeCommitted) && $crimeCommitted)
+            <p><strong>Crime Committed:</strong> {{ $crimeCommitted }}</p>
+        @endif
+        @if(isset($age) && $age)
+            <p><strong>Age:</strong> {{ $age }}</p>
+        @endif
+        @if(isset($address) && $address)
+            <p><strong>Address:</strong> {{ $address }}</p>
+        @endif
+        @if(isset($rtc) && $rtc)
+            <p><strong>Court Branch (RTC):</strong> {{ $rtc }}</p>
+        @endif
         <p><strong>Total Records:</strong> {{ count($pdls) }}</p>
         <p><strong>Generated On:</strong> {{ $generatedAt }}</p>
     </div>
@@ -194,7 +206,7 @@
                 $currentPdlId = null;
                 $pdlCaseCount = 0;
                 $pdlCases = [];
-                
+
                 // Group cases by PDL
                 foreach($pdls as $pdl) {
                     if (!isset($pdlCases[$pdl['pdl_id']])) {

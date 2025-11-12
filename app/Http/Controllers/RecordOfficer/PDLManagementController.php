@@ -16,6 +16,7 @@ use App\Models\Verifications;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use App\Models\Court;
+use App\Models\TransferReason;
 
 class PDLManagementController extends Controller
 {
@@ -333,13 +334,40 @@ class PDLManagementController extends Controller
             return redirect()->back()->with('error', 'PDL is already in verification.');
         }
 
-
+        // Save or update transfer reason
+        $this->saveTransferReason($validated['reason']);
 
         NotificationService::pdlTransferred($pdl, $validated['reason'], $user);
 
         $validated['personnel_id'] = $user->id;
         Verifications::create($validated);
         return redirect()->back()->with('success', 'PDL transferred successfully.');
+    }
+
+    public function getTransferReasons()
+    {
+        $reasons = TransferReason::orderBy('usage_count', 'desc')
+            ->orderBy('reason', 'asc')
+            ->pluck('reason')
+            ->toArray();
+
+        return response()->json($reasons);
+    }
+
+    private function saveTransferReason($reason)
+    {
+        $reason = trim($reason);
+        if (empty($reason)) {
+            return;
+        }
+
+        $transferReason = TransferReason::firstOrNew(['reason' => $reason]);
+        if ($transferReason->exists) {
+            $transferReason->increment('usage_count');
+        } else {
+            $transferReason->usage_count = 1;
+            $transferReason->save();
+        }
     }
 
     public function view_create()

@@ -44,13 +44,14 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
         type: 'gcta',
         days: getGctaDays(),
         reason: '',
-        supporting_document: null,
+        supporting_documents: [] as File[],
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route('admin.time-allowance.update', pdl.id), {
             preserveScroll: true,
+            forceFormData: true,
             onSuccess: () => {
                 reset();
             },
@@ -181,31 +182,56 @@ export function ManageTimeAllowance({ pdl, gctaDays, tastmDays, records }: Manag
                         </div>
 
                         <div className="grid gap-2 mb-2">
-                            <Label htmlFor="supporting_document">Supporting Document (optional)</Label>
+                            <Label htmlFor="supporting_documents">Supporting Documents (optional)</Label>
                             <div>
                                 <div className="mb-1 text-xs text-gray-600">
-                                    Upload a supporting document (e.g., approval letter, memorandum) if applicable.
+                                    Upload supporting documents (e.g., approval letter, memorandum). You can select multiple files (JPG, PNG).
                                 </div>
                             </div>
                             <div>
-
                                 <Input
                                     type="file"
-                                    id="supporting_document"
-                                    name="supporting_document"
+                                    id="supporting_documents"
+                                    name="supporting_documents"
                                     accept=".jpg,.jpeg,.png"
-                                    onChange={(e) => setData('supporting_document', e.target.files?.[0] || null)}
+                                    multiple
+                                    onChange={(e) => {
+                                        const files = Array.from(e.target.files || []);
+                                        setData('supporting_documents', files);
+                                    }}
                                 />
 
-                                {data.supporting_document && (
-                                    <a
-                                        href={URL.createObjectURL(data.supporting_document)}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="mt-2 inline-block text-sm text-blue-600 hover:underline"
-                                    >
-                                        Review Uploaded Document
-                                    </a>
+                                {data.supporting_documents && data.supporting_documents.length > 0 && (
+                                    <div className="mt-2 space-y-1">
+                                        {data.supporting_documents.map((file: File, index: number) => (
+                                            <div key={index} className="flex items-center gap-2 text-sm">
+                                                <a
+                                                    href={URL.createObjectURL(file)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 hover:underline"
+                                                >
+                                                    {file.name}
+                                                </a>
+                                                <span className="text-gray-500">
+                                                    ({(file.size / 1024).toFixed(2)} KB)
+                                                </span>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-6 px-2 text-xs"
+                                                    onClick={() => {
+                                                        const newFiles = [...data.supporting_documents];
+                                                        newFiles.splice(index, 1);
+                                                        setData('supporting_documents', newFiles);
+                                                    }}
+                                                >
+                                                    Remove
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
                             </div>
                         </div>

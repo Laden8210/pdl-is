@@ -215,6 +215,7 @@ Route::middleware(['auth', 'law.enforcement'])->prefix('law-enforcement')->group
     Route::get('/dashboard', [DashboardController::class, 'lawEnforcementDashboard'])->name('dashboard.law-enforcement');
     Route::get('/pdl-management/personal-information', [PDLManagementController::class, 'personal_information'])->name('pdl-management.personal-information');
     Route::post('/pdl-management/personal-information/transfer/', [PDLManagementController::class, 'transfer'])->name('pdl-management.transfer');
+    Route::get('/pdl-management/transfer-reasons', [PDLManagementController::class, 'getTransferReasons'])->name('pdl-management.transfer-reasons');
 
 
     Route::get('/pdl-management/personal-information/{pdl_id}', [PDLManagementController::class, 'view_update'])->name('pdl-management.personal-information.view');
